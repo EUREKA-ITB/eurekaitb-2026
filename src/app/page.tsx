@@ -58,29 +58,6 @@ export default function LandingPage() {
             <h2 className="font-display text-3xl sm:text-4xl font-bold">Timeline Kegiatan</h2>
             <p className="mt-3 text-silver-shine text-sm">Alur waktu pelaksanaan EUREKA ITB 2026</p>
           </div>
-
-          <div className="relative mt-10">
-            {/* The Connecting Line (Vertical on mobile, Horizontal on desktop) */}
-            <div className="absolute left-[15px] sm:left-1/2 sm:-ml-[1px] md:left-0 md:top-[24px] md:w-full md:h-[2px] w-[2px] h-full bg-white/10"></div>
-            
-            <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-4 relative z-10">
-              {timelineItems.map((item, index) => (
-                <div key={item.title} className="relative flex flex-col md:items-center pl-10 sm:pl-0 w-full group">
-                  {/* Node Circle */}
-                  <div className="absolute left-0 sm:left-1/2 sm:-ml-[8px] md:left-1/2 md:top-0 top-1 w-4 h-4 rounded-full bg-blue-marine border-2 border-sunlight-orange z-10 group-hover:scale-125 group-hover:bg-sunlight-orange transition-all duration-300"></div>
-                  
-                  {/* Content Box */}
-                  <div className="md:mt-12 md:text-center w-full sm:w-5/6 sm:mx-auto md:w-full">
-                    <span className="inline-block px-3 py-1 mb-3 text-xs font-bold text-blue-marine bg-sunlight-orange rounded-full shadow-[0_0_10px_rgba(255,184,0,0.2)]">
-                      {item.date}
-                    </span>
-                    <h3 className="font-display text-lg font-bold text-white mb-2">{item.title}</h3>
-                    <p className="text-xs sm:text-sm leading-relaxed text-silver-shine">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
