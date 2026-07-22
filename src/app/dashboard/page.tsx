@@ -61,7 +61,7 @@ export default async function DashboardPage() {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-white/10 pb-6 w-full box-border gap-4">
           <div>
             <Link href="/" className="font-display font-bold text-2xl text-white tracking-widest hover:text-sunlight-orange transition-colors block mb-2">
-              EUREKA<span className="text-sunlight-orange">2026</span>
+              EUREKA! <span className="text-sunlight-orange">ITB 2026</span>
             </Link>
             <h1 className="font-display text-2xl sm:text-3xl font-bold text-white mb-1">Portal Peserta Resmi</h1>
             <p className="text-silver-shine text-sm">Selamat datang, <span className="font-semibold text-white">{session.user.name}</span></p>
@@ -142,29 +142,21 @@ export default async function DashboardPage() {
                   </div>
                 </div>
 
-                {/* 2. AKSES RUANG KOMPETISI (DIBEDAKAN PER KOMPETISI) */}
+                {/* 2. AKSES RUANG KOMPETISI */}
                 <div className="lg:col-span-2 bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl">
                   <h2 className="font-display text-2xl font-bold text-white mb-6">Portal Ruang Lomba</h2>
                   
                   {userTeam[0].compeType === "physics_olympiad" ? (
-                    // TAMPILAN KHUSUS PHYSICS OLYMPIAD
+                    // TAMPILAN KHUSUS PHYSICS OLYMPIAD (SEKARANG CUMA ADA CBT)
                     <div className="space-y-6">
-                      {/* CARD AKSES CBT INDOLAT */}
                       <div className="bg-gradient-to-r from-blue-900/40 to-black/40 border border-white/10 rounded-2xl p-6">
-                        <h3 className="text-white font-bold mb-2">Penyisihan: Platform Ujian CBT</h3>
-                        <p className="text-sm text-silver-shine mb-4">Gunakan kredensial di bawah ini untuk mengakses platform ujian eksternal.</p>
+                        <h3 className="text-white font-bold mb-2">Penyisihan & Semifinal: Platform Ujian CBT</h3>
+                        <p className="text-sm text-silver-shine mb-4">Gunakan kredensial di bawah ini untuk mengakses platform ujian eksternal EUREKA.</p>
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">User:</p><p className="font-mono font-bold">{participantNumber}</p></div>
                           <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">Pass:</p><p className="font-mono font-bold">{cbtPassword}</p></div>
                         </div>
-                        <a href="https://cbt.indolat.com" target="_blank" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm">Masuk Platform Ujian</a>
-                      </div>
-
-                      {/* CARD SUBMISI SEMIFINAL (SCAN KERTAS) */}
-                      <div className="bg-black/30 border border-dashed border-white/20 rounded-2xl p-6 text-center">
-                        <p className="text-sm font-bold text-white mb-2">Semifinal: Submisi Berkas Scan</p>
-                        <p className="text-xs text-silver-shine mb-4">Unggah hasil scan kertas jawaban semifinal Anda di sini.</p>
-                        <Link href={`/competition/physics_olympiad/submit-semifinal`} className="bg-white/10 text-white px-6 py-2 rounded-lg text-sm">Buka Ruang Submisi</Link>
+                        <a href="https://cbt.indolat.com" target="_blank" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">Masuk Platform Ujian</a>
                       </div>
                     </div>
                   ) : (
@@ -175,7 +167,7 @@ export default async function DashboardPage() {
                       <p className="text-xs text-silver-shine mb-6 max-w-sm mx-auto">
                         Unggah dokumen teknis, proposal, atau laporan sesuai jadwal yang ditentukan.
                       </p>
-                      <Link href={`/competition/${userTeam[0].compeType}/submit`} className="bg-sunlight-orange text-blue-marine font-bold px-6 py-3 rounded-xl text-sm">
+                      <Link href={`/competition/${userTeam[0].compeType}/submit`} className="bg-sunlight-orange text-blue-marine font-bold px-6 py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">
                         Buka Ruang Submisi
                       </Link>
                     </div>
