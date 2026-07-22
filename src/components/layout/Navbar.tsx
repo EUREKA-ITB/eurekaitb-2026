@@ -122,46 +122,27 @@ export default function Navbar({ session }: { session: Session | null }) {
           <div className="lg:hidden absolute top-20 left-0 w-full md:w-[420px] bg-[#0a102b]/96 backdrop-blur-2xl border-b md:border-r md:border-b-0 border-white/10 shadow-2xl md:min-h-[calc(100vh-80px)] overflow-y-auto transition-all">
             <div className="p-6 md:p-8 flex flex-col h-full gap-6">
               
-              <div className="md:hidden">
-                {session ? (
-                  <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/10">
-                    <div className="flex items-center gap-4">
-                      {session.user?.image ? (
-                        <Image src={session.user.image} alt="User" width={48} height={48} unoptimized className="w-12 h-12 rounded-full border-2 border-sunlight-orange object-cover" />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-sunlight-orange text-blue-marine flex items-center justify-center font-bold text-xl">
-                          {session.user?.name?.charAt(0)}
-                        </div>
-                      )}
-                      <div className="text-left flex-1 overflow-hidden">
-                        <p className="text-silver-shine text-xs uppercase tracking-wider mb-1">Masuk sebagai</p>
-                        <p className="text-white font-bold text-lg leading-tight truncate">{session.user?.name}</p>
-                      </div>
-                    </div>
-                    {/* Tombol Logout Mobile */}
-                    <button 
-                      onClick={() => {
-                        setIsOpen(false);
-                        setIsLogoutModalOpen(true);
-                      }}
-                      className="flex items-center gap-2 text-sm font-bold text-maroon-flash hover:text-red-400 transition-colors ml-1"
-                      title="Keluar / Logout"
-                    >
-                      <LogOut size={18} /> Logout
-                    </button>
-                  </div>
-                ) : (
-                  <div className="pb-6 mb-6 border-b border-white/10">
-                    <Link 
-                      href="/login" 
-                      className="w-full flex justify-center py-3.5 bg-sunlight-orange text-blue-marine font-bold rounded-xl hover:bg-yellow-400 transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Sign In / Sign Up
-                    </Link>
-                  </div>
-                )}
-              </div>
+              <Link 
+                href="/#kontak" 
+                className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" 
+                onClick={() => setIsOpen(false)}
+              >
+                Narahubung & Sponsor
+              </Link>
+
+              <Link 
+                href="/help" 
+                className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" 
+                onClick={() => setIsOpen(false)}
+              >
+                FAQ & Helpdesk
+              </Link>
+            </div>
+            
+            {/* Footer Menu di Desktop Panel */}
+            <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">
+              © 2026 EUREKA ITB. All rights reserved.
+            </div>
 
               <div className="flex flex-col gap-3 flex-1">
                 {session && (
