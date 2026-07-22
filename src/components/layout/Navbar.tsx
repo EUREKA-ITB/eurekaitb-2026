@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { ChevronDown, LogOut, Menu, X, LayoutDashboard, Settings } from "lucide-react";
 import type { Session } from "next-auth";
-import LogoutModal from "./LogoutModal"; // Pastikan path ini benar
+import LogoutModal from "./LogoutModal";
 
 export default function Navbar({ session }: { session: Session | null }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -18,12 +18,10 @@ export default function Navbar({ session }: { session: Session | null }) {
   ];
 
   return (
-    // TAMBAHAN: Kita bungkus nav dan modal pakai React Fragment (<> ... </>)
     <>
       <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-blue-marine/85 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
           
-          {/* Kiri: Logo & Hamburger */}
           <div className="flex items-center gap-3 sm:gap-5 min-w-0">
             <button 
               onClick={() => setIsOpen(!isOpen)} 
@@ -41,7 +39,6 @@ export default function Navbar({ session }: { session: Session | null }) {
             </Link>
           </div>
 
-          {/* Kanan: Menu Desktop (lg:flex) */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3">
             <Link href="/" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Home</Link>
             
@@ -65,7 +62,6 @@ export default function Navbar({ session }: { session: Session | null }) {
             <Link href="/faq" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
             <Link href="/side-event" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Side Event</Link>
 
-            {/* Menu Tambahan Khusus Login */}
             {session && (
               <Link href="/dashboard" className="px-4 py-2 rounded-full text-sm font-bold text-sunlight-orange bg-sunlight-orange/10 hover:bg-sunlight-orange/20 transition-colors ml-1">
                 Dashboard
@@ -73,7 +69,6 @@ export default function Navbar({ session }: { session: Session | null }) {
             )}
 
             {session ? (
-              // Kapsul Profil dengan Ikon Settings
               <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1.5 pr-4 gap-3 ml-2 hover:bg-white/10 transition-colors">
                 <Link href="/dashboard" className="flex items-center gap-3 group" title="Buka Dashboard">
                   {session.user?.image ? (
@@ -88,19 +83,8 @@ export default function Navbar({ session }: { session: Session | null }) {
                     <span className="text-sm font-bold text-sunlight-orange leading-tight">{session.user?.name}</span>
                   </div>
                 </Link>
-                
                 <div className="w-px h-6 bg-white/20"></div>
-                
-                {/* Ikon Settings (Pengaturan Akun) */}
-                <Link 
-                  href="/settings" 
-                  className="text-silver-shine hover:text-white transition-colors"
-                  title="Pengaturan Akun"
-                >
-                  <Settings size={18} />
-                </Link>
-
-                {/* Ikon Keluar */}
+                <Link href="/settings" className="text-silver-shine hover:text-white transition-colors" title="Pengaturan Akun"><Settings size={18} /></Link>
                 <button 
                   onClick={() => setIsLogoutModalOpen(true)}
                   className="flex items-center gap-2 text-sm font-bold text-maroon-flash hover:text-red-400 transition-colors ml-1"
@@ -119,74 +103,58 @@ export default function Navbar({ session }: { session: Session | null }) {
 
         {/* Dropdown Mobile Menu */}
         {isOpen && (
-          <div className="lg:hidden absolute top-20 left-0 w-full md:w-[420px] bg-[#0a102b]/96 backdrop-blur-2xl border-b md:border-r md:border-b-0 border-white/10 shadow-2xl md:min-h-[calc(100vh-80px)] overflow-y-auto transition-all">
+          <div className="lg:hidden absolute top-20 left-0 w-full md:w-[420px] bg-[#0a102b]/96 backdrop-blur-2xl border-b border-white/10 shadow-2xl md:min-h-[calc(100vh-80px)] overflow-y-auto transition-all">
             <div className="p-6 md:p-8 flex flex-col h-full gap-6">
-              
-              <Link 
-                href="/#kontak" 
-                className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" 
-                onClick={() => setIsOpen(false)}
-              >
-                Narahubung & Sponsor
-              </Link>
-
-              <Link 
-                href="/help" 
-                className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" 
-                onClick={() => setIsOpen(false)}
-              >
-                FAQ & Helpdesk
-              </Link>
-            </div>
-            
-            {/* Footer Menu di Desktop Panel */}
-            <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">
-              © 2026 EUREKA ITB. All rights reserved.
-            </div>
+              <div className="md:hidden">
+                {session ? (
+                  <div className="flex items-center justify-between pb-6 mb-6 border-b border-white/10">
+                    <div className="flex items-center gap-4">
+                      {session.user?.image ? (
+                        <Image src={session.user.image} alt="User" width={48} height={48} unoptimized className="w-12 h-12 rounded-full border-2 border-sunlight-orange object-cover" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-sunlight-orange text-blue-marine flex items-center justify-center font-bold text-xl">{session.user?.name?.charAt(0)}</div>
+                      )}
+                      <div className="text-left flex-1 overflow-hidden">
+                        <p className="text-silver-shine text-xs uppercase tracking-wider mb-1">Masuk sebagai</p>
+                        <p className="text-white font-bold text-lg leading-tight truncate">{session.user?.name}</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => { setIsOpen(false); setIsLogoutModalOpen(true); }}
+                      className="flex items-center gap-2 text-sm font-bold text-maroon-flash hover:text-red-400 transition-colors ml-1"
+                    >
+                      <LogOut size={18} /> Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="pb-6 mb-6 border-b border-white/10">
+                    <Link href="/login" className="w-full flex justify-center py-3.5 bg-sunlight-orange text-blue-marine font-bold rounded-xl hover:bg-yellow-400 transition-colors" onClick={() => setIsOpen(false)}>Sign In / Sign Up</Link>
+                  </div>
+                )}
+              </div>
 
               <div className="flex flex-col gap-3 flex-1">
                 {session && (
                   <>
-                    <Link 
-                      href="/dashboard" 
-                      className="w-full text-left p-4 rounded-2xl font-bold text-blue-marine bg-sunlight-orange hover:bg-yellow-400 transition-colors shadow-lg flex justify-between items-center" 
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <LayoutDashboard size={18} />
-                        <span>Dashboard Peserta</span>
-                      </div>
-                      <span>→</span>
+                    <Link href="/dashboard" className="w-full text-left p-4 rounded-2xl font-bold text-blue-marine bg-sunlight-orange hover:bg-yellow-400 transition-colors shadow-lg flex justify-between items-center" onClick={() => setIsOpen(false)}>
+                      <div className="flex items-center gap-2"><LayoutDashboard size={18} /><span>Dashboard Peserta</span></div><span>→</span>
                     </Link>
-                    
-                    <Link 
-                      href="/settings" 
-                      className="w-full text-left p-4 rounded-2xl font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex justify-between items-center" 
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Settings size={18} />
-                        <span>Pengaturan Akun</span>
-                      </div>
+                    <Link href="/settings" className="w-full text-left p-4 rounded-2xl font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex justify-between items-center" onClick={() => setIsOpen(false)}>
+                      <div className="flex items-center gap-2"><Settings size={18} /><span>Pengaturan Akun</span></div>
                     </Link>
                   </>
                 )}
-
                 <p className="px-2 pt-2 mt-2 text-[10px] uppercase tracking-[0.35em] text-silver-shine">Navigation</p>
-                
                 <Link href="/" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Home</Link>
                 <Link href="/competition/physics_olympiad" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
-                <Link href="/competition/science_project" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Science Project</Link>
-                <Link href="/competition/industrial_case" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Industrial Case</Link>
                 <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
                 <Link href="/side-event" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
               </div>
+              <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>
             </div>
           </div>
         )}
       </nav>
-
-      {/* LETAKKAN MODAL DI LUAR NAV: Sekarang modal merdeka dari penjara blur nav-nya! */}
       <LogoutModal isOpen={isLogoutModalOpen} onClose={() => setIsLogoutModalOpen(false)} />
     </>
   );
