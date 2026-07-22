@@ -193,6 +193,14 @@ export default function Navbar({ session }: { session: Session | null }) {
               >
                 Narahubung & Sponsor
               </Link>
+
+              <Link 
+                href="/help" 
+                className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" 
+                onClick={() => setIsOpen(false)}
+              >
+                FAQ & Helpdesk
+              </Link>
             </div>
             
             {/* Footer Menu di Desktop Panel */}
