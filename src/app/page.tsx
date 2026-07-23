@@ -29,7 +29,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(255,184,0,0.15),_transparent_40%),linear-gradient(180deg,_rgba(5,10,31,0.1),_rgba(5,10,31,0.8))]"></div>
         <div className="max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-silver-shine shadow-[0_0_15px_rgba(255,184,0,0.1)]">
-            <Sparkles size={14} className="text-sunlight-orange" /> EUREKA! ITB 2026
+            EUREKA! ITB 2026
           </div>
           <h1 className="mt-8 font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
             Exploring Physics, <span className="text-sunlight-orange relative whitespace-nowrap">Racing Ideas<svg className="absolute -bottom-2 left-0 w-full text-sunlight-orange/40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="transparent"/></svg></span>,<br className="hidden sm:block" /> and Building Impact.
