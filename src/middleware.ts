@@ -49,9 +49,10 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    '/', // <--- TAMBAHKAN BARIS INI BIAR SIHIRNYA JALAN
     '/dashboard/:path*',
     '/settings/:path*',
     '/competition/:path*',
-    '/adm-se/:path*' // Daftarkan rute admin ke matcher
+    '/adm-se/:path*'
   ],
 };
