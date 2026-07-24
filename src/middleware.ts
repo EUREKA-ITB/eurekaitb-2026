@@ -6,14 +6,20 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hostname = request.nextUrl.hostname;
 
-  // SIHIR DOMAIN KHUSUS SIDE EVENT
-  if (hostname === 'side-event.eurekaitb.com' && path === '/') {
-    // Kalau ada yang buka domain ini, diam-diam langsung arahkan ke kamar /side-event
-    return NextResponse.rewrite(new URL('/side-event', request.url));
+  // 1. SIHIR DOMAIN KHUSUS SIDE EVENT (TRAP SYSTEM)
+  if (hostname === 'side-event.eurekaitb.com') {
+    // A. Kalau buka halaman utama, arahkan ke /side-event diam-diam
+    if (path === '/') {
+      return NextResponse.rewrite(new URL('/side-event', request.url));
+    }
+    // B. Kalau nyasar ke halaman lomba/lainnya, tendang balik ke halaman depan!
+    // (Kecuali halaman admin /adm-se dan file sistem bawaan Next.js)
+    if (!path.startsWith('/adm-se') && !path.startsWith('/_next') && !path.startsWith('/api')) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-  // ... (sisa kodingan middleware kamu di bawahnya tetap sama)
   // 1. Protected Routes (Peserta & Admin)
   const isProtectedPath = path.startsWith('/dashboard') || path.startsWith('/settings') || path.startsWith('/competition');
   if (isProtectedPath) {
