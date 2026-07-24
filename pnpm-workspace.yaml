@@ -1,7 +1,12 @@
 allowBuilds:
   esbuild: true
+<<<<<<< HEAD
   sharp: true
   unrs-resolver: true
+=======
+  sharp: false
+  unrs-resolver: false
+>>>>>>> main
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver

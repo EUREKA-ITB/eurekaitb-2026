@@ -4,7 +4,7 @@ import type { AdapterAccount } from "next-auth/adapters";
 // ==============================================================================
 // 1. ENUMS
 // ==============================================================================
-export const roleEnum = pgEnum("role", ["admin", "participant"]);
+export const roleEnum = pgEnum("role", ["admin", "admin_se", "participant"]);
 export const compeTypeEnum = pgEnum("compe_type", [
   "physics_olympiad",  
   "science_project",   
@@ -90,6 +90,23 @@ export const accounts = pgTable("account", {
 }, (account) => ({
   compoundKey: primaryKey({ columns: [account.provider, account.providerAccountId] }),
 }));
+
+// ==============================================================================
+// 7. SIDE EVENT BLOCKS (Advanced Linktree-style CMS)
+// ==============================================================================
+export const blockTypeEnum = pgEnum("block_type", ["link", "image", "text", "video"]);
+
+export const sideEventBlocks = pgTable("side_event_blocks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  type: blockTypeEnum("type").default("link").notNull(),
+  title: text("title"), // Digunakan untuk Judul Link ATAU Teks Paragraf
+  url: text("url"), // Digunakan untuk URL Tujuan, Link Gambar, atau Link YouTube
+  iconUrl: text("icon_url"), // Opsional: URL Icon untuk tipe link
+  isPrimary: boolean("is_primary").default(false).notNull(),
+  isActive: boolean("is_active").default(true).notNull(), // Untuk hide/show tanpa menghapus
+  orderIndex: integer("order_index").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 export const sessions = pgTable("session", {
   sessionToken: text("sessionToken").primaryKey(),
