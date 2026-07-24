@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Mail, ArrowLeft } from "lucide-react"; 
+import { ExternalLink, Mail } from "lucide-react"; 
 import { db } from "@/db"; 
 import { sideEventBlocks } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
@@ -10,14 +10,12 @@ export const revalidate = 0;
 const getDirectImageUrl = (url: string | null) => {
   if (!url) return "";
   
-  // Ngecek apakah ini link Google Drive
   const gDriveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (gDriveMatch && gDriveMatch[1]) {
-    // Trik terbaru: pakai server konten Google langsung biar nggak diblokir CORS
     return `https://lh3.googleusercontent.com/d/${gDriveMatch[1]}`;
   }
   
-  return url; // Kalau bukan Drive, biarin aja
+  return url; 
 };
 
 export default async function SideEventPage() {
@@ -33,9 +31,7 @@ export default async function SideEventPage() {
       
       <div className="w-full max-w-xl z-10 flex flex-col items-center">
         
-        <Link href="/" className="self-start inline-flex items-center text-silver-shine hover:text-white transition-colors text-sm font-semibold mb-8">
-          <ArrowLeft size={16} className="mr-2" /> Kembali ke Beranda
-        </Link>
+        {/* Tombol Kembali ke Beranda Sudah Dihapus */}
 
         <div className="w-24 h-24 bg-white/5 border border-white/20 rounded-full flex items-center justify-center mb-6 shadow-xl backdrop-blur-md">
            <span className="font-display font-bold text-2xl text-sunlight-orange">E26</span>
@@ -64,7 +60,6 @@ export default async function SideEventPage() {
               if (block.type === "image") {
                 return (
                   <div key={block.id} className="w-full rounded-2xl overflow-hidden border border-white/10 my-2 bg-black/20 flex justify-center">
-                    {/* IMPLEMENTASI FUNGSI AJAIB DI SINI */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={getDirectImageUrl(block.url)} alt={block.title || "EUREKA Image"} className="w-full h-auto object-cover" />
                   </div>
@@ -104,7 +99,6 @@ export default async function SideEventPage() {
                   
                   <div className="flex items-center gap-3 relative z-10 min-w-0 flex-1 pr-4">
                     {block.iconUrl ? (
-                      // IMPLEMENTASI FUNGSI AJAIB JUGA DI SINI (BUAT ICON)
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={getDirectImageUrl(block.iconUrl)} alt="Icon" className="w-6 h-6 object-contain shrink-0" />
                     ) : (

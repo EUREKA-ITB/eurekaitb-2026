@@ -6,21 +6,18 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hostname = request.nextUrl.hostname;
 
-  // 1. SIHIR DOMAIN KHUSUS SIDE EVENT (TRAP SYSTEM)
+  // 1. SIHIR DOMAIN KHUSUS SIDE EVENT (TRAP DIHAPUS, HANYA REWRITE HOME)
   if (hostname === 'side-event.eurekaitb.com') {
     // A. Kalau buka halaman utama, arahkan ke /side-event diam-diam
     if (path === '/') {
       return NextResponse.rewrite(new URL('/side-event', request.url));
     }
-    // B. Kalau nyasar ke halaman lomba/lainnya, tendang balik ke halaman depan!
-    // (Kecuali halaman admin /adm-se dan file sistem bawaan Next.js)
-    if (!path.startsWith('/adm-se') && !path.startsWith('/_next') && !path.startsWith('/api')) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+    // B. Aturan tendang balik (trap) sudah dihapus, user bebas klik Navbar!
   }
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-  // 1. Protected Routes (Peserta & Admin)
+  
+  // 2. Protected Routes (Peserta & Admin)
   const isProtectedPath = path.startsWith('/dashboard') || path.startsWith('/settings') || path.startsWith('/competition');
   if (isProtectedPath) {
     if (!token) {
@@ -30,7 +27,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Admin Routes (KHUSUS ADMIN SIDE EVENT & SUPER ADMIN)
+  // 3. Admin Routes (KHUSUS ADMIN SIDE EVENT & SUPER ADMIN)
   if (path.startsWith('/adm-se')) {
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url));
@@ -41,7 +38,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Competition Typo Protection
+  // 4. Competition Typo Protection
   const validCompetitions = ['physics_olympiad', 'science_project', 'industrial_case'];
   if (path.startsWith('/competition/')) {
     const category = path.split('/')[2];
@@ -55,7 +52,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/', // <--- TAMBAHKAN BARIS INI BIAR SIHIRNYA JALAN
+    '/', // Wajib ada agar sihir Side Event jalan di halaman utama
     '/dashboard/:path*',
     '/settings/:path*',
     '/competition/:path*',
