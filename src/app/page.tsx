@@ -1,7 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Navbar from "@/components/layout/Navbar";
-import Link from "next/link"; // <-- INI TAMBAHAN IMPORTNYA
+import Link from "next/link";
+import InteractiveTimeline from "@/components/InteractiveTimeline";
 
 export default async function LandingPage() {
   const session = await getServerSession(authOptions);
@@ -20,18 +21,15 @@ export default async function LandingPage() {
         </p>
       </section>
 
-      {/* TIMELINE SECTION (Bisa discroll ke pinggir) */}
+      {/* TIMELINE SECTION */}
       <section id="timeline" className="py-20 px-6 border-t border-white/10 overflow-hidden">
-        <h2 className="font-display text-4xl font-bold mb-10 text-center">Timeline Kegiatan</h2>
-        <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
-          {/* Card Timeline Sementara */}
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="min-w-[300px] bg-white/5 border border-white/10 p-6 rounded-2xl snap-center shrink-0">
-              <p className="text-sunlight-orange font-bold mb-2">Fase {item}</p>
-              <h3 className="text-2xl font-display font-semibold mb-2">Early Bird</h3>
-              <p className="text-silver-shine text-sm">Pendaftaran gelombang pertama dibuka dengan harga khusus.</p>
-            </div>
-          ))}
+        <h2 className="font-display text-4xl font-bold mb-10 text-center">
+          Timeline <span className="text-sunlight-orange">Kegiatan</span>
+        </h2>
+        
+        {/* Komponen Timeline Interaktif */}
+        <div className="max-w-6xl mx-auto">
+          <InteractiveTimeline />
         </div>
       </section>
 
@@ -46,7 +44,6 @@ export default async function LandingPage() {
               <h3 className="text-2xl font-display font-bold mb-2 text-sunlight-orange">Physics Olympiad</h3>
               <p className="text-silver-shine text-sm">Kompetisi individu untuk siswa SMA/MA/SMK sederajat menguji pemahaman fisika tingkat lanjut.</p>
             </div>
-            {/* <button> DIUBAH MENJADI <Link> */}
             <Link href="/competition/physics_olympiad" className="w-full md:w-auto px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-blue-marine transition-all font-semibold shrink-0 text-center block">
               Info Lengkap
             </Link>
@@ -58,7 +55,6 @@ export default async function LandingPage() {
               <h3 className="text-2xl font-display font-bold mb-2 text-sunlight-orange">Science Project</h3>
               <p className="text-silver-shine text-sm">Kompetisi beregu (2-3 orang) untuk SMA/sederajat dalam merancang proyek sains inovatif.</p>
             </div>
-            {/* <button> DIUBAH MENJADI <Link> */}
             <Link href="/competition/science_project" className="w-full md:w-auto px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-blue-marine transition-all font-semibold shrink-0 text-center block">
               Info Lengkap
             </Link>
@@ -70,7 +66,6 @@ export default async function LandingPage() {
               <h3 className="text-2xl font-display font-bold mb-2 text-sunlight-orange">Industrial Case</h3>
               <p className="text-silver-shine text-sm">Tantangan pemecahan masalah industri untuk Mahasiswa S1 beregu (2-3 orang).</p>
             </div>
-            {/* <button> DIUBAH MENJADI <Link> */}
             <Link href="/competition/industrial_case" className="w-full md:w-auto px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-blue-marine transition-all font-semibold shrink-0 text-center block">
               Info Lengkap
             </Link>
