@@ -1,18 +1,25 @@
-<<<<<<< HEAD
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import Navbar from "@/components/layout/Navbar";
-import Link from "next/link";
-import InteractiveTimeline from "@/components/InteractiveTimeline";
-=======
 import Link from "next/link";
 import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy } from "lucide-react";
->>>>>>> main
 
 const competitionCards = [
-  { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Babak kompetisi untuk peserta tunggal yang ingin menantang logika, konsep fisika, dan pemecahan masalah tingkat lanjut.", href: "/competition/physics_olympiad" },
-  { title: "Science Project", tagline: "Tim - SMA/Sederajat", description: "Format tim untuk presentasi proyek sains yang aplikatif, kreatif, dan relevan dengan isu nyata di sekitar peserta.", href: "/competition/science_project" },
-  { title: "Industrial Case", tagline: "Tim - Mahasiswa S1", description: "Cabang berbasis studi kasus industri dengan pendekatan analitis, strategis, dan presentasi solusi yang terstruktur.", href: "/competition/industrial_case" },
+  { 
+    title: "Physics Olympiad", 
+    tagline: "Individu - SMA/Sederajat", 
+    description: "Babak kompetisi untuk peserta tunggal yang ingin menantang logika, konsep fisika, dan pemecahan masalah tingkat lanjut.", 
+    href: "/competition/physics_olympiad" 
+  },
+  { 
+    title: "Science Project", 
+    tagline: "Tim - SMA/Sederajat", 
+    description: "Format tim untuk presentasi proyek sains yang aplikatif, kreatif, dan relevan dengan isu nyata di sekitar peserta.", 
+    href: "/competition/science_project" 
+  },
+  { 
+    title: "Industrial Case", 
+    tagline: "Tim - Mahasiswa S1", 
+    description: "Cabang berbasis studi kasus industri dengan pendekatan analitis, strategis, dan presentasi solusi yang terstruktur.", 
+    href: "/competition/industrial_case" 
+  },
 ];
 
 const timelineItems = [
@@ -23,40 +30,25 @@ const timelineItems = [
 ];
 
 const faqPreview = [
-  { q: "Apa saja cabang lombanya?", a: "Physics Olympiad untuk individu SMA, Science Project untuk tim SMA, dan Industrial Case untuk tim mahasiswa S1." },
-  { q: "Kapan pendaftaran ditutup?", a: "Ikuti timeline resmi di halaman utama dan setiap halaman kompetisi. Status terbaru akan selalu ditampilkan di portal ini." },
-  { q: "Di mana guidebook dan update diumumkan?", a: "Guidebook dan pengumuman utama bisa diakses dari halaman kompetisi, halaman side event, dan FAQ umum." },
+  { 
+    q: "Apa saja cabang lombanya?", 
+    a: "Physics Olympiad untuk individu SMA, Science Project untuk tim SMA, dan Industrial Case untuk tim mahasiswa S1." 
+  },
+  { 
+    q: "Kapan pendaftaran ditutup?", 
+    a: "Ikuti timeline resmi di halaman utama dan setiap halaman kompetisi. Status terbaru akan selalu ditampilkan di portal ini." 
+  },
+  { 
+    q: "Di mana guidebook dan update diumumkan?", 
+    a: "Guidebook dan pengumuman utama bisa diakses dari halaman kompetisi, halaman side event, dan FAQ umum." 
+  },
 ];
 
 export default function LandingPage() {
   return (
-<<<<<<< HEAD
-    <div className="min-h-screen bg-blue-marine text-white font-sans selection:bg-sunlight-orange selection:text-blue-marine">
-      <Navbar session={session} />
-
-      {/* HERO SECTION */}
-      <section className="pt-32 pb-20 px-6 flex flex-col items-center justify-center min-h-[80vh] text-center">
-        <h1 className="font-display text-5xl md:text-8xl font-extrabold mb-6 leading-tight">
-          Exploring <span className="text-sunlight-orange">Physics</span>
-        </h1>
-        <p className="text-silver-shine max-w-2xl text-lg md:text-xl mb-10">
-          Dari rasa ingin tahu menjadi dampak nyata. Bergabunglah dalam kompetisi sains dan fisika terbesar tahun ini untuk SMA dan Mahasiswa tingkat nasional.
-        </p>
-      </section>
-
-      {/* TIMELINE SECTION */}
-      <section id="timeline" className="py-20 px-6 border-t border-white/10 overflow-hidden">
-        <h2 className="font-display text-4xl font-bold mb-10 text-center">
-          Timeline <span className="text-sunlight-orange">Kegiatan</span>
-        </h2>
-        
-        {/* Komponen Timeline Interaktif */}
-        <div className="max-w-6xl mx-auto">
-          <InteractiveTimeline />
-=======
     <div className="min-h-screen overflow-x-hidden text-white selection:bg-sunlight-orange selection:text-blue-marine">
       
-      {/* 1. HERO SECTION - Clean, Center-aligned, No bulky cards */}
+      {/* 1. HERO SECTION */}
       <section className="relative isolate pt-32 pb-24 px-4 sm:px-6 flex flex-col items-center text-center">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(255,184,0,0.15),_transparent_40%),linear-gradient(180deg,_rgba(5,10,31,0.1),_rgba(5,10,31,0.8))]"></div>
         <div className="max-w-4xl mx-auto">
@@ -77,54 +69,35 @@ export default function LandingPage() {
               FAQ Umum
             </Link>
           </div>
->>>>>>> main
         </div>
       </section>
 
-      {/* 2. TIMELINE SECTION - Horizontal connected line layout (MCF Style) */}
+      {/* 2. TIMELINE SECTION (Bawaan Asli Main) */}
       <section id="timeline" className="px-4 sm:px-6 py-20 border-t border-white/5 bg-black/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center justify-center rounded-full bg-sunlight-orange/10 p-3 mb-4">
               <CalendarDays className="text-sunlight-orange" size={24} />
             </div>
-<<<<<<< HEAD
-            <Link href="/competition/physics_olympiad" className="w-full md:w-auto px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-blue-marine transition-all font-semibold shrink-0 text-center block">
-              Info Lengkap
-            </Link>
-          </div>
-          
-          {/* Lomba 2 */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:bg-white/10 transition-colors">
-            <div className="flex-1">
-              <h3 className="text-2xl font-display font-bold mb-2 text-sunlight-orange">Science Project</h3>
-              <p className="text-silver-shine text-sm">Kompetisi beregu (2-3 orang) untuk SMA/sederajat dalam merancang proyek sains inovatif.</p>
-            </div>
-            <Link href="/competition/science_project" className="w-full md:w-auto px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-blue-marine transition-all font-semibold shrink-0 text-center block">
-              Info Lengkap
-            </Link>
-          </div>
-          
-          {/* Lomba 3 */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:bg-white/10 transition-colors">
-            <div className="flex-1">
-              <h3 className="text-2xl font-display font-bold mb-2 text-sunlight-orange">Industrial Case</h3>
-              <p className="text-silver-shine text-sm">Tantangan pemecahan masalah industri untuk Mahasiswa S1 beregu (2-3 orang).</p>
-            </div>
-            <Link href="/competition/industrial_case" className="w-full md:w-auto px-8 py-3 rounded-full border border-white/20 hover:bg-white hover:text-blue-marine transition-all font-semibold shrink-0 text-center block">
-              Info Lengkap
-            </Link>
-          </div>
-
-=======
             <h2 className="font-display text-3xl sm:text-4xl font-bold">Timeline Kegiatan</h2>
             <p className="mt-3 text-silver-shine text-sm">Alur waktu pelaksanaan EUREKA ITB 2026</p>
           </div>
->>>>>>> main
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {timelineItems.map((item, index) => (
+              <div key={index} className="relative rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:border-sunlight-orange/30 hover:bg-white/10">
+                <span className="text-xs font-bold text-sunlight-orange tracking-widest uppercase">
+                  {item.date}
+                </span>
+                <h3 className="mt-2 text-xl font-bold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm text-silver-shine leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* 3. COMPETITIONS SECTION - Sleek glassmorphism grid */}
+      {/* 3. COMPETITIONS SECTION */}
       <section id="lomba" className="px-4 sm:px-6 py-20 relative isolate">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.03),_transparent_40%)]"></div>
         <div className="max-w-7xl mx-auto">
@@ -160,7 +133,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. SIDE EVENT SECTION - Streamlined Banner Style */}
+      {/* 4. SIDE EVENT SECTION */}
       <section id="side-event" className="px-4 sm:px-6 py-12">
         <div className="max-w-7xl mx-auto rounded-3xl border border-sunlight-orange/20 bg-gradient-to-r from-sunlight-orange/10 to-transparent p-8 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-sunlight-orange/10 rounded-full blur-3xl"></div>
@@ -178,7 +151,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. PREVIEW FAQ SECTION - Clean Accordion */}
+      {/* 5. PREVIEW FAQ SECTION */}
       <section className="px-4 sm:px-6 py-16 mb-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6 mb-8">
