@@ -1,24 +1,39 @@
-import React from 'react';
+import React from "react";
 
-// Data dummy jadwal acara
 const timelineEvents = [
   {
     id: 1,
-    fase: "Fase 1",
     date: "10 Agustus 2026",
     title: "Pendaftaran Buka",
-    description: "Pembukaan pendaftaran gelombang pertama peserta EUREKA! ITB 2026.",
+    description:
+      "Pembukaan pendaftaran gelombang pertama peserta EUREKA! ITB 2026.",
   },
   {
     id: 2,
-    fase: "Fase 2",
     date: "25 Agustus 2026",
     title: "Babak Penyisihan",
     description: "Penyisihan tahap awal yang dilaksanakan secara daring.",
   },
   {
     id: 3,
-    fase: "Fase 3",
+    date: "15 September 2026",
+    title: "Grand Final & Exhibition",
+    description: "Puncak acara EUREKA! ITB 2026 dan pengumuman pemenang.",
+  },
+   {
+    id: 3,
+    date: "15 September 2026",
+    title: "Grand Final & Exhibition",
+    description: "Puncak acara EUREKA! ITB 2026 dan pengumuman pemenang.",
+  },
+   {
+    id: 3,
+    date: "15 September 2026",
+    title: "Grand Final & Exhibition",
+    description: "Puncak acara EUREKA! ITB 2026 dan pengumuman pemenang.",
+  },
+   {
+    id: 3,
     date: "15 September 2026",
     title: "Grand Final & Exhibition",
     description: "Puncak acara EUREKA! ITB 2026 dan pengumuman pemenang.",
@@ -27,22 +42,31 @@ const timelineEvents = [
 
 export default function InteractiveTimeline() {
   return (
-    <div className="w-full max-w-4xl mx-auto py-6 px-4">
-      {/* Alur Garis Timeline */}
-      <div className="relative border-l-2 border-sunlight-orange/50 ml-4 md:ml-32 space-y-8">
+    <div className="w-full pt-8 pb-4">
+      {/* Scrollbar disembunyikan menggunakan kelas hide-scrollbar &[&::-webkit-scrollbar]:hidden [scrollbar-width:none] */}
+      <div className="flex flex-row gap-6 overflow-x-auto pt-6 pb-6 px-4 hide-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {timelineEvents.map((event) => (
-          <div key={event.id} className="relative pl-6 md:pl-8 group">
-            {/* Titik Penanda (Dot) */}
-            <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-sunlight-orange border-4 border-blue-marine group-hover:scale-125 transition-transform duration-200" />
+          <div
+            key={event.id}
+            className="min-w-[280px] md:min-w-[320px] flex-1 shrink-0 flex flex-col"
+          >
+            {/* Tanggal & Titik Penanda */}
+            <div className="relative flex items-center mb-4">
+              {/* Garis Horizontal Menyambung */}
+              <div className="absolute left-0 right-0 h-[2px] bg-sunlight-orange/40" />
 
-            {/* Tanggal */}
-            <span className="text-sm font-semibold text-sunlight-orange block mb-1">
-              {event.date}
-            </span>
+              {/* Titik Penanda (Dot) Oranye/Kuning */}
+              <div className="relative z-10 w-4 h-4 rounded-full bg-sunlight-orange border-2 border-blue-marine shrink-0" />
 
-            {/* Kartu Konten (Transparan sesuai tema) */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-sm hover:bg-white/10 hover:border-sunlight-orange/50 hover:-translate-y-1 transition-all duration-300">
-              <h3 className="text-xl font-display font-bold text-white mb-2">
+              {/* Tanggal di Samping Titik */}
+              <span className="relative z-10 ml-3 text-xs md:text-sm font-semibold text-sunlight-orange bg-blue-marine px-2 py-0.5 rounded">
+                {event.date}
+              </span>
+            </div>
+
+            {/* Kartu Konten */}
+            <div className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-md hover:border-sunlight-orange/50 hover:bg-white/10 transition-all duration-300 flex-1 shadow-lg">
+              <h3 className="text-xl font-bold text-white mb-2 font-display">
                 {event.title}
               </h3>
               <p className="text-silver-shine text-sm leading-relaxed">

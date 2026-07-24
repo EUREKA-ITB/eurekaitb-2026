@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy } from "lucide-react";
+// 1. Impor komponen InteractiveTimeline milikmu
+import InteractiveTimeline from "@/components/InteractiveTimeline";
 
 const competitionCards = [
   { 
@@ -20,13 +22,6 @@ const competitionCards = [
     description: "Cabang berbasis studi kasus industri dengan pendekatan analitis, strategis, dan presentasi solusi yang terstruktur.", 
     href: "/competition/industrial_case" 
   },
-];
-
-const timelineItems = [
-  { date: "Nov 2025", title: "Launch & Registration", desc: "Pendaftaran dibuka dan guidebook mulai diumumkan." },
-  { date: "Feb 2026", title: "Screening & Admin Check", desc: "Verifikasi biodata, administrasi, dan kelengkapan dokumen." },
-  { date: "Mar 2026", title: "Preliminary Round", desc: "Babak awal kompetisi dilaksanakan sesuai cabang masing-masing." },
-  { date: "Apr 2026", title: "Announcement Stage", desc: "Pengumuman hasil, daftar lolos, dan arahan tahap selanjutnya." },
 ];
 
 const faqPreview = [
@@ -72,28 +67,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 2. TIMELINE SECTION (Bawaan Asli Main) */}
-      <section id="timeline" className="px-4 sm:px-6 py-20 border-t border-white/5 bg-black/20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center rounded-full bg-sunlight-orange/10 p-3 mb-4">
-              <CalendarDays className="text-sunlight-orange" size={24} />
-            </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold">Timeline Kegiatan</h2>
-            <p className="mt-3 text-silver-shine text-sm">Alur waktu pelaksanaan EUREKA ITB 2026</p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {timelineItems.map((item, index) => (
-              <div key={index} className="relative rounded-2xl border border-white/10 bg-white/5 p-6 transition-all hover:border-sunlight-orange/30 hover:bg-white/10">
-                <span className="text-xs font-bold text-sunlight-orange tracking-widest uppercase">
-                  {item.date}
-                </span>
-                <h3 className="mt-2 text-xl font-bold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm text-silver-shine leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
+      {/* 2. TIMELINE SECTION (Memanggil Komponen InteractiveTimeline Kamu) */}
+      {/* TIMELINE SECTION */}
+      <section id="timeline" className="py-20 px-6 border-t border-white/10">
+        <h2 className="font-display text-4xl font-bold mb-6 text-center">
+          Timeline <span className="text-sunlight-orange">Kegiatan</span>
+        </h2>
+        
+        {/* Komponen Timeline Interaktif */}
+        <div className="max-w-6xl mx-auto">
+          <InteractiveTimeline />
         </div>
       </section>
 

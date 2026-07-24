@@ -166,3 +166,13 @@ body {
 .goog-te-gadget-icon { 
     display: none !important; 
 }
+/* Sembunyikan scrollbar untuk Chrome, Safari, dan Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sembunyikan scrollbar untuk IE, Edge, dan Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
