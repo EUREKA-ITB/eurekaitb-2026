@@ -97,7 +97,7 @@ export default function SiteFooter() {
                   <a href="#" aria-label="X EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <XIcon />
                   </a>
-                  <a href="#" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
+                  <a href="https://www.linkedin.com/company/eureka-itb" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <LinkedinIcon />
                   </a>
                   <a href="#" aria-label="TikTok EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">

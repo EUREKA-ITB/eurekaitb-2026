@@ -33,12 +33,16 @@ export default async function SideEventPage() {
         
         {/* Tombol Kembali ke Beranda Sudah Dihapus */}
 
-        <div className="w-24 h-24 bg-white/5 border border-white/20 rounded-full flex items-center justify-center mb-6 shadow-xl backdrop-blur-md">
-           <span className="font-display font-bold text-2xl text-sunlight-orange">E26</span>
+        <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-xl backdrop-blur-md overflow-hidden">
+           <img 
+             src="/side-event/PP-SE-2.png" 
+             alt="Profile Side Event" 
+             className="w-full h-full object-cover"
+           />
         </div>
         <h1 className="font-display text-3xl font-bold mb-2 tracking-widest text-center uppercase">Side Event</h1>
         <p className="text-silver-shine text-sm mb-10 text-center max-w-sm leading-relaxed">
-          EUREKA! ITB 2026 Mini Competition. Dari rasa ingin tahu menjadi dampak nyata.
+          EUREKA! ITB 2026 Mini Competition.  
         </p>
 
         <div className="w-full flex flex-col gap-4 mb-12">
@@ -121,7 +125,7 @@ export default async function SideEventPage() {
           <a href="https://instagram.com/eurekaitb" target="_blank" rel="noreferrer" className="p-3 bg-white/5 rounded-full hover:bg-white/10 hover:text-sunlight-orange transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
           </a>
-          <a href="#" className="p-3 bg-white/5 rounded-full hover:bg-white/10 hover:text-sunlight-orange transition-colors">
+          <a href="https://www.linkedin.com/company/eureka-itb" className="p-3 bg-white/5 rounded-full hover:bg-white/10 hover:text-sunlight-orange transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
           </a>
           <a href="mailto:officialeurekaitb@gmail.com" className="p-3 bg-white/5 rounded-full hover:bg-white/10 hover:text-sunlight-orange transition-colors">

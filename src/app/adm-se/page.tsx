@@ -31,8 +31,7 @@ export default async function AdminSideEventPage() {
             <div>
               <h3 className="font-bold text-blue-400 text-sm mb-1">Penting: Aturan Upload Gambar & Ikon</h3>
               <p className="text-silver-shine text-sm leading-relaxed">
-                Google Drive seringkali memblokir akses <i>direct image</i>. 
-                Agar gambar/ikon pasti muncul, mohon <i>upload</i> file Anda ke <i>hosting</i> gambar gratis seperti <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Postimages</a> atau <a href="https://imgbb.com/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Imgbb</a>. Kemudian salin <strong>Direct Link</strong> (yang berakhiran <code>.png</code> / <code>.jpg</code> / <code>.webp</code>) dan tempel URL tersebut ke form di bawah.
+                Jika gambar yang di-upload melalui Google Drive tidak muncul di halaman side-event, anda bisa <i>upload</i> file Anda ke <i>hosting</i> gambar gratis seperti <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Postimages</a> atau <a href="https://imgbb.com/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Imgbb</a>. Kemudian salin <strong>Direct Link</strong> (yang berakhiran <code>.png</code> / <code>.jpg</code> / <code>.webp</code>) dan tempel URL tersebut ke form di bawah.
                 Pastikan gambar yang diunggah berukuran maksimal 2MB agar tidak memperlambat halaman saat loading.
               </p>
             </div>
