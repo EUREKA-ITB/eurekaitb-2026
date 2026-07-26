@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hostname = request.nextUrl.hostname;
 
-  // 1. DOMAIN KHUSUS SIDE EVENT (TRAP DIHAPUS, HANYA REWRITE HOME)
+  // 1. DOMAIN KHUSUS MINI COMPETITION (TRAP DIHAPUS, HANYA REWRITE HOME)
   if (hostname === 'mini-competition.eurekaitb.com') {
-    // A. Kalau buka halaman utama, arahkan ke /side-event diam-diam
+    // Kalau buka halaman utama, arahkan ke /mini-competition diam-diam
     if (path === '/') {
-      return NextResponse.rewrite(new URL('/side-event', request.url));
+      return NextResponse.rewrite(new URL('/mini-competition', request.url));
     }
   }
 
