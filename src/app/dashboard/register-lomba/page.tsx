@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
 
-// 1. Definisikan Struktur Tipe Data yang Ketat
 interface CloudinaryResult {
   info?: string | {
     secure_url?: string;
@@ -63,7 +62,6 @@ export default function RegisterLombaPage() {
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [lockedCompeName, setLockedCompeName] = useState<string>("");
 
-  // 2. FETCH DATA LAMA JIKA ADA (Fitur Edit)
   useEffect(() => {
     const fetchExistingData = async () => {
       try {
@@ -72,7 +70,6 @@ export default function RegisterLombaPage() {
           const data = await response.json();
           
           if (data && data.team) {
-            // PROTEKSI KUNCI FORM JIKA SUDAH BAYAR/LUNAS
             if (data.team.statusPayment !== "unpaid") {
               setIsLocked(true);
               setLockedCompeName(data.team.compeType.replace("_", " "));
@@ -135,7 +132,6 @@ export default function RegisterLombaPage() {
     
     setFormData((prev) => {
       const currentLeader = prev.members[0] || createEmptyMember(true);
-      // Reset isian grade karena pilihan SMA/Mahasiswa berbeda
       currentLeader.grade = ""; 
       
       let newMembers: MemberInput[] = [currentLeader];
@@ -144,7 +140,6 @@ export default function RegisterLombaPage() {
         if (prev.members.length < 2) {
           newMembers.push(createEmptyMember(false));
         } else {
-          // Reset grade anggota lain juga
           newMembers = prev.members.map(m => ({...m, grade: ""}));
         }
       }
@@ -187,7 +182,6 @@ export default function RegisterLombaPage() {
     setIsSaving(true);
 
     try {
-      // Validasi Ekstra Ketat
       const hasMissingPhotos = formData.members.some((m) => m.photoUrl === "");
       const hasMissingKTM = formData.members.some((m) => m.ktmUrl === "");
       const hasMissingIgLink = formData.members.some((m) => m.igAccountLink.trim() === "");
@@ -234,7 +228,6 @@ export default function RegisterLombaPage() {
     );
   }
 
-  // TAMPILAN JIKA FORM TERKUNCI (Sudah Bayar/Lunas)
   if (isLocked) {
     return (
       <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 flex items-center justify-center box-border">

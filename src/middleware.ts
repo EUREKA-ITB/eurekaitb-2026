@@ -6,13 +6,12 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hostname = request.nextUrl.hostname;
 
-  // 1. SIHIR DOMAIN KHUSUS SIDE EVENT (TRAP DIHAPUS, HANYA REWRITE HOME)
-  if (hostname === 'side-event.eurekaitb.com') {
-    // A. Kalau buka halaman utama, arahkan ke /side-event diam-diam
+  // 1. DOMAIN KHUSUS MINI COMPETITION (TRAP DIHAPUS, HANYA REWRITE HOME)
+  if (hostname === 'mini-competition.eurekaitb.com') {
+    // Kalau buka halaman utama, arahkan ke /mini-competition diam-diam
     if (path === '/') {
-      return NextResponse.rewrite(new URL('/side-event', request.url));
+      return NextResponse.rewrite(new URL('/mini-competition', request.url));
     }
-    // B. Aturan tendang balik (trap) sudah dihapus, user bebas klik Navbar!
   }
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
@@ -27,7 +26,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Admin Routes (KHUSUS ADMIN SIDE EVENT & SUPER ADMIN)
+  // 3. Admin Routes (KHUSUS ADMIN SIDE EVENT & ADMIN UTAMA)
   if (path.startsWith('/adm-se')) {
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url));
@@ -52,7 +51,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/', // Wajib ada agar sihir Side Event jalan di halaman utama
+    '/', 
     '/dashboard/:path*',
     '/settings/:path*',
     '/competition/:path*',

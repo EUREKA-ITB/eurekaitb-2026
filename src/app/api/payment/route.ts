@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const { teamId, paymentUrl } = await req.json();
     if (!teamId || !paymentUrl) return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 });
 
-    // 1. Simpan/Update Dokumen Bukti Bayar
+    // 1. Save bukti payment
     const existingDoc = await db.select().from(documents).where(eq(documents.teamId, teamId)).limit(1);
     if (existingDoc.length > 0) {
       await db.update(documents).set({ urlPayment: paymentUrl }).where(eq(documents.teamId, teamId));
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
       await db.insert(documents).values({ teamId: teamId, urlIdentitas: null, urlPayment: paymentUrl });
     }
 
-    // 2. MENGUBAH STATUS PESERTA MENJADI 'PENDING'
+    // 2. STATUS 'PENDING'
     await db.update(teams).set({ statusPayment: "pending" }).where(eq(teams.id, teamId));
 
     return NextResponse.json({ message: "Bukti pembayaran berhasil diunggah!" }, { status: 200 });

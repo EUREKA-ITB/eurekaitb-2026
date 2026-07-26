@@ -40,7 +40,6 @@ export default function Navbar({ session }: { session: Session | null }) {
           </div>
 
           <div className="hidden lg:flex items-center gap-2 xl:gap-3">
-            <Link href="/" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Home</Link>
             
             <div className="relative group">
               <button className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">
@@ -58,10 +57,6 @@ export default function Navbar({ session }: { session: Session | null }) {
                 </div>
               </div>
             </div>
-
-            <Link href="/side-event" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Side Event</Link>
-            <Link href="/faq-v2" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
-            <Link href="/about" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">About</Link>
 
             {session && (
               <Link href="/dashboard" className="px-4 py-2 rounded-full text-sm font-bold text-sunlight-orange bg-sunlight-orange/10 hover:bg-sunlight-orange/20 transition-colors ml-1">
@@ -146,11 +141,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                   </>
                 )}
                 <p className="px-2 pt-2 mt-2 text-[10px] uppercase tracking-[0.35em] text-silver-shine">Navigation</p>
-                <Link href="/" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Home</Link>
-                <Link href="/competition/physics_olympiad" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
-                <Link href="/side-event" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
-                <Link href="/faq-v2" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
-                <Link href="/about" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>About</Link>
+
               </div>
               <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>
             </div>
