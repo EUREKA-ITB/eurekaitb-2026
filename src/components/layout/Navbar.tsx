@@ -44,8 +44,8 @@ export default function Navbar({ session }: { session: Session | null }) {
             <Link 
               href="/" 
               onClick={(e) => {
-                // Cek apakah lagi di domain side-event (hanya jalan pas diklik, jadi 100% aman dari error React)
-                if (typeof window !== 'undefined' && window.location.hostname.includes('side-event')) {
+                // Cek domain side-event 
+                if (typeof window !== 'undefined' && window.location.hostname.includes('mini-competition')) {
                   e.preventDefault();
                   // Arahkan ke domain utama
                   window.location.href = 'https://eurekaitb2026.vercel.app'; 
@@ -74,7 +74,7 @@ export default function Navbar({ session }: { session: Session | null }) {
             </div>
 
             <Link href="/faq" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
-            <Link href="/side-event" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Side Event</Link>
+            <Link href="/mini-competition" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Side Event</Link>
 
             {session && (
               <Link href="/dashboard" className="px-4 py-2 rounded-full text-sm font-bold text-sunlight-orange bg-sunlight-orange/10 hover:bg-sunlight-orange/20 transition-colors ml-1">
@@ -164,7 +164,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 <Link 
                   href="/" 
                   onClick={(e) => {
-                    if (typeof window !== 'undefined' && window.location.hostname.includes('side-event')) {
+                    if (typeof window !== 'undefined' && window.location.hostname.includes('mini-competition')) {
                       e.preventDefault();
                       window.location.href = 'https://eurekaitb2026.vercel.app'; 
                     } else {
@@ -196,7 +196,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 </div>
 
                 <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
-                <Link href="/side-event" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
+                <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
               </div>
               <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>
             </div>

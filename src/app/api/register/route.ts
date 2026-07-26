@@ -6,27 +6,29 @@ import { hash } from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    // Menangkap semua data yang dikirim dari form frontend
+    const { name, email, password, institution, level, nisn } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "Nama, email, dan password wajib diisi!" }, { status: 400 });
     }
 
-    // Cek apakah email sudah dipakai
     const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (existingUser.length > 0) {
       return NextResponse.json({ error: "Email ini sudah terdaftar. Silakan login." }, { status: 400 });
     }
 
-    // Enkripsi Password yang diketik user
     const hashedPassword = await hash(password, 10);
 
-    // Simpan ke database Postgres
+    // Menyimpan data lengkap ke database
     await db.insert(users).values({
       name: name,
       email: email,
       password: hashedPassword,
-      role: "participant", // Otomatis jadi peserta biasa
+      role: "participant",
+      institution: institution, // Menyimpan institusi
+      educationLevel: level, // Menyimpan level (SMA/S1)
+      identityNumber: nisn, // Menyimpan NISN/NIM
     });
 
     return NextResponse.json({ message: "Akun berhasil dibuat!" }, { status: 201 });
