@@ -45,9 +45,6 @@ export async function toggleActiveStatus(id: string, currentStatus: boolean) {
   }
 }
 
-// ... (biarkan fungsi addBlock, deleteBlock, dan toggleActiveStatus yang sudah ada)
-
-// TAMBAHKAN FUNGSI INI DI PALING BAWAH
 export async function editBlock(id: string, data: { title: string, url: string, iconUrl: string, isPrimary: boolean }) {
   try {
     await db.update(sideEventBlocks).set({

@@ -25,7 +25,7 @@ interface RequestBody {
   members: MemberPayload[];
 }
 
-// FUNGSI GET: Menarik data lama (Kini menarik ktmUrl juga)
+// GET
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -37,7 +37,6 @@ export async function GET() {
     const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
     if (userTeam.length === 0) return NextResponse.json(null, { status: 200 }); 
 
-    // Ekstraksi eksplisit agar ktmUrl dipastikan terbawa ke Front-End
     const tMembers = await db.select({
       id: teamMembers.id,
       teamId: teamMembers.teamId,
@@ -62,7 +61,7 @@ export async function GET() {
   }
 }
 
-// FUNGSI POST: Simpan Baru / Edit
+// POST: Update / Edit
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);

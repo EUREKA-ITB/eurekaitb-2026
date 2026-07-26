@@ -17,14 +17,10 @@ type BlockItem = {
 
 export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[] }) {
   const [isLoading, setIsLoading] = useState(false);
-  
-  // State untuk mode Edit
   const [editingId, setEditingId] = useState<string | null>(null);
-  
   const [blockType, setBlockType] = useState<"link" | "image" | "text" | "video">("link");
   const [formData, setFormData] = useState({ title: "", url: "", iconUrl: "", isPrimary: false });
 
-  // Fungsi Submit (Menangani Tambah & Edit)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -45,7 +41,6 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
     setIsLoading(false);
   };
 
-  // Fungsi untuk masuk ke mode Edit
   const handleEditClick = (block: BlockItem) => {
     setEditingId(block.id);
     setBlockType(block.type);
@@ -55,11 +50,9 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
       iconUrl: block.iconUrl || "",
       isPrimary: block.isPrimary,
     });
-    // Scroll otomatis ke form atas
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Fungsi untuk batal Edit
   const handleCancelEdit = () => {
     setEditingId(null);
     setFormData({ title: "", url: "", iconUrl: "", isPrimary: false });
@@ -96,7 +89,7 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
           )}
         </div>
         
-        {/* Type Selector (Disabled saat Edit karena tipe block tidak boleh diganti) */}
+        {/* Type Selector (Disabled saat Edit) */}
         <div className={`grid grid-cols-4 gap-2 mb-6 border-b border-white/10 pb-6 ${editingId ? "opacity-50 pointer-events-none" : ""}`}>
           {(['link', 'image', 'text', 'video'] as const).map((type) => (
             <button

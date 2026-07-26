@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-
-// Struktur data yang ketat (Bebas dari 'any')
 interface AdminTeamData {
   id: string;
   teamName: string;
@@ -19,7 +17,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   const [teams, setTeams] = useState<AdminTeamData[]>(initialData);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
-  // FUNGSI 1: EXPORT CSV MURNI JAVASCRIPT
+  // EXPORT CSV 
   const handleExportCSV = () => {
     const headers = ["Nama Tim/Peserta", "Institusi", "Kategori Lomba", "Status", "Link KTM", "Link Bukti Bayar"];
     const rows = teams.map(t => [
@@ -42,13 +40,12 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     toast.success("Berkas CSV berhasil diunduh!");
   };
 
-  // FUNGSI 2: VERIFIKASI STATUS (Memanggil API)
+  // VERIF STATUS (call API)
   const handleVerify = async (teamId: string, currentStatus: string) => {
     const newStatus = currentStatus === "verified" ? "unpaid" : "verified";
     setIsProcessing(teamId);
 
     try {
-      // Perhatikan URL di sini sudah disesuaikan langsung ke /api/verify
       const res = await fetch("/api/verify", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -57,7 +54,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
 
       if (!res.ok) throw new Error("Gagal mengubah status");
 
-      // Update UI langsung tanpa memuat ulang halaman
       setTeams(teams.map(t => t.id === teamId ? { ...t, statusPayment: newStatus } : t));
       toast.success(`Status diubah menjadi ${newStatus.toUpperCase()}`);
       router.refresh();
@@ -82,7 +78,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
         </button>
       </div>
 
-      {/* Tabel Utama yang Estetik (Sesuai aslinya) */}
+      {/* Tabel Utama */}
       <div className="bg-white/5 border border-white/10 rounded-2xl p-1 overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[900px]">
           <thead>

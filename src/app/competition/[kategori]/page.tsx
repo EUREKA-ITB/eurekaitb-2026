@@ -8,7 +8,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
   const resolvedParams = use(params);
   const formatName = resolvedParams.kategori.replace(/_/g, " ").toUpperCase();
   
-  // 1. DATA DOKUMEN (Dipertahankan sesuai logic awal)
+  // 1. DATA DOKUMEN
   const getDocuments = (kategori: string) => {
     if (kategori === "physics_olympiad") {
       return [
@@ -34,7 +34,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
   };
   const info = getCompeInfo(resolvedParams.kategori);
 
-  // 3. DATA TIMELINE (Sesuai gaya MCF)
+  // 3. DATA TIMELINE
   const getTimeline = (kategori: string) => {
     return [
       { date: "12 Nov - 10 Feb", title: "Registrasi & Pendaftaran", desc: "Pendaftaran peserta dan verifikasi berkas secara online." },
@@ -45,7 +45,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
   };
   const timelineData = getTimeline(resolvedParams.kategori);
 
-  // 4. DATA FAQ KHUSUS LOMBA (Sesuai gaya MCF)
+  // 4. DATA FAQ KHUSUS LOMBA 
   const getFaq = (kategori: string) => {
     return [
       { q: `Apakah diperbolehkan mendaftar ${formatName} dan cabang lomba lain sekaligus?`, a: "Boleh, asalkan jadwal tahapan lomba tidak bentrok satu sama lain." },
@@ -64,7 +64,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
           <ArrowLeft size={16} className="mr-2" /> Kembali ke Daftar Lomba
         </Link>
 
-        {/* 1. HERO SECTION (Layout Centered ala MCF) */}
+        {/* 1. HERO SECTION */}
         <section className="relative text-center flex flex-col items-center justify-center pt-8 pb-12">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-64 bg-sunlight-orange/15 blur-[100px] rounded-full z-0 pointer-events-none"></div>
           
@@ -96,7 +96,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
           </div>
         </section>
 
-        {/* 2. PDF VIEWER SECTION (Fitur Khusus Eureka) */}
+        {/* 2. PDF VIEWER SECTION */}
         <section className="relative z-10">
           <div className="bg-white/5 border border-white/10 p-6 md:p-10 rounded-[2rem] backdrop-blur-md">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
@@ -125,7 +125,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
               </div>
             </div>
 
-            {/* Frame PDF dengan Object Fallback biar ga kerender kayak Landing Page pas 404 */}
+            {/* Frame PDF dgn Object Fallback */}
             <div className="w-full bg-[#0a0f24] border border-white/10 rounded-2xl overflow-hidden relative h-[400px] md:h-[700px] flex flex-col items-center justify-center group">
               
               {/* Tampilan Desktop */}
@@ -134,7 +134,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
                 type="application/pdf" 
                 className="hidden md:block w-full h-full absolute inset-0 z-10"
               >
-                {/* Fallback Inner HTML jika file PDF benar-benar belum ada di folder public */}
+                {/* Fallback Inner HTML kl file PDF blm ada di folder public */}
                 <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-black/40">
                   <FileText size={48} className="text-white/20 mb-4" />
                   <p className="text-white font-bold mb-2">Dokumen Belum Tersedia</p>
@@ -157,7 +157,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
                 </a>
               </div>
 
-              {/* Tombol Unduh Ekstra di Pojok Kanan Atas Viewer (Desktop) */}
+              {/* Tombol Unduh (Desktop) */}
               <a href={activeDoc.url} download className="hidden md:flex absolute top-4 right-6 z-20 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 px-4 py-2 rounded-lg text-white text-xs font-bold items-center gap-2 transition-colors">
                 Unduh PDF
               </a>
@@ -165,7 +165,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
           </div>
         </section>
 
-        {/* 3. TIMELINE SECTION (Gaya MCF) */}
+        {/* 3. TIMELINE SECTION */}
         <section className="relative z-10 py-10">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl font-bold flex items-center justify-center gap-3">
@@ -196,7 +196,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
           </div>
         </section>
 
-        {/* 4. HADIAH PEMENANG SECTION (Gaya MCF) */}
+        {/* 4. HADIAH PEMENANG SECTION */}
         <section className="relative z-10 py-10">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl font-bold flex items-center justify-center gap-3">
@@ -231,7 +231,7 @@ export default function CompetitionDetailPage({ params }: { params: Promise<{ ka
           </p>
         </section>
 
-        {/* 5. FAQ SECTION (Gaya MCF) */}
+        {/* 5. FAQ SECTION */}
         <section className="relative z-10 py-10 border-t border-white/10">
           <div className="flex flex-col md:flex-row gap-10">
             <div className="md:w-1/3">

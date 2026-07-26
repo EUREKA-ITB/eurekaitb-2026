@@ -6,7 +6,6 @@ import { hash } from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    // Menangkap semua data yang dikirim dari form frontend
     const { name, email, password, institution, level, nisn } = await req.json();
 
     if (!name || !email || !password) {
@@ -20,15 +19,14 @@ export async function POST(req: Request) {
 
     const hashedPassword = await hash(password, 10);
 
-    // Menyimpan data lengkap ke database
     await db.insert(users).values({
       name: name,
       email: email,
       password: hashedPassword,
       role: "participant",
-      institution: institution, // Menyimpan institusi
-      educationLevel: level, // Menyimpan level (SMA/S1)
-      identityNumber: nisn, // Menyimpan NISN/NIM
+      institution: institution, 
+      educationLevel: level, 
+      identityNumber: nisn, 
     });
 
     return NextResponse.json({ message: "Akun berhasil dibuat!" }, { status: 201 });

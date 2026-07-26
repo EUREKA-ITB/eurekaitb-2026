@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     const { currentPassword, newPassword } = await req.json();
 
-    // Cari user di database
+    // search user di database
     const dbUser = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
     if (dbUser.length === 0) {
       return NextResponse.json({ error: "User tidak ditemukan" }, { status: 404 });
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const user = dbUser[0];
     const isGoogleUser = !user.password;
 
-    // Jika BUKAN user Google, wajib verifikasi password lama
+    // verif pw lama (sign up non-google)
     if (!isGoogleUser) {
       if (!currentPassword) {
         return NextResponse.json({ error: "Password saat ini wajib diisi!" }, { status: 400 });
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Hash password baru dan simpan (Berlaku untuk Create & Update)
+    // Create & Update pw
     const hashedPassword = await hash(newPassword, 10);
     await db.update(users)
       .set({ password: hashedPassword })
