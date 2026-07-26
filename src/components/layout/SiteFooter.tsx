@@ -3,9 +3,10 @@ import { ArrowUpRight, Mail, MapPin } from "lucide-react";
 
 const quickLinks = [
   { label: "Home", href: "/" },
-  { label: "Competitions", href: "/#lomba" },
-  { label: "FAQ", href: "/faq" },
+  { label: "Competitions", href: "/#lomba"},
   { label: "Side Event", href: "/side-event" },
+  { label: "FAQ", href: "/faq-v2" },
+  { label: "About", href: "/about" },
 ];
 
 function InstagramIcon() {
@@ -97,7 +98,7 @@ export default function SiteFooter() {
                   <a href="#" aria-label="X EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <XIcon />
                   </a>
-                  <a href="https://www.linkedin.com/company/eureka-itb" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
+                  <a href="#" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <LinkedinIcon />
                   </a>
                   <a href="#" aria-label="TikTok EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">

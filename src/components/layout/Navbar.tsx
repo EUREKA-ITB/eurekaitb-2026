@@ -10,7 +10,6 @@ import LogoutModal from "./LogoutModal";
 export default function Navbar({ session }: { session: Session | null }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const [isMobileCompeOpen, setIsMobileCompeOpen] = useState<boolean>(false);
 
   const competitionLinks = [
     { label: "Physics Olympiad", href: "/competition/physics_olympiad" },
@@ -41,20 +40,7 @@ export default function Navbar({ session }: { session: Session | null }) {
           </div>
 
           <div className="hidden lg:flex items-center gap-2 xl:gap-3">
-            <Link 
-              href="/" 
-              onClick={(e) => {
-                // Cek apakah lagi di domain side-event (hanya jalan pas diklik, jadi 100% aman dari error React)
-                if (typeof window !== 'undefined' && window.location.hostname.includes('side-event')) {
-                  e.preventDefault();
-                  // Arahkan ke domain utama
-                  window.location.href = 'https://eurekaitb2026.vercel.app'; 
-                }
-              }}
-              className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors"
-            >
-              Home
-            </Link>
+            <Link href="/" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Home</Link>
             
             <div className="relative group">
               <button className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">
@@ -73,8 +59,9 @@ export default function Navbar({ session }: { session: Session | null }) {
               </div>
             </div>
 
-            <Link href="/faq" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
             <Link href="/side-event" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Side Event</Link>
+            <Link href="/faq-v2" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
+            <Link href="/about" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">About</Link>
 
             {session && (
               <Link href="/dashboard" className="px-4 py-2 rounded-full text-sm font-bold text-sunlight-orange bg-sunlight-orange/10 hover:bg-sunlight-orange/20 transition-colors ml-1">
@@ -158,45 +145,12 @@ export default function Navbar({ session }: { session: Session | null }) {
                     </Link>
                   </>
                 )}
-                
                 <p className="px-2 pt-2 mt-2 text-[10px] uppercase tracking-[0.35em] text-silver-shine">Navigation</p>
-                
-                <Link 
-                  href="/" 
-                  onClick={(e) => {
-                    if (typeof window !== 'undefined' && window.location.hostname.includes('side-event')) {
-                      e.preventDefault();
-                      window.location.href = 'https://eurekaitb2026.vercel.app'; 
-                    } else {
-                      setIsOpen(false);
-                    }
-                  }}
-                  className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
-                >
-                  Home
-                </Link>
-
-                {/* BAGIAN COMPETITIONS UNTUK MOBILE (DROPDOWN) */}
-                <div className="w-full flex flex-col">
-                  <button 
-                    onClick={() => setIsMobileCompeOpen(!isMobileCompeOpen)}
-                    className="w-full text-left p-4 rounded-xl font-bold text-white/80 hover:bg-white/5 flex justify-between items-center transition-colors"
-                  >
-                    <span>Competitions</span>
-                    <ChevronDown size={16} className={`transition-transform ${isMobileCompeOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  
-                  {isMobileCompeOpen && (
-                    <div className="flex flex-col pl-4 border-l border-white/10 ml-6 gap-1 mb-2 mt-1">
-                      <Link href="/competition/physics_olympiad" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
-                      <Link href="/competition/science_project" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Science Project</Link>
-                      <Link href="/competition/industrial_case" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Industrial Case</Link>
-                    </div>
-                  )}
-                </div>
-
-                <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
+                <Link href="/" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Home</Link>
+                <Link href="/competition/physics_olympiad" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
                 <Link href="/side-event" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
+                <Link href="/faq-v2" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
+                <Link href="/about" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>About</Link>
               </div>
               <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>
             </div>
