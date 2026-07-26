@@ -44,10 +44,8 @@ export default function Navbar({ session }: { session: Session | null }) {
             <Link 
               href="/" 
               onClick={(e) => {
-                // Cek domain side-event 
                 if (typeof window !== 'undefined' && window.location.hostname.includes('mini-competition')) {
                   e.preventDefault();
-                  // Arahkan ke domain utama
                   window.location.href = 'https://eurekaitb2026.vercel.app'; 
                 }
               }}
@@ -196,7 +194,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 </div>
 
                 <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
-                <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
+                <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Mini Competition</Link>
               </div>
               <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>
             </div>

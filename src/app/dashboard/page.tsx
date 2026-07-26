@@ -19,7 +19,6 @@ export default async function DashboardPage() {
   const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
   const hasRegistered = userTeam.length > 0;
 
-  // SOLUSI ERROR 'ANY': Mendefinisikan tipe data Drizzle secara eksplisit
   let membersData: {
     id: string;
     teamId: string | null;
@@ -45,12 +44,10 @@ export default async function DashboardPage() {
     cbtPassword = userTeam[0].cbtPassword || "******";
 
     membersData = await db.select().from(teamMembers).where(eq(teamMembers.teamId, userTeam[0].id));
-    
-    // Urutkan agar ketua selalu di atas
+
     membersData.sort((a, b) => Number(b.isLeader || false) - Number(a.isLeader || false));
   }
 
-  // Progress Bar Logic
   const currentStep = !hasRegistered ? 1 : (isVerified ? 3 : (isPending ? 2.5 : 2));
 
   return (
@@ -112,7 +109,7 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex flex-col gap-8 w-full box-border">
             
-            {/* KONDISI JIKA SUDAH VERIFIED: MUNCUL KARTU PESERTA & AKSES LOMBA */}
+            {/* VERIFIED: MUNCUL KARTU PESERTA & AKSES LOMBA */}
             {isVerified && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* 1. KARTU TANDA PESERTA */}
@@ -147,7 +144,7 @@ export default async function DashboardPage() {
                   <h2 className="font-display text-2xl font-bold text-white mb-6">Portal Ruang Lomba</h2>
                   
                   {userTeam[0].compeType === "physics_olympiad" ? (
-                    // TAMPILAN KHUSUS PHYSICS OLYMPIAD (SEKARANG CUMA ADA CBT)
+                    // TAMPILAN KHUSUS PHYSICS OLYMPIAD
                     <div className="space-y-6">
                       <div className="bg-gradient-to-r from-blue-900/40 to-black/40 border border-white/10 rounded-2xl p-6">
                         <h3 className="text-white font-bold mb-2">Penyisihan & Semifinal: Platform Ujian CBT</h3>
@@ -176,7 +173,7 @@ export default async function DashboardPage() {
               </div>
             )}
 
-            {/* KONDISI JIKA BELUM VERIFIED (UNPAID / PENDING) */}
+            {/* BELUM VERIFIED (UNPAID / PENDING) */}
             {!isVerified && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border">
                 {/* KARTU IDENTITAS SEMENTARA */}
@@ -204,7 +201,7 @@ export default async function DashboardPage() {
                   )}
                 </div>
 
-                {/* KARTU MENUJU PEMBAYARAN */}
+                {/* KARTU INFO PEMBAYARAN */}
                 <div className={`border p-6 sm:p-8 rounded-3xl backdrop-blur-sm flex flex-col justify-between relative overflow-hidden ${isPending ? "bg-yellow-500/10 border-yellow-500/30" : "bg-gradient-to-br from-white/5 to-sunlight-orange/10 border-white/10"}`}>
                   <div className="relative z-10">
                     <h3 className="font-display text-xl font-bold mb-4 text-white flex items-center gap-2">
@@ -230,7 +227,7 @@ export default async function DashboardPage() {
               </div>
             )}
 
-            {/* DETAIL ANGGOTA TIM (Selalu Muncul di Bawah) */}
+            {/* DETAIL ANGGOTA TIM */}
             <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm w-full mt-2">
               <h3 className="font-display text-lg font-bold mb-6 text-white border-b border-white/10 pb-4">Struktur Anggota Tim</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
