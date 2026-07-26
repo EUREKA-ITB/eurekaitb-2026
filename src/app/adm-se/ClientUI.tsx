@@ -36,7 +36,7 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
       toast.error(res?.error);
     } else {
       toast.success(editingId ? "Block updated successfully!" : "Block created successfully!");
-      handleCancelEdit(); // Reset form
+      handleCancelEdit(); 
     }
     setIsLoading(false);
   };
@@ -71,7 +71,6 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr]">
       
-      {/* FORM SECTION (CREATE & EDIT) */}
       <div className={`border p-6 sm:p-8 rounded-3xl backdrop-blur-md h-max shadow-xl transition-all ${editingId ? "bg-sunlight-orange/10 border-sunlight-orange/50" : "bg-white/5 border-white/10"}`}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -89,7 +88,6 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
           )}
         </div>
         
-        {/* Type Selector (Disabled saat Edit) */}
         <div className={`grid grid-cols-4 gap-2 mb-6 border-b border-white/10 pb-6 ${editingId ? "opacity-50 pointer-events-none" : ""}`}>
           {(['link', 'image', 'text', 'video'] as const).map((type) => (
             <button
@@ -133,27 +131,30 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
             </div>
           )}
 
-          {blockType === "link" && (
-            <>
-              <div>
-                <label className="text-xs font-bold text-silver-shine uppercase tracking-wider mb-2 block">Icon URL (Optional)</label>
-                <input 
-                  type="url" placeholder="https://.../icon.png"
-                  value={formData.iconUrl} onChange={(e) => setFormData({...formData, iconUrl: e.target.value})}
-                  className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange text-sm"
-                />
-              </div>
-              <label className="flex items-center gap-3 cursor-pointer mt-2 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                <input 
-                  type="checkbox" checked={formData.isPrimary} onChange={(e) => setFormData({...formData, isPrimary: e.target.checked})}
-                  className="w-5 h-5 accent-sunlight-orange rounded"
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-white">Highlight as Primary Link</span>
-                  <span className="text-xs text-silver-shine">Displays with a glowing orange aesthetic</span>
-                </div>
+          {(blockType === "link" || blockType === "image") && (
+            <div>
+              <label className="text-xs font-bold text-silver-shine uppercase tracking-wider mb-2 block">
+                {blockType === "image" ? "Target Link URL (Optional - For Guidebook)" : "Icon URL (Optional)"}
               </label>
-            </>
+              <input 
+                type="url" placeholder="https://..."
+                value={formData.iconUrl} onChange={(e) => setFormData({...formData, iconUrl: e.target.value})}
+                className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange text-sm"
+              />
+            </div>
+          )}
+
+          {blockType === "link" && (
+            <label className="flex items-center gap-3 cursor-pointer mt-2 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+              <input 
+                type="checkbox" checked={formData.isPrimary} onChange={(e) => setFormData({...formData, isPrimary: e.target.checked})}
+                className="w-5 h-5 accent-sunlight-orange rounded"
+              />
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-white">Highlight as Primary Link</span>
+                <span className="text-xs text-silver-shine">Displays with a glowing orange aesthetic</span>
+              </div>
+            </label>
           )}
 
           <div className="flex gap-3 mt-2">
@@ -162,14 +163,13 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
                 Cancel
               </button>
             )}
-            <button type="submit" disabled={isLoading} className={`flex-[2] text-blue-marine font-bold py-3.5 rounded-xl transition-colors shadow-lg ${editingId ? "bg-sunlight-orange hover:bg-yellow-400" : "bg-sunlight-orange hover:bg-yellow-400"}`}>
+            <button type="submit" disabled={isLoading} className={`flex-[2] text-blue-marine font-bold py-3.5 rounded-xl transition-colors shadow-lg bg-sunlight-orange hover:bg-yellow-400`}>
               {isLoading ? "Processing..." : editingId ? "Update Block" : "Publish Block"}
             </button>
           </div>
         </form>
       </div>
 
-      {/* BLOCK MANAGER */}
       <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-md shadow-xl h-max">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-sunlight-orange/20 rounded-lg"><LayoutGrid className="text-sunlight-orange" size={20} /></div>

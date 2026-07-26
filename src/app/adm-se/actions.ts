@@ -15,7 +15,7 @@ export async function addBlock(data: { type: "link" | "image" | "text" | "video"
       isPrimary: data.isPrimary,
       isActive: true,
     });
-    revalidatePath("/side-event");
+    revalidatePath("/mini-competition");
     revalidatePath("/adm-se");
     return { success: true };
   } catch (error) {
@@ -26,7 +26,7 @@ export async function addBlock(data: { type: "link" | "image" | "text" | "video"
 export async function deleteBlock(id: string) {
   try {
     await db.delete(sideEventBlocks).where(eq(sideEventBlocks.id, id));
-    revalidatePath("/side-event");
+    revalidatePath("/mini-competition");
     revalidatePath("/adm-se");
     return { success: true };
   } catch (error) {
@@ -37,7 +37,7 @@ export async function deleteBlock(id: string) {
 export async function toggleActiveStatus(id: string, currentStatus: boolean) {
   try {
     await db.update(sideEventBlocks).set({ isActive: !currentStatus }).where(eq(sideEventBlocks.id, id));
-    revalidatePath("/side-event");
+    revalidatePath("/mini-competition");
     revalidatePath("/adm-se");
     return { success: true };
   } catch (error) {
@@ -54,7 +54,7 @@ export async function editBlock(id: string, data: { title: string, url: string, 
       isPrimary: data.isPrimary,
     }).where(eq(sideEventBlocks.id, id));
     
-    revalidatePath("/side-event");
+    revalidatePath("/mini-competition");
     revalidatePath("/adm-se");
     return { success: true };
   } catch (error) {
