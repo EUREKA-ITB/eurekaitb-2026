@@ -19,19 +19,18 @@ export default async function AdminSideEventPage() {
             Command Center
           </div>
           <h1 className="font-display font-bold text-3xl sm:text-4xl text-white mb-2">
-            Side Event Configuration
+            Mini Competition Configuration
           </h1>
           <p className="text-silver-shine text-sm sm:text-base max-w-2xl leading-relaxed">
             Manage your dynamic Linktree-style portal here. You can construct the page using multiple block types including standard links, embedded videos, images, and text content. Changes are pushed globally in real-time.
           </p>
 
-          {/* BANNER CATATAN PENTING UNTUK ADMIN */}
           <div className="mt-6 flex gap-4 items-start bg-blue-500/10 border border-blue-500/20 p-4 sm:p-5 rounded-2xl max-w-3xl backdrop-blur-sm">
             <Info className="text-blue-400 shrink-0 mt-0.5" size={20} />
             <div>
               <h3 className="font-bold text-blue-400 text-sm mb-1">Penting: Aturan Upload Gambar & Ikon</h3>
               <p className="text-silver-shine text-sm leading-relaxed">
-                Jika gambar yang di-upload melalui Google Drive tidak muncul di halaman side-event, anda bisa <i>upload</i> file Anda ke <i>hosting</i> gambar gratis seperti <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Postimages</a> atau <a href="https://imgbb.com/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Imgbb</a>. Kemudian salin <strong>Direct Link</strong> (yang berakhiran <code>.png</code> / <code>.jpg</code> / <code>.webp</code>) dan tempel URL tersebut ke form di bawah.
+                Jika gambar yang di-upload melalui Google Drive tidak muncul di halaman mini-competition, anda bisa <i>upload</i> file Anda ke <i>hosting</i> gambar gratis seperti <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Postimages</a> atau <a href="https://imgbb.com/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Imgbb</a>. Kemudian salin <strong>Direct Link</strong> (yang berakhiran <code>.png</code> / <code>.jpg</code> / <code>.webp</code>) dan tempel URL tersebut ke form di bawah.
                 Pastikan gambar yang diunggah berukuran maksimal 2MB agar tidak memperlambat halaman saat loading.
               </p>
             </div>

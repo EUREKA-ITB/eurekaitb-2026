@@ -72,7 +72,7 @@ export default function Navbar({ session }: { session: Session | null }) {
             </div>
 
             <Link href="/faq" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
-            <Link href="/mini-competition" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Side Event</Link>
+            <Link href="/mini-competition" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Mini Competition</Link>
 
             {session && (
               <Link href="/dashboard" className="px-4 py-2 rounded-full text-sm font-bold text-sunlight-orange bg-sunlight-orange/10 hover:bg-sunlight-orange/20 transition-colors ml-1">
