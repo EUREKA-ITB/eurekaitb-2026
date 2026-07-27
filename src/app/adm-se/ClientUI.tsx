@@ -78,32 +78,32 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr]">
+    <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1fr_1.5fr] w-full overflow-hidden">
       
-      <div className={`border p-6 sm:p-8 rounded-3xl h-max shadow-xl transition-all ${editingId ? "bg-sunlight-orange/10 border-sunlight-orange/50" : "bg-white/5 border-white/10"}`}>
+      <div className={`border p-5 sm:p-8 rounded-3xl h-max shadow-xl transition-all w-full overflow-hidden ${editingId ? "bg-sunlight-orange/10 border-sunlight-orange/50" : "bg-white/5 border-white/10"}`}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${editingId ? "bg-sunlight-orange text-blue-marine" : "bg-sunlight-orange/20 text-sunlight-orange"}`}>
+            <div className={`p-2 rounded-lg shrink-0 ${editingId ? "bg-sunlight-orange text-blue-marine" : "bg-sunlight-orange/20 text-sunlight-orange"}`}>
               {editingId ? <Pencil size={20} /> : <Plus size={20} />}
             </div>
-            <h2 className="font-display font-bold text-xl text-white">
+            <h2 className="font-display font-bold text-lg sm:text-xl text-white truncate">
               {editingId ? "Edit Block" : "Create New Block"}
             </h2>
           </div>
           {editingId && (
-            <button onClick={handleCancelEdit} className="p-2 rounded-full hover:bg-white/10 text-silver-shine hover:text-white transition-colors">
+            <button onClick={handleCancelEdit} className="p-2 rounded-full hover:bg-white/10 text-silver-shine hover:text-white transition-colors shrink-0">
               <X size={20} />
             </button>
           )}
         </div>
         
-        <div className={`grid grid-cols-4 gap-2 mb-6 border-b border-white/10 pb-6 ${editingId ? "opacity-50 pointer-events-none" : ""}`}>
+        <div className={`grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6 border-b border-white/10 pb-6 ${editingId ? "opacity-50 pointer-events-none" : ""}`}>
           {(['link', 'image', 'text', 'video'] as const).map((type) => (
             <button
               key={type}
               type="button"
               onClick={() => setBlockType(type)}
-              className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${blockType === type ? "bg-sunlight-orange text-blue-marine border-sunlight-orange font-bold shadow-lg" : "bg-white/5 border-white/10 text-silver-shine hover:bg-white/10"}`}
+              className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all w-full ${blockType === type ? "bg-sunlight-orange text-blue-marine border-sunlight-orange font-bold shadow-lg" : "bg-white/5 border-white/10 text-silver-shine hover:bg-white/10"}`}
             >
               {renderIcon(type)}
               <span className="text-[10px] uppercase tracking-wider mt-1.5">{type}</span>
@@ -111,9 +111,9 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
           {(blockType === "link" || blockType === "text" || blockType === "image") && (
-            <div>
+            <div className="w-full">
               <label className="text-xs font-bold text-silver-shine uppercase tracking-wider mb-2 block">
                 {blockType === "text" ? "Judul Subheading" : blockType === "image" ? "Alt Text (Optional)" : "Display Title"}
               </label>
@@ -128,7 +128,7 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
           )}
 
           {(blockType === "link" || blockType === "image" || blockType === "video") && (
-            <div>
+            <div className="w-full">
               <label className="text-xs font-bold text-silver-shine uppercase tracking-wider mb-2 block">
                 {blockType === "video" ? "YouTube Embed URL" : blockType === "image" ? "Image Source URL" : "Target URL"}
               </label>
@@ -141,9 +141,9 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
           )}
 
           {(blockType === "link" || blockType === "image") && (
-            <div>
-              <label className="text-xs font-bold text-silver-shine uppercase tracking-wider mb-2 block">
-                {blockType === "image" ? "Target Link URL (Optional - For Guidebook)" : "Icon URL (Optional)"}
+            <div className="w-full">
+              <label className="text-xs font-bold text-silver-shine uppercase tracking-wider mb-2 block truncate">
+                {blockType === "image" ? "Target Link URL (Optional)" : "Icon URL (Optional)"}
               </label>
               <input 
                 type="url" placeholder="https://..."
@@ -154,47 +154,47 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
           )}
 
           {blockType === "link" && (
-            <label className="flex items-center gap-3 cursor-pointer mt-2 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+            <label className="flex items-center gap-3 cursor-pointer mt-2 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors w-full">
               <input 
                 type="checkbox" checked={formData.isPrimary} onChange={(e) => setFormData({...formData, isPrimary: e.target.checked})}
-                className="w-5 h-5 accent-sunlight-orange rounded"
+                className="w-5 h-5 accent-sunlight-orange rounded shrink-0"
               />
-              <div className="flex flex-col">
-                <span className="text-sm font-bold text-white">Highlight as Primary Link</span>
-                <span className="text-xs text-silver-shine">Displays with a glowing orange aesthetic</span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-bold text-white truncate">Highlight as Primary Link</span>
+                <span className="text-[10px] sm:text-xs text-silver-shine truncate">Displays with a glowing orange aesthetic</span>
               </div>
             </label>
           )}
 
-          <div className="flex gap-3 mt-2">
+          <div className="flex flex-col sm:flex-row gap-3 mt-2 w-full">
             {editingId && (
-              <button type="button" onClick={handleCancelEdit} className="flex-1 bg-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/20 transition-colors shadow-lg">
+              <button type="button" onClick={handleCancelEdit} className="w-full sm:flex-1 bg-white/10 text-white font-bold py-3.5 rounded-xl hover:bg-white/20 transition-colors shadow-lg">
                 Cancel
               </button>
             )}
-            <button type="submit" disabled={isLoading} className={`flex-[2] text-blue-marine font-bold py-3.5 rounded-xl transition-colors shadow-lg bg-sunlight-orange hover:bg-yellow-400`}>
+            <button type="submit" disabled={isLoading} className={`w-full sm:flex-[2] text-blue-marine font-bold py-3.5 rounded-xl transition-colors shadow-lg bg-sunlight-orange hover:bg-yellow-400`}>
               {isLoading ? "Processing..." : editingId ? "Update Block" : "Publish Block"}
             </button>
           </div>
         </form>
       </div>
 
-      <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl shadow-xl h-max w-full">
+      <div className="bg-white/5 border border-white/10 p-5 sm:p-8 rounded-3xl shadow-xl h-max w-full overflow-hidden">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-sunlight-orange/20 rounded-lg"><LayoutGrid className="text-sunlight-orange" size={20} /></div>
-          <h2 className="font-display font-bold text-xl text-white">Content Manager</h2>
+          <div className="p-2 bg-sunlight-orange/20 rounded-lg shrink-0"><LayoutGrid className="text-sunlight-orange" size={20} /></div>
+          <h2 className="font-display font-bold text-lg sm:text-xl text-white truncate">Content Manager</h2>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 w-full">
           {initialBlocks.length === 0 ? (
-            <p className="text-center text-silver-shine text-sm py-8 border border-dashed border-white/20 rounded-2xl">
+            <p className="text-center text-silver-shine text-sm py-8 border border-dashed border-white/20 rounded-2xl w-full">
               No content blocks found. Start building!
             </p>
           ) : (
             initialBlocks.map((block, index) => (
-              <div key={block.id} className={`flex flex-col gap-4 p-4 rounded-2xl border transition-all ${block.isActive ? "bg-black/30 border-white/10" : "bg-black/10 border-white/5 opacity-60"} ${editingId === block.id ? "ring-2 ring-sunlight-orange" : ""}`}>
+              <div key={block.id} className={`flex flex-col gap-4 p-4 rounded-2xl border transition-all w-full overflow-hidden ${block.isActive ? "bg-black/30 border-white/10" : "bg-black/10 border-white/5 opacity-60"} ${editingId === block.id ? "ring-2 ring-sunlight-orange" : ""}`}>
                 
-                <div className="flex items-start gap-3 w-full">
+                <div className="flex items-start gap-3 w-full overflow-hidden">
                   <div className="flex flex-col gap-1 shrink-0 bg-white/5 rounded-lg border border-white/5 p-1">
                     <button onClick={() => handleMove(block.id, "up")} disabled={index === 0 || movingId !== null} className={`p-0.5 transition-colors ${movingId === block.id ? "animate-pulse text-sunlight-orange" : "text-silver-shine hover:text-sunlight-orange disabled:opacity-20"}`}>
                       <ChevronUp size={16} />
@@ -205,17 +205,17 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
                   </div>
 
                   <div className="p-2 bg-white/5 rounded-lg text-sunlight-orange shrink-0">{renderIcon(block.type)}</div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <div className="flex flex-wrap items-center gap-2 mb-1 w-full">
                       <h3 className="font-bold text-white text-sm truncate max-w-full">{block.title || (block.type === 'video' ? 'Video Player' : 'Image Block')}</h3>
                       {block.isPrimary && <span className="bg-sunlight-orange/20 text-sunlight-orange text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">Primary</span>}
                       {!block.isActive && <span className="bg-maroon-flash/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">Hidden</span>}
                     </div>
-                    {block.url && <p className="text-xs text-silver-shine truncate max-w-full">{block.url}</p>}
+                    {block.url && <p className="text-xs text-silver-shine truncate w-full">{block.url}</p>}
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2 w-full justify-end border-t border-white/5 pt-3 mt-1">
+                <div className="flex items-center gap-2 w-full justify-end border-t border-white/5 pt-3 mt-1 shrink-0">
                   <button 
                     onClick={() => handleEditClick(block)}
                     title="Edit Block"
