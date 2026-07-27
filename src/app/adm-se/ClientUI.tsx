@@ -3,7 +3,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Trash2, Eye, EyeOff, Plus, LayoutGrid, Type, Image as ImageIcon, Link as LinkIcon, Video, Pencil, X, ChevronUp, ChevronDown } from "lucide-react";
-import { addBlock, deleteBlock, toggleActiveStatus, editBlock, moveBlock } from "./action";
+import { addBlock, deleteBlock, toggleActiveStatus, editBlock, moveBlock } from "./actions";
 
 type BlockItem = {
   id: string;
