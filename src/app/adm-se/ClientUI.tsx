@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Trash2, Eye, EyeOff, Plus, LayoutGrid, Type, Image as ImageIcon, Link as LinkIcon, Video, Pencil, X } from "lucide-react";
-import { addBlock, deleteBlock, toggleActiveStatus, editBlock } from "./actions";
+import { Trash2, Eye, EyeOff, Plus, LayoutGrid, Type, Image as ImageIcon, Link as LinkIcon, Video, Pencil, X, ChevronUp, ChevronDown } from "lucide-react";
+import { addBlock, deleteBlock, toggleActiveStatus, editBlock, moveBlock } from "./action";
 
 type BlockItem = {
   id: string;
@@ -58,6 +58,11 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
     setFormData({ title: "", url: "", iconUrl: "", isPrimary: false });
   };
 
+  const handleMove = async (id: string, direction: "up" | "down") => {
+    const res = await moveBlock(id, direction);
+    if (res?.error) toast.error(res.error);
+  };
+
   const renderIcon = (type: string) => {
     switch(type) {
       case 'link': return <LinkIcon size={16} />;
@@ -71,7 +76,7 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr]">
       
-      <div className={`border p-6 sm:p-8 rounded-3xl backdrop-blur-md h-max shadow-xl transition-all ${editingId ? "bg-sunlight-orange/10 border-sunlight-orange/50" : "bg-white/5 border-white/10"}`}>
+      <div className={`border p-6 sm:p-8 rounded-3xl h-max shadow-xl transition-all ${editingId ? "bg-sunlight-orange/10 border-sunlight-orange/50" : "bg-white/5 border-white/10"}`}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${editingId ? "bg-sunlight-orange text-blue-marine" : "bg-sunlight-orange/20 text-sunlight-orange"}`}>
@@ -106,12 +111,12 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
           {(blockType === "link" || blockType === "text" || blockType === "image") && (
             <div>
               <label className="text-xs font-bold text-silver-shine uppercase tracking-wider mb-2 block">
-                {blockType === "text" ? "Text Content" : blockType === "image" ? "Alt Text (Optional)" : "Display Title"}
+                {blockType === "text" ? "Judul Subheading" : blockType === "image" ? "Alt Text (Optional)" : "Display Title"}
               </label>
               <textarea 
                 required={blockType === "text" || blockType === "link"} 
-                rows={blockType === "text" ? 3 : 1}
-                placeholder={blockType === "text" ? "Enter your text here..." : "e.g., Register for Mini Competition"}
+                rows={blockType === "text" ? 2 : 1}
+                placeholder={blockType === "text" ? "Contoh: KOMPETISI UTAMA" : "e.g., Register for Mini Competition"}
                 value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
                 className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange text-sm resize-none"
               />
@@ -170,7 +175,7 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
         </form>
       </div>
 
-      <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-md shadow-xl h-max">
+      <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl shadow-xl h-max">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-sunlight-orange/20 rounded-lg"><LayoutGrid className="text-sunlight-orange" size={20} /></div>
           <h2 className="font-display font-bold text-xl text-white">Content Manager</h2>
@@ -182,9 +187,19 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
               No content blocks found. Start building!
             </p>
           ) : (
-            initialBlocks.map((block) => (
+            initialBlocks.map((block, index) => (
               <div key={block.id} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border transition-all ${block.isActive ? "bg-black/30 border-white/10" : "bg-black/10 border-white/5 opacity-60"} ${editingId === block.id ? "ring-2 ring-sunlight-orange" : ""}`}>
+                
                 <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className="flex flex-col gap-1 mr-1 shrink-0 bg-white/5 rounded-lg border border-white/5 p-1">
+                    <button onClick={() => handleMove(block.id, "up")} disabled={index === 0} className="p-0.5 text-silver-shine hover:text-sunlight-orange disabled:opacity-20 transition-colors">
+                      <ChevronUp size={16} />
+                    </button>
+                    <button onClick={() => handleMove(block.id, "down")} disabled={index === initialBlocks.length - 1} className="p-0.5 text-silver-shine hover:text-sunlight-orange disabled:opacity-20 transition-colors">
+                      <ChevronDown size={16} />
+                    </button>
+                  </div>
+
                   <div className="p-2 bg-white/5 rounded-lg text-sunlight-orange mt-0.5">{renderIcon(block.type)}</div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1">

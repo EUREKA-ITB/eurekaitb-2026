@@ -97,19 +97,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. SIDE EVENT SECTION - Streamlined Banner Style */}
+      {/* 4. MINI COMPE SECTION - Streamlined Banner Style */}
       <section id="side-event" className="px-4 sm:px-6 py-12">
         <div className="max-w-7xl mx-auto rounded-3xl border border-sunlight-orange/20 bg-gradient-to-r from-sunlight-orange/10 to-transparent p-8 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-sunlight-orange/10 rounded-full blur-3xl"></div>
           <div className="relative z-10 max-w-xl text-center md:text-left">
-            <h2 className="font-display text-3xl font-bold text-white">Side Event & Mini Competition</h2>
+            <h2 className="font-display text-3xl font-bold text-white">Mini Competition</h2>
             <p className="mt-4 text-sm leading-relaxed text-silver-shine">
               Selain kompetisi utama, ikuti juga rangkaian side event kami. Akses seluruh pendaftaran kegiatan pendukung, webinar, dan kontak resmi dalam satu portal.
             </p>
           </div>
           <div className="relative z-10 w-full md:w-auto flex-shrink-0">
             <Link href="/side-event" className="flex items-center justify-center gap-2 rounded-full bg-white text-blue-marine px-8 py-4 text-sm font-bold transition-transform hover:scale-105 shadow-[0_4px_15px_rgba(255,255,255,0.1)] w-full md:w-auto">
-              Buka Halaman Side Event <ChevronRight size={16} />
+              Buka Halaman Mini Competition <ChevronRight size={16} />
             </Link>
           </div>
         </div>
