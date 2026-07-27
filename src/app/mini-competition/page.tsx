@@ -20,7 +20,7 @@ export default async function SideEventPage() {
     .select()
     .from(sideEventBlocks)
     .where(eq(sideEventBlocks.isActive, true))
-    .orderBy(asc(sideEventBlocks.orderIndex));
+    .orderBy(asc(sideEventBlocks.orderIndex), asc(sideEventBlocks.createdAt));
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans flex flex-col items-center pt-24 pb-20 px-4 sm:px-6 relative overflow-hidden">

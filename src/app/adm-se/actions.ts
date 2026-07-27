@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 
 export async function addBlock(data: { type: "link" | "image" | "text" | "video", title: string, url: string, iconUrl: string, isPrimary: boolean }) {
   try {
-    const allBlocks = await db.select().from(sideEventBlocks).orderBy(asc(sideEventBlocks.orderIndex));
+    const allBlocks = await db.select().from(sideEventBlocks).orderBy(asc(sideEventBlocks.orderIndex), asc(sideEventBlocks.createdAt));
     const newIndex = allBlocks.length > 0 ? (allBlocks[allBlocks.length - 1].orderIndex ?? 0) + 1 : 0;
 
     await db.insert(sideEventBlocks).values({
@@ -68,19 +68,32 @@ export async function editBlock(id: string, data: { title: string, url: string, 
 
 export async function moveBlock(id: string, direction: "up" | "down") {
   try {
-    const allBlocks = await db.select().from(sideEventBlocks).orderBy(asc(sideEventBlocks.orderIndex));
-    const currentIndex = allBlocks.findIndex(b => b.id === id);
+    const allBlocks = await db.select().from(sideEventBlocks).orderBy(asc(sideEventBlocks.orderIndex), asc(sideEventBlocks.createdAt));
     
+    for (let i = 0; i < allBlocks.length; i++) {
+        allBlocks[i].orderIndex = i;
+    }
+
+    const currentIndex = allBlocks.findIndex(b => b.id === id);
     if (currentIndex === -1) return { error: "Block not found" };
-    if (direction === "up" && currentIndex === 0) return { success: true };
-    if (direction === "down" && currentIndex === allBlocks.length - 1) return { success: true };
+
+    if ((direction === "up" && currentIndex === 0) || (direction === "down" && currentIndex === allBlocks.length - 1)) {
+        for (const block of allBlocks) {
+            await db.update(sideEventBlocks).set({ orderIndex: block.orderIndex }).where(eq(sideEventBlocks.id, block.id));
+        }
+        revalidatePath("/mini-competition");
+        revalidatePath("/adm-se");
+        return { success: true };
+    }
 
     const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
-    const currentBlock = allBlocks[currentIndex];
-    const targetBlock = allBlocks[targetIndex];
+    const temp = allBlocks[currentIndex].orderIndex;
+    allBlocks[currentIndex].orderIndex = allBlocks[targetIndex].orderIndex;
+    allBlocks[targetIndex].orderIndex = temp;
 
-    await db.update(sideEventBlocks).set({ orderIndex: targetBlock.orderIndex }).where(eq(sideEventBlocks.id, currentBlock.id));
-    await db.update(sideEventBlocks).set({ orderIndex: currentBlock.orderIndex }).where(eq(sideEventBlocks.id, targetBlock.id));
+    for (const block of allBlocks) {
+        await db.update(sideEventBlocks).set({ orderIndex: block.orderIndex }).where(eq(sideEventBlocks.id, block.id));
+    }
 
     revalidatePath("/mini-competition");
     revalidatePath("/adm-se");

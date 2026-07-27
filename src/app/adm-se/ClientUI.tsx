@@ -17,6 +17,7 @@ type BlockItem = {
 
 export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[] }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [movingId, setMovingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [blockType, setBlockType] = useState<"link" | "image" | "text" | "video">("link");
   const [formData, setFormData] = useState({ title: "", url: "", iconUrl: "", isPrimary: false });
@@ -59,8 +60,11 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
   };
 
   const handleMove = async (id: string, direction: "up" | "down") => {
+    if (movingId) return;
+    setMovingId(id);
     const res = await moveBlock(id, direction);
     if (res?.error) toast.error(res.error);
+    setMovingId(null);
   };
 
   const renderIcon = (type: string) => {
@@ -175,43 +179,43 @@ export default function ClientUI({ initialBlocks }: { initialBlocks: BlockItem[]
         </form>
       </div>
 
-      <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl shadow-xl h-max">
+      <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl shadow-xl h-max w-full">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-sunlight-orange/20 rounded-lg"><LayoutGrid className="text-sunlight-orange" size={20} /></div>
           <h2 className="font-display font-bold text-xl text-white">Content Manager</h2>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {initialBlocks.length === 0 ? (
             <p className="text-center text-silver-shine text-sm py-8 border border-dashed border-white/20 rounded-2xl">
               No content blocks found. Start building!
             </p>
           ) : (
             initialBlocks.map((block, index) => (
-              <div key={block.id} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl border transition-all ${block.isActive ? "bg-black/30 border-white/10" : "bg-black/10 border-white/5 opacity-60"} ${editingId === block.id ? "ring-2 ring-sunlight-orange" : ""}`}>
+              <div key={block.id} className={`flex flex-col gap-4 p-4 rounded-2xl border transition-all ${block.isActive ? "bg-black/30 border-white/10" : "bg-black/10 border-white/5 opacity-60"} ${editingId === block.id ? "ring-2 ring-sunlight-orange" : ""}`}>
                 
-                <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="flex flex-col gap-1 mr-1 shrink-0 bg-white/5 rounded-lg border border-white/5 p-1">
-                    <button onClick={() => handleMove(block.id, "up")} disabled={index === 0} className="p-0.5 text-silver-shine hover:text-sunlight-orange disabled:opacity-20 transition-colors">
+                <div className="flex items-start gap-3 w-full">
+                  <div className="flex flex-col gap-1 shrink-0 bg-white/5 rounded-lg border border-white/5 p-1">
+                    <button onClick={() => handleMove(block.id, "up")} disabled={index === 0 || movingId !== null} className={`p-0.5 transition-colors ${movingId === block.id ? "animate-pulse text-sunlight-orange" : "text-silver-shine hover:text-sunlight-orange disabled:opacity-20"}`}>
                       <ChevronUp size={16} />
                     </button>
-                    <button onClick={() => handleMove(block.id, "down")} disabled={index === initialBlocks.length - 1} className="p-0.5 text-silver-shine hover:text-sunlight-orange disabled:opacity-20 transition-colors">
+                    <button onClick={() => handleMove(block.id, "down")} disabled={index === initialBlocks.length - 1 || movingId !== null} className={`p-0.5 transition-colors ${movingId === block.id ? "animate-pulse text-sunlight-orange" : "text-silver-shine hover:text-sunlight-orange disabled:opacity-20"}`}>
                       <ChevronDown size={16} />
                     </button>
                   </div>
 
-                  <div className="p-2 bg-white/5 rounded-lg text-sunlight-orange mt-0.5">{renderIcon(block.type)}</div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-white text-sm truncate">{block.title || (block.type === 'video' ? 'Video Player' : 'Image Block')}</h3>
-                      {block.isPrimary && <span className="bg-sunlight-orange/20 text-sunlight-orange text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Primary</span>}
-                      {!block.isActive && <span className="bg-maroon-flash/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Hidden</span>}
+                  <div className="p-2 bg-white/5 rounded-lg text-sunlight-orange shrink-0">{renderIcon(block.type)}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <h3 className="font-bold text-white text-sm truncate max-w-full">{block.title || (block.type === 'video' ? 'Video Player' : 'Image Block')}</h3>
+                      {block.isPrimary && <span className="bg-sunlight-orange/20 text-sunlight-orange text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">Primary</span>}
+                      {!block.isActive && <span className="bg-maroon-flash/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0">Hidden</span>}
                     </div>
-                    {block.url && <p className="text-xs text-silver-shine truncate max-w-[200px] sm:max-w-xs">{block.url}</p>}
+                    {block.url && <p className="text-xs text-silver-shine truncate max-w-full">{block.url}</p>}
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 w-full justify-end border-t border-white/5 pt-3 mt-1">
                   <button 
                     onClick={() => handleEditClick(block)}
                     title="Edit Block"

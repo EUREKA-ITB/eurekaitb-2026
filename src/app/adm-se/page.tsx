@@ -7,7 +7,7 @@ import { Info } from "lucide-react";
 export const revalidate = 0;
 
 export default async function AdminSideEventPage() {
-  const blocks = await db.select().from(sideEventBlocks).orderBy(asc(sideEventBlocks.orderIndex));
+  const blocks = await db.select().from(sideEventBlocks).orderBy(asc(sideEventBlocks.orderIndex), asc(sideEventBlocks.createdAt));
 
   return (
     <div className="min-h-screen bg-blue-marine text-white pt-28 pb-20 px-4 sm:px-6 relative overflow-x-hidden">
@@ -30,7 +30,7 @@ export default async function AdminSideEventPage() {
             <div>
               <h3 className="font-bold text-blue-400 text-sm mb-1">Penting: Aturan Upload Gambar & Ikon</h3>
               <p className="text-silver-shine text-sm leading-relaxed">
-                Jika gambar yang di-upload melalui Google Drive tidak muncul di halaman mini-competition, anda bisa <i>upload</i> file Anda ke <i>hosting</i> gambar gratis seperti <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Postimages</a> atau <a href="https://imgbb.com/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Imgbb</a>. Kemudian salin <strong>Direct Link</strong> (yang berakhiran <code>.png</code> / <code>.jpg</code> / <code>.webp</code>) dan tempel URL tersebut ke form di bawah.
+                Jika gambar yang di-upload melalui Google Drive tidak muncul di halaman mini-competition, anda bisa upload file Anda ke hosting gambar gratis seperti <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Postimages</a> atau <a href="https://imgbb.com/" target="_blank" rel="noreferrer" className="text-white font-semibold hover:text-sunlight-orange transition-colors underline decoration-white/30 underline-offset-2">Imgbb</a>. Kemudian salin Direct Link (yang berakhiran .png / .jpg / .webp) dan tempel URL tersebut ke form di bawah.
                 Pastikan gambar yang diunggah berukuran maksimal 2MB agar tidak memperlambat halaman saat loading.
               </p>
             </div>
