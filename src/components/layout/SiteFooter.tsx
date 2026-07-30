@@ -54,7 +54,7 @@ export default function SiteFooter() {
               EUREKA! <span className="text-sunlight-orange">ITB 2026</span>
             </p>
             <p className="mt-4 max-w-xl text-sm leading-7 text-silver-shine">
-              Official website of EUREKA! ITB 2026. Portal peserta, kompetisi, guidebook, dan informasi utama disusun dalam satu alur yang rapi.
+              Official website of EUREKA! ITB 2026. Portal bagi peserta untuk mengakses informasi penting terutama kompetisi, kegiatan, pendaftaran, dan lainnya.
             </p>
           </div>
 

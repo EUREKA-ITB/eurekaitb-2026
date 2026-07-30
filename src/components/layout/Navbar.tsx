@@ -36,7 +36,7 @@ export default function Navbar({ session }: { session: Session | null }) {
               <span className="font-display font-bold text-lg sm:text-xl tracking-widest text-white truncate">
                 EUREKA! <span className="text-sunlight-orange">ITB 2026</span>
               </span>
-              <span className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-silver-shine">ITB Official Event</span>
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-silver-shine">HIMAFI ITB Official Event</span>
             </Link>
           </div>
 

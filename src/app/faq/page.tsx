@@ -48,7 +48,7 @@ const faqs = [
 ];
 
 export default function FaqPage() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "(Nomor WA belum tersedia)";
+  const whatsappNumber = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "6283148657849 (Aldi)";
   const whatsappTemplate = encodeURIComponent(
     "Halo tim helpdesk EUREKA 2026, saya ingin menanyakan masalah terkait pendaftaran lomba."
   );
@@ -158,7 +158,7 @@ export default function FaqPage() {
                     <p className="font-semibold text-white">WhatsApp</p>
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-silver-shine truncate">{whatsappNumber}</p>
-                      <CopyButton text={whatsappNumber} ariaLabel="Copy whatsapp number" className="shrink-0" />
+                      <CopyButton text="6283148657849" ariaLabel="Copy whatsapp number" className="shrink-0" />
                     </div>
                   </div>
                 </div>
@@ -197,7 +197,7 @@ export default function FaqPage() {
               <div className="flex flex-col gap-3">
                 <EmailHelpButton />
                 <a
-                  href={`https://wa.me/${whatsappNumber}?text=${whatsappTemplate}`}
+                  href={`https://wa.me/${6285139556416}?text=${whatsappTemplate}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex w-full justify-center rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine transition hover:bg-yellow-400"

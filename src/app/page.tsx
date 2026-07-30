@@ -2,9 +2,9 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy } from "lucide-react";
 
 const competitionCards = [
-  { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Babak kompetisi untuk peserta tunggal yang ingin menantang logika, konsep fisika, dan pemecahan masalah tingkat lanjut.", href: "/competition/physics_olympiad" },
-  { title: "Science Project", tagline: "Tim - SMA/Sederajat", description: "Format tim untuk presentasi proyek sains yang aplikatif, kreatif, dan relevan dengan isu nyata di sekitar peserta.", href: "/competition/science_project" },
-  { title: "Industrial Case", tagline: "Tim - Mahasiswa S1", description: "Cabang berbasis studi kasus industri dengan pendekatan analitis, strategis, dan presentasi solusi yang terstruktur.", href: "/competition/industrial_case" },
+  { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang ingin mengukur penguasaan dan problem solving konsep fisika secara mendalam.", href: "/competition/physics_olympiad" },
+  { title: "Science Project Competition", tagline: "Tim - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang mau mengembangkan ide dan inovasi berbasis sains secara tim.", href: "/competition/science_project" },
+  { title: "Industrial Case Competition", tagline: "Tim - Mahasiswa S1", description: "Kompetisi ini cocok bagi kamu yang ingin melatih kemampuan analisis permasalahan serta memberikan solusi inovatif suatu kasus industri.", href: "/competition/industrial_case" },
 ];
 
 const timelineItems = [
@@ -15,7 +15,7 @@ const timelineItems = [
 ];
 
 const faqPreview = [
-  { q: "Apa saja cabang lombanya?", a: "Physics Olympiad untuk individu SMA, Science Project untuk tim SMA, dan Industrial Case untuk tim mahasiswa S1." },
+  { q: "Apa saja cabang lombanya?", a: "Main Competition : Physics Olympiad untuk individu SMA, Science Project untuk tim SMA, dan Industrial Case untuk tim mahasiswa S1. Mini Competition : Essay, Short Video, dan Poster, untuk siswa (SMA) dan mahasiswa." },
   { q: "Kapan pendaftaran ditutup?", a: "Ikuti timeline resmi di halaman utama dan setiap halaman kompetisi. Status terbaru akan selalu ditampilkan di portal ini." },
   { q: "Di mana guidebook dan update diumumkan?", a: "Guidebook dan pengumuman utama bisa diakses dari halaman kompetisi, halaman side event, dan FAQ umum." },
 ];
@@ -32,10 +32,10 @@ export default function LandingPage() {
             EUREKA! ITB 2026
           </div>
           <h1 className="mt-8 font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
-            Exploring Physics, <span className="text-sunlight-orange relative whitespace-nowrap">Racing Ideas<svg className="absolute -bottom-2 left-0 w-full text-sunlight-orange/40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="transparent"/></svg></span>,<br className="hidden sm:block" /> and Building Impact.
+            Exploring Physics, <span className="text-sunlight-orange relative whitespace-nowrap">From Curiousity<svg className="absolute -bottom-2 left-0 w-full text-sunlight-orange/40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="transparent"/></svg></span>,<br className="hidden sm:block" /> to Impact.
           </h1>
           <p className="mt-6 mx-auto max-w-2xl text-base sm:text-lg leading-8 text-silver-shine">
-            Platform EUREKA ITB 2026 dirancang layaknya festival kompetisi modern: akses informasi cepat, jalur pendaftaran yang terintegrasi, dan direktori panduan yang terpusat.
+            EUREKA ITB merupakan Badan Semi Otonom (BSO) di bawah naungan HIMAFI ITB yang menyelenggarakan kompetisi tentang sains terutama fisika berskala nasional tingkat SMA dan perguruan tinggi.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/#lomba" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-sunlight-orange px-8 py-3.5 text-sm font-bold text-blue-marine transition-all hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(255,184,0,0.3)]">
@@ -56,7 +56,7 @@ export default function LandingPage() {
               <CalendarDays className="text-sunlight-orange" size={24} />
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-bold">Timeline Kegiatan</h2>
-            <p className="mt-3 text-silver-shine text-sm">Alur waktu pelaksanaan EUREKA ITB 2026</p>
+            <p className="mt-3 text-silver-shine text-sm">Linimasa pelaksanaan EUREKA! ITB 2026</p>
           </div>
         </div>
       </section>
@@ -66,8 +66,8 @@ export default function LandingPage() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.03),_transparent_40%)]"></div>
         <div className="max-w-7xl mx-auto">
           <div className="mb-12 text-center">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold">Cabang Kompetisi</h2>
-            <p className="mt-3 text-silver-shine text-sm">Pilih cabang yang sesuai dengan minat dan kualifikasi tim kamu.</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold">Main Competition</h2>
+            <p className="mt-3 text-silver-shine text-sm">Mari eksplor dan tentukan cabang yang sesuai dengan minat kamu.</p>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">
@@ -104,7 +104,7 @@ export default function LandingPage() {
           <div className="relative z-10 max-w-xl text-center md:text-left">
             <h2 className="font-display text-3xl font-bold text-white">Mini Competition</h2>
             <p className="mt-4 text-sm leading-relaxed text-silver-shine">
-              Selain kompetisi utama, ikuti juga rangkaian side event kami. Akses seluruh pendaftaran kegiatan pendukung, webinar, dan kontak resmi dalam satu portal.
+              Selain Main Competition, EUREKA! ITB 2026 juga menyediakan Mini Competition. Cocok bagi kamu yang ingin mengeksplor kreativitas terkait sains dan teknologi fisika. 
             </p>
           </div>
           <div className="relative z-10 w-full md:w-auto flex-shrink-0">
