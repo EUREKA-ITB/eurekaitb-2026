@@ -3,6 +3,7 @@ import { ArrowUpRight, Mail, MapPin } from "lucide-react";
 
 const quickLinks = [
   { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
   { label: "Competitions", href: "/#lomba" },
   { label: "FAQ", href: "/faq" },
   { label: "Mini Competition", href: "/mini-competition" },
@@ -48,7 +49,6 @@ export default function SiteFooter() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr_0.9fr]">
           
-          {/* Branding & Deskripsi */}
           <div>
             <p className="font-display text-3xl font-bold tracking-widest">
               EUREKA! <span className="text-sunlight-orange">ITB 2026</span>
@@ -58,7 +58,6 @@ export default function SiteFooter() {
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine">Quick Links</p>
             <div className="mt-4 flex flex-col gap-2">
@@ -71,7 +70,6 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          {/* Contact & Icon Socmed */}
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine">Contact</p>
             <div className="mt-4 space-y-4 text-sm text-silver-shine">
@@ -84,7 +82,6 @@ export default function SiteFooter() {
                 <p className="leading-7">ITB Kampus Ganesha, Jl. Ganesa No. 10, Coblong, Kota Bandung, Jawa Barat 40132</p>
               </div>
               
-              {/* Icon Sosmed Clickable */}
               <div className="pt-2">
                 <p className="font-semibold text-white mb-3">Social Media</p>
                 <div className="flex flex-wrap gap-3">
@@ -110,7 +107,6 @@ export default function SiteFooter() {
 
         </div>
 
-        {/* Bottom Copyright */}
         <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-silver-shine sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <MapPin size={14} className="text-sunlight-orange" />
