@@ -14,13 +14,16 @@ export const paymentStatusEnum = pgEnum("payment_status", ["unpaid", "pending", 
 export const registrationPhaseEnum = pgEnum("registration_phase", ["early_bird", "normal", "late"]);
 
 // ==============================================================================
-// 2. USERS (Nama tabel diubah jadi "user" agar dibaca NextAuth)
+// 2. USERS
 // ==============================================================================
 export const users = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: text("password"),
+  institution: varchar("institution", { length: 255 }), // TAMBAHAN BARU
+  educationLevel: varchar("education_level", { length: 50 }), // TAMBAHAN BARU
+  identityNumber: varchar("identity_number", { length: 100 }), // TAMBAHAN BARU
   emailVerified: timestamp("emailVerified", { mode: "date" }), 
   image: text("image"), 
   role: roleEnum("role").default("participant").notNull(),

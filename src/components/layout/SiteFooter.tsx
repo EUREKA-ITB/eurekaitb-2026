@@ -5,7 +5,7 @@ const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Competitions", href: "/#lomba" },
   { label: "FAQ", href: "/faq" },
-  { label: "Side Event", href: "/side-event" },
+  { label: "Mini Competition", href: "/mini-competition" },
 ];
 
 function InstagramIcon() {
@@ -48,17 +48,17 @@ export default function SiteFooter() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr_0.9fr]">
           
-          {/* Kolom 1: Branding & Deskripsi */}
+          {/* Branding & Deskripsi */}
           <div>
             <p className="font-display text-3xl font-bold tracking-widest">
               EUREKA! <span className="text-sunlight-orange">ITB 2026</span>
             </p>
             <p className="mt-4 max-w-xl text-sm leading-7 text-silver-shine">
-              Official website of EUREKA! ITB 2026. Portal peserta, kompetisi, guidebook, dan informasi utama disusun dalam satu alur yang rapi.
+              Official website of EUREKA! ITB 2026. Portal bagi peserta untuk mengakses informasi penting terutama kompetisi, kegiatan, pendaftaran, dan lainnya.
             </p>
           </div>
 
-          {/* Kolom 2: Quick Links */}
+          {/* Quick Links */}
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine">Quick Links</p>
             <div className="mt-4 flex flex-col gap-2">
@@ -71,7 +71,7 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          {/* Kolom 3: Contact & Ikon Sosial Media (Ala MCF) */}
+          {/* Contact & Icon Socmed */}
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine">Contact</p>
             <div className="mt-4 space-y-4 text-sm text-silver-shine">
@@ -84,7 +84,7 @@ export default function SiteFooter() {
                 <p className="leading-7">ITB Kampus Ganesha, Jl. Ganesa No. 10, Coblong, Kota Bandung, Jawa Barat 40132</p>
               </div>
               
-              {/* Bagian Sosmed Murni Ikon Clickable */}
+              {/* Icon Sosmed Clickable */}
               <div className="pt-2">
                 <p className="font-semibold text-white mb-3">Social Media</p>
                 <div className="flex flex-wrap gap-3">
@@ -97,7 +97,7 @@ export default function SiteFooter() {
                   <a href="#" aria-label="X EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <XIcon />
                   </a>
-                  <a href="https://www.linkedin.com/company/eureka-itb" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
+                  <a href="https://www.linkedin.com/in/eureka-itb-a6aa262ab" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <LinkedinIcon />
                   </a>
                   <a href="#" aria-label="TikTok EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">

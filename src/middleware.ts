@@ -6,18 +6,18 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hostname = request.nextUrl.hostname;
 
-  // 1. SIHIR DOMAIN KHUSUS SIDE EVENT (TRAP DIHAPUS, HANYA REWRITE HOME)
-  if (hostname === 'side-event.eurekaitb.com') {
-    // A. Kalau buka halaman utama, arahkan ke /side-event diam-diam
+  if (hostname === 'mini-competition.eurekaitb.com') {
     if (path === '/') {
-      return NextResponse.rewrite(new URL('/side-event', request.url));
+      return NextResponse.rewrite(new URL('/mini-competition', request.url));
     }
-    // B. Aturan tendang balik (trap) sudah dihapus, user bebas klik Navbar!
+  }
+
+  if (path.startsWith('/admin-se')) {
+    return NextResponse.redirect(new URL(path.replace('/admin-se', '/adm-se'), request.url));
   }
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
-  // 2. Protected Routes (Peserta & Admin)
   const isProtectedPath = path.startsWith('/dashboard') || path.startsWith('/settings') || path.startsWith('/competition');
   if (isProtectedPath) {
     if (!token) {
@@ -27,18 +27,15 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Admin Routes (KHUSUS ADMIN SIDE EVENT & SUPER ADMIN)
   if (path.startsWith('/adm-se')) {
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
-    // Jika role bukan 'admin' DAN bukan 'admin_se', tendang ke dashboard!
     if (token.role !== 'admin' && token.role !== 'admin_se') {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
 
-  // 4. Competition Typo Protection
   const validCompetitions = ['physics_olympiad', 'science_project', 'industrial_case'];
   if (path.startsWith('/competition/')) {
     const category = path.split('/')[2];
@@ -52,10 +49,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/', // Wajib ada agar sihir Side Event jalan di halaman utama
+    '/', 
     '/dashboard/:path*',
     '/settings/:path*',
     '/competition/:path*',
-    '/adm-se/:path*'
+    '/adm-se/:path*',
+    '/admin-se/:path*'
   ],
 };

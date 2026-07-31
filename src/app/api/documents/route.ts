@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     const body = (await req.json()) as DocumentPayload;
     
-    // Cari user dan ID Tim mereka
+    // search user dan ID Tim 
     const dbUser = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
     const userId = dbUser[0].id;
     
@@ -29,18 +29,17 @@ export async function POST(req: Request) {
     }
     const teamId = userTeam[0].id;
 
-    // Cek apakah tim ini sudah punya baris di tabel dokumen
     const existingDoc = await db.select().from(documents).where(eq(documents.teamId, teamId)).limit(1);
 
     if (existingDoc.length > 0) {
-      // Update dokumen yang sudah ada (menggabungkan data lama dan baru)
+      // Update dokumen (merge data lama dan baru)
       await db.update(documents).set({
         urlIdentitas: body.urlIdentitas ?? existingDoc[0].urlIdentitas,
         urlPayment: body.urlPayment ?? existingDoc[0].urlPayment,
         uploadedAt: new Date(),
       }).where(eq(documents.teamId, teamId));
     } else {
-      // Buat baris dokumen baru
+      // baris dokumen baru
       await db.insert(documents).values({
         teamId: teamId,
         urlIdentitas: body.urlIdentitas ?? null,
