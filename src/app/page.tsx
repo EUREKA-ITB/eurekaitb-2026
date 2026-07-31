@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy } from "lucide-react";
+import InteractiveTimeline from "@/components/InteractiveTimeline";
 
 const competitionCards = [
   { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang ingin mengukur penguasaan dan problem solving konsep fisika secara mendalam.", href: "/competition/physics_olympiad" },
@@ -24,7 +25,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-hidden text-white selection:bg-sunlight-orange selection:text-blue-marine">
       
-      {/* 1. HERO SECTION - Clean, Center-aligned, No bulky cards */}
+      {/* 1. HERO SECTION */}
       <section className="relative isolate pt-32 pb-24 px-4 sm:px-6 flex flex-col items-center text-center">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(255,184,0,0.15),_transparent_40%),linear-gradient(180deg,_rgba(5,10,31,0.1),_rgba(5,10,31,0.8))]"></div>
         <div className="max-w-4xl mx-auto">
@@ -48,7 +49,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 2. TIMELINE SECTION - Horizontal connected line layout (MCF Style) */}
+      {/* 2. TIMELINE SECTION (Menggunakan Komponen Stafmu) */}
       <section id="timeline" className="px-4 sm:px-6 py-20 border-t border-white/5 bg-black/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -58,10 +59,14 @@ export default function LandingPage() {
             <h2 className="font-display text-3xl sm:text-4xl font-bold">Timeline Kegiatan</h2>
             <p className="mt-3 text-silver-shine text-sm">Linimasa pelaksanaan EUREKA! ITB 2026</p>
           </div>
+          
+          <div className="max-w-6xl mx-auto">
+            <InteractiveTimeline />
+          </div>
         </div>
       </section>
 
-      {/* 3. COMPETITIONS SECTION - Sleek glassmorphism grid */}
+      {/* 3. COMPETITIONS SECTION */}
       <section id="lomba" className="px-4 sm:px-6 py-20 relative isolate">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.03),_transparent_40%)]"></div>
         <div className="max-w-7xl mx-auto">
@@ -97,7 +102,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. MINI COMPE SECTION - Streamlined Banner Style */}
+      {/* 4. MINI COMPE SECTION */}
       <section id="side-event" className="px-4 sm:px-6 py-12">
         <div className="max-w-7xl mx-auto rounded-3xl border border-sunlight-orange/20 bg-gradient-to-r from-sunlight-orange/10 to-transparent p-8 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-sunlight-orange/10 rounded-full blur-3xl"></div>
@@ -108,14 +113,14 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="relative z-10 w-full md:w-auto flex-shrink-0">
-            <Link href="/side-event" className="flex items-center justify-center gap-2 rounded-full bg-white text-blue-marine px-8 py-4 text-sm font-bold transition-transform hover:scale-105 shadow-[0_4px_15px_rgba(255,255,255,0.1)] w-full md:w-auto">
+            <Link href="/mini-competition" className="flex items-center justify-center gap-2 rounded-full bg-white text-blue-marine px-8 py-4 text-sm font-bold transition-transform hover:scale-105 shadow-[0_4px_15px_rgba(255,255,255,0.1)] w-full md:w-auto">
               Buka Halaman Mini Competition <ChevronRight size={16} />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 5. PREVIEW FAQ SECTION - Clean Accordion */}
+      {/* 5. PREVIEW FAQ SECTION */}
       <section className="px-4 sm:px-6 py-16 mb-10">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6 mb-8">
