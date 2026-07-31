@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/db";
 import { teams, users, teamMembers } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { getCurrentPhase } from "@/lib/competition-config";
 
 interface MemberPayload {
   fullName: string;
@@ -25,7 +26,6 @@ interface RequestBody {
   members: MemberPayload[];
 }
 
-// GET
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -57,21 +57,20 @@ export async function GET() {
       members: tMembers
     }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Gagal menarik data" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch data" }, { status: 500 });
   }
 }
 
-// POST: Update / Edit
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user?.email) return NextResponse.json({ error: "Akses ditolak." }, { status: 401 });
+    if (!session || !session.user?.email) return NextResponse.json({ error: "Access denied." }, { status: 401 });
 
     const body = (await req.json()) as RequestBody;
     const { compeType, teamName, institutionName, members } = body;
 
     if (!compeType || !teamName || !institutionName || members.length === 0) {
-      return NextResponse.json({ error: "Semua kolom esensial wajib diisi!" }, { status: 400 });
+      return NextResponse.json({ error: "All essential fields are required!" }, { status: 400 });
     }
 
     const dbUser = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
@@ -79,11 +78,13 @@ export async function POST(req: Request) {
 
     const existingTeam = await db.select().from(teams).where(eq(teams.userId, userId)).limit(1);
     let targetTeamId = "";
+    
+    const activePhase = getCurrentPhase();
 
     if (existingTeam.length > 0) {
       if (existingTeam[0].statusPayment !== "unpaid") {
         return NextResponse.json(
-          { error: "Data tidak bisa diedit karena pembayaran sedang diproses atau sudah diverifikasi!" }, 
+          { error: "Data cannot be edited because payment is being processed or verified!" }, 
           { status: 403 }
         );
       }
@@ -95,7 +96,7 @@ export async function POST(req: Request) {
       await db.delete(teamMembers).where(eq(teamMembers.teamId, targetTeamId));
     } else {
       const newTeam = await db.insert(teams).values({
-        userId, teamName, institutionName, compeType, registrationPhase: "early_bird",
+        userId, teamName, institutionName, compeType, registrationPhase: activePhase,
       }).returning({ id: teams.id });
       targetTeamId = newTeam[0].id;
     }
@@ -118,9 +119,8 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ message: "Data berhasil disimpan!" }, { status: 200 });
+    return NextResponse.json({ message: "Data successfully saved!" }, { status: 200 });
   } catch (error: unknown) {
-    console.error(error);
-    return NextResponse.json({ error: "Terjadi gangguan server Postgres." }, { status: 500 });
+    return NextResponse.json({ error: "Server error occurred." }, { status: 500 });
   }
 }

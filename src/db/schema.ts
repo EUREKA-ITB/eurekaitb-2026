@@ -1,38 +1,25 @@
 import { pgTable, uuid, varchar, timestamp, pgEnum, text, boolean, primaryKey, integer } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
-// ==============================================================================
-// 1. ENUMS
-// ==============================================================================
 export const roleEnum = pgEnum("role", ["admin", "admin_se", "participant"]);
-export const compeTypeEnum = pgEnum("compe_type", [
-  "physics_olympiad",  
-  "science_project",   
-  "industrial_case"    
-]);
+export const compeTypeEnum = pgEnum("compe_type", ["physics_olympiad", "science_project", "industrial_case"]);
 export const paymentStatusEnum = pgEnum("payment_status", ["unpaid", "pending", "verified", "rejected"]);
 export const registrationPhaseEnum = pgEnum("registration_phase", ["early_bird", "normal", "late"]);
 
-// ==============================================================================
-// 2. USERS
-// ==============================================================================
 export const users = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: text("password"),
-  institution: varchar("institution", { length: 255 }), // TAMBAHAN BARU
-  educationLevel: varchar("education_level", { length: 50 }), // TAMBAHAN BARU
-  identityNumber: varchar("identity_number", { length: 100 }), // TAMBAHAN BARU
+  institution: varchar("institution", { length: 255 }),
+  educationLevel: varchar("education_level", { length: 50 }),
+  identityNumber: varchar("identity_number", { length: 100 }),
   emailVerified: timestamp("emailVerified", { mode: "date" }), 
   image: text("image"), 
   role: roleEnum("role").default("participant").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// ==============================================================================
-// 3. TEAMS
-// ==============================================================================
 export const teams = pgTable("teams", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id).notNull(), 
@@ -46,17 +33,14 @@ export const teams = pgTable("teams", {
   cbtPassword: varchar("cbt_password", { length: 50 }),
 });
 
-// ==============================================================================
-// 4. TEAM MEMBERS (Diperbarui dengan Kelas & Pas Foto)
-// ==============================================================================
 export const teamMembers = pgTable("team_members", {
   id: uuid("id").defaultRandom().primaryKey(),
   teamId: uuid("team_id").references(() => teams.id).notNull(),
   fullName: varchar("full_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(), 
   phoneNumber: varchar("phone_number", { length: 50 }).notNull(),
-  grade: varchar("grade", { length: 50 }).notNull(), // Kelas di SMA atau Semester di Kampus
-  photoUrl: text("photo_url").notNull(), // Link dari Cloudinary untuk Pas Foto 3x4
+  grade: varchar("grade", { length: 50 }).notNull(),
+  photoUrl: text("photo_url").notNull(),
   ktmUrl: text("ktm_url"), 
   proofFollowUrl: text("proof_follow_url"),
   proofShareUrl: text("proof_share_url"),
@@ -64,9 +48,6 @@ export const teamMembers = pgTable("team_members", {
   isLeader: boolean("is_leader").default(false).notNull(), 
 });
 
-// ==============================================================================
-// 5. DOCUMENTS 
-// ==============================================================================
 export const documents = pgTable("documents", {
   id: uuid("id").defaultRandom().primaryKey(),
   teamId: uuid("team_id").references(() => teams.id).notNull(),
@@ -75,9 +56,6 @@ export const documents = pgTable("documents", {
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
 });
 
-// ==============================================================================
-// 6. NEXTAUTH TABEL WAJIB (Diubah jadi singular: account, session, verificationToken)
-// ==============================================================================
 export const accounts = pgTable("account", {
   userId: uuid("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
   type: text("type").$type<AdapterAccount["type"]>().notNull(),
@@ -94,19 +72,16 @@ export const accounts = pgTable("account", {
   compoundKey: primaryKey({ columns: [account.provider, account.providerAccountId] }),
 }));
 
-// ==============================================================================
-// 7. SIDE EVENT BLOCKS (Advanced Linktree-style CMS)
-// ==============================================================================
 export const blockTypeEnum = pgEnum("block_type", ["link", "image", "text", "video"]);
 
 export const sideEventBlocks = pgTable("side_event_blocks", {
   id: uuid("id").defaultRandom().primaryKey(),
   type: blockTypeEnum("type").default("link").notNull(),
-  title: text("title"), // Digunakan untuk Judul Link ATAU Teks Paragraf
-  url: text("url"), // Digunakan untuk URL Tujuan, Link Gambar, atau Link YouTube
-  iconUrl: text("icon_url"), // Opsional: URL Icon untuk tipe link
+  title: text("title"),
+  url: text("url"),
+  iconUrl: text("icon_url"),
   isPrimary: boolean("is_primary").default(false).notNull(),
-  isActive: boolean("is_active").default(true).notNull(), // Untuk hide/show tanpa menghapus
+  isActive: boolean("is_active").default(true).notNull(),
   orderIndex: integer("order_index").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

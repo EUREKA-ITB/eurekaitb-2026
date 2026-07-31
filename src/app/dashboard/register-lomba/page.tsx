@@ -5,11 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
+import { getCurrentPhase, getPrice, formatIDR, PHASE_NAMES } from "@/lib/competition-config";
+import type { CompeType } from "@/lib/competition-config";
 
 interface CloudinaryResult {
-  info?: string | {
-    secure_url?: string;
-  };
+  info?: string | { secure_url?: string; };
 }
 
 interface MemberInput {
@@ -20,29 +20,21 @@ interface MemberInput {
   photoUrl: string;    
   ktmUrl: string;      
   igAccountLink: string;
-  proofFollowUrl: string; // TAMBAHAN: Bukti Follow
-  proofShareUrl: string;  // TAMBAHAN: Bukti Share
+  proofFollowUrl: string;
+  proofShareUrl: string; 
   isLeader: boolean;   
 }
 
 interface FormData {
-  compeType: "physics_olympiad" | "science_project" | "industrial_case" | "";
+  compeType: CompeType | "";
   teamName: string;
   institutionName: string;
   members: MemberInput[]; 
 }
 
 const createEmptyMember = (isLeader: boolean): MemberInput => ({
-  fullName: "",
-  email: "",
-  phoneNumber: "",
-  grade: "",
-  photoUrl: "",
-  ktmUrl: "", 
-  igAccountLink: "",
-  proofFollowUrl: "",
-  proofShareUrl: "",
-  isLeader: isLeader,
+  fullName: "", email: "", phoneNumber: "", grade: "", photoUrl: "", ktmUrl: "", 
+  igAccountLink: "", proofFollowUrl: "", proofShareUrl: "", isLeader: isLeader,
 });
 
 export default function RegisterLombaPage() {
@@ -53,14 +45,14 @@ export default function RegisterLombaPage() {
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   
   const [formData, setFormData] = useState<FormData>({
-    compeType: "",
-    teamName: "",
-    institutionName: "",
-    members: [createEmptyMember(true)], 
+    compeType: "", teamName: "", institutionName: "", members: [createEmptyMember(true)], 
   });
 
   const [isLocked, setIsLocked] = useState<boolean>(false);
   const [lockedCompeName, setLockedCompeName] = useState<string>("");
+
+  const currentPhase = getCurrentPhase();
+  const currentPhaseName = PHASE_NAMES[currentPhase];
 
   useEffect(() => {
     const fetchExistingData = async () => {
@@ -79,46 +71,28 @@ export default function RegisterLombaPage() {
 
             setIsEditMode(true);
             
-            let validMembers: Partial<MemberInput>[] = 
-              Array.isArray(data.members) && data.members.length > 0 
-                ? data.members 
-                : [createEmptyMember(true)];
+            let validMembers: Partial<MemberInput>[] = Array.isArray(data.members) && data.members.length > 0 ? data.members : [createEmptyMember(true)];
 
-            validMembers = validMembers.sort(
-              (a: Partial<MemberInput>, b: Partial<MemberInput>) => 
-                Number(b.isLeader || false) - Number(a.isLeader || false)
-            );
+            validMembers = validMembers.sort((a: Partial<MemberInput>, b: Partial<MemberInput>) => Number(b.isLeader || false) - Number(a.isLeader || false));
 
             const processedMembers: MemberInput[] = validMembers.map((m: Partial<MemberInput>) => ({
-              fullName: m.fullName || "",
-              email: m.email || "",
-              phoneNumber: m.phoneNumber || "",
-              grade: m.grade || "",       
-              photoUrl: m.photoUrl || "", 
-              ktmUrl: m.ktmUrl || "",     
-              igAccountLink: m.igAccountLink || "",
-              proofFollowUrl: m.proofFollowUrl || "",
-              proofShareUrl: m.proofShareUrl || "",
-              isLeader: m.isLeader ?? false,
+              fullName: m.fullName || "", email: m.email || "", phoneNumber: m.phoneNumber || "", grade: m.grade || "",       
+              photoUrl: m.photoUrl || "", ktmUrl: m.ktmUrl || "", igAccountLink: m.igAccountLink || "",
+              proofFollowUrl: m.proofFollowUrl || "", proofShareUrl: m.proofShareUrl || "", isLeader: m.isLeader ?? false,
             }));
 
-            if (
-              (data.team.compeType === "science_project" || data.team.compeType === "industrial_case") &&
-              processedMembers.length < 2
-            ) {
+            if ((data.team.compeType === "science_project" || data.team.compeType === "industrial_case") && processedMembers.length < 2) {
               processedMembers.push(createEmptyMember(false));
             }
 
             setFormData({
-              compeType: data.team.compeType || "",
-              teamName: data.team.teamName || "",
-              institutionName: data.team.institutionName || "",
-              members: processedMembers,
+              compeType: data.team.compeType || "", teamName: data.team.teamName || "",
+              institutionName: data.team.institutionName || "", members: processedMembers,
             });
           }
         }
       } catch (error: unknown) {
-        console.error("Gagal menarik data lama:", error);
+        /* Silently handle error */
       } finally {
         setIsFetching(false);
       }
@@ -129,26 +103,17 @@ export default function RegisterLombaPage() {
 
   const handleCompeTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedType = e.target.value as FormData["compeType"];
-    
     setFormData((prev) => {
       const currentLeader = prev.members[0] || createEmptyMember(true);
       currentLeader.grade = ""; 
-      
       let newMembers: MemberInput[] = [currentLeader];
       
       if (selectedType === "science_project" || selectedType === "industrial_case") {
-        if (prev.members.length < 2) {
-          newMembers.push(createEmptyMember(false));
-        } else {
-          newMembers = prev.members.map(m => ({...m, grade: ""}));
-        }
+        if (prev.members.length < 2) newMembers.push(createEmptyMember(false));
+        else newMembers = prev.members.map(m => ({...m, grade: ""}));
       }
 
-      return {
-        ...prev,
-        compeType: selectedType,
-        members: newMembers,
-      };
+      return { ...prev, compeType: selectedType, members: newMembers };
     });
   };
 
@@ -162,9 +127,7 @@ export default function RegisterLombaPage() {
 
   const addMemberSlot = () => {
     setFormData((prev) => {
-      if (prev.members.length < 3) {
-        return { ...prev, members: [...prev.members, createEmptyMember(false)] };
-      }
+      if (prev.members.length < 3) return { ...prev, members: [...prev.members, createEmptyMember(false)] };
       return prev;
     });
   };
@@ -189,29 +152,25 @@ export default function RegisterLombaPage() {
       const hasMissingShare = formData.members.some((m) => m.proofShareUrl === "");
       
       if (hasMissingPhotos || hasMissingKTM || hasMissingIgLink || hasMissingFollow || hasMissingShare) {
-        alert("PENTING: Harap lengkapi seluruh dokumen dan link Instagram (Pas Foto, KTM, Link IG, Bukti Follow, & Bukti Share) untuk SETIAP anggota!");
+        alert("IMPORTANT: Please complete all documents and links (Photo, Student ID, IG Link, Proof of Follow & Share) for EVERY member!");
         setIsSaving(false);
         return;
       }
 
       const response = await fetch("/api/teams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData),
       });
 
       const data = await response.json() as { error?: string; message?: string };
 
-      if (!response.ok) {
-        alert(`Gagal: ${data.error ?? "Terjadi kesalahan"}`);
-      } else {
-        alert(isEditMode ? "Pembaruan Data Sukses!" : "Pendaftaran Kompetisi Sukses!");
+      if (!response.ok) alert(`Failed: ${data.error ?? "An error occurred"}`);
+      else {
+        alert(isEditMode ? "Data Successfully Updated!" : "Competition Registration Successful!");
         router.push("/dashboard");
         router.refresh(); 
       }
     } catch (error: unknown) {
-      console.error(error);
-      alert("Terjadi kesalahan jaringan.");
+      alert("Network error occurred.");
     } finally {
       setIsSaving(false);
     }
@@ -220,28 +179,20 @@ export default function RegisterLombaPage() {
   const isTeamCompetition = formData.compeType === "science_project" || formData.compeType === "industrial_case";
   const isMahasiswa = formData.compeType === "industrial_case";
 
-  if (isFetching) {
-    return (
-      <div className="min-h-screen bg-blue-marine flex items-center justify-center text-white font-display text-xl tracking-widest">
-        MEMUAT DATA...
-      </div>
-    );
-  }
+  if (isFetching) return <div className="min-h-screen bg-blue-marine flex items-center justify-center text-white font-display text-xl tracking-widest">LOADING DATA...</div>;
 
   if (isLocked) {
     return (
       <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 flex items-center justify-center box-border">
         <div className="bg-white/5 border border-white/10 p-8 sm:p-12 rounded-3xl text-center max-w-lg shadow-2xl backdrop-blur-sm">
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-red-400 font-bold text-2xl">!</div>
-          <h2 className="font-display text-2xl font-bold mb-4">Akses Form Terkunci</h2>
+          <h2 className="font-display text-2xl font-bold mb-4">Form Access Locked</h2>
           <p className="text-silver-shine text-sm leading-relaxed mb-8">
-            Akun Anda saat ini sudah terdaftar pada kompetisi <span className="text-white font-bold capitalize">{lockedCompeName}</span> dan sedang dalam tahap verifikasi/lunas. 
+            Your account is currently registered for <span className="text-white font-bold capitalize">{lockedCompeName}</span> and is undergoing payment verification or has been verified. 
             <br/><br/>
-            Sistem EUREKA membatasi 1 Akun Email hanya untuk 1 Pendaftaran Lomba.
+            EUREKA limits 1 Email Account to 1 Competition Registration.
           </p>
-          <Link href="/dashboard" className="inline-block bg-sunlight-orange text-blue-marine font-bold px-8 py-3 rounded-xl hover:bg-yellow-400 transition-colors">
-            Kembali ke Dashboard
-          </Link>
+          <Link href="/dashboard" className="inline-block bg-sunlight-orange text-blue-marine font-bold px-8 py-3 rounded-xl hover:bg-yellow-400 transition-colors">Return to Dashboard</Link>
         </div>
       </div>
     );
@@ -251,78 +202,59 @@ export default function RegisterLombaPage() {
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden pt-28">
       <div className="max-w-4xl mx-auto w-full">
         
-        <button 
-          type="button" 
-          onClick={() => router.back()} 
-          className="inline-flex items-center text-silver-shine hover:text-white mb-6 transition-colors text-sm sm:text-base bg-transparent border-none p-0 cursor-pointer"
-        >
-          <span className="mr-2">←</span> Batal & Kembali
+        <button type="button" onClick={() => router.back()} className="inline-flex items-center text-silver-shine hover:text-white mb-6 transition-colors text-sm sm:text-base bg-transparent border-none p-0 cursor-pointer">
+          <span className="mr-2">←</span> Cancel & Return
         </button>
 
         <h1 className="font-display text-2xl sm:text-4xl font-bold text-sunlight-orange mb-3 break-words">
-          {isEditMode ? "Edit Data Pendaftaran" : "Pendaftaran Kompetisi"}
+          {isEditMode ? "Edit Registration Data" : "Competition Registration"}
         </h1>
         <p className="text-silver-shine text-xs sm:text-sm mb-8 max-w-xl">
-          Lengkapi formulir di bawah ini. Pastikan data seluruh anggota valid beserta kelengkapan berkas administrasi.
+          Complete the form below. Ensure all member data and administrative documents are valid.
         </p>
 
         <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 p-5 sm:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-sm w-full box-border">
           
-          {/* BAGIAN 1: INFORMASI UMUM TIM */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 border-b border-white/10 pb-10">
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold mb-2">Kategori Lomba</label>
-              <select 
-                required
-                className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors"
-                value={formData.compeType}
-                onChange={handleCompeTypeChange}
-              >
-                <option value="" disabled>-- Pilih Kategori Lomba --</option>
-                <option value="physics_olympiad">Physics Olympiad (SMA - Individu)</option>
-                <option value="science_project">Science Project (SMA - Tim)</option>
-                <option value="industrial_case">Industrial Case (Mahasiswa S1 - Tim)</option>
+              <label className="block text-sm font-semibold mb-2">Competition Category</label>
+              <select required className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.compeType} onChange={handleCompeTypeChange}>
+                <option value="" disabled>-- Select Competition --</option>
+                <option value="physics_olympiad">Physics Olympiad (High School - Individual)</option>
+                <option value="science_project">Science Project (High School - Team)</option>
+                <option value="industrial_case">Industrial Case (Undergraduate - Team)</option>
               </select>
+              
+              {formData.compeType !== "" && (
+                <div className="mt-4 bg-sunlight-orange/10 border border-sunlight-orange/30 p-4 rounded-xl flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-sunlight-orange font-bold uppercase tracking-widest mb-1">Current Registration Phase</p>
+                    <p className="text-white font-bold">{currentPhaseName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-silver-shine mb-1">Registration Fee</p>
+                    <p className="text-xl font-display font-bold text-sunlight-orange">{formatIDR(getPrice(formData.compeType as CompeType, currentPhase))}</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2">
-                {formData.compeType === "physics_olympiad" ? "Nama Lengkap Peserta" : "Nama Tim / Kelompok"}
-              </label>
-              <input 
-                required
-                type="text"
-                placeholder={formData.compeType === "physics_olympiad" ? "Contoh: Albert Einstein" : "Contoh: Tim Gamma ITB"}
-                className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors"
-                value={formData.teamName}
-                onChange={(e) => setFormData((prev) => ({...prev, teamName: e.target.value}))}
-              />
+              <label className="block text-sm font-semibold mb-2">{formData.compeType === "physics_olympiad" ? "Full Participant Name" : "Team Name"}</label>
+              <input required type="text" placeholder={formData.compeType === "physics_olympiad" ? "e.g. Albert Einstein" : "e.g. Gamma Team ITB"} className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.teamName} onChange={(e) => setFormData((prev) => ({...prev, teamName: e.target.value}))} />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2">Asal Institusi</label>
-              <input 
-                required
-                type="text"
-                placeholder="Contoh: SMA Negeri 3 Bandung"
-                className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors"
-                value={formData.institutionName}
-                onChange={(e) => setFormData((prev) => ({...prev, institutionName: e.target.value}))}
-              />
+              <label className="block text-sm font-semibold mb-2">Institution / School</label>
+              <input required type="text" placeholder="e.g. SMAN 3 Bandung" className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.institutionName} onChange={(e) => setFormData((prev) => ({...prev, institutionName: e.target.value}))} />
             </div>
           </div>
 
-          {/* BAGIAN 2: BIODATA PERSONIL */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-            <h3 className="font-display text-xl font-bold text-sunlight-orange">Biodata Personil</h3>
-            
+            <h3 className="font-display text-xl font-bold text-sunlight-orange">Personnel Data</h3>
             {isTeamCompetition && formData.members.length < 3 && (
-              <button
-                type="button"
-                onClick={addMemberSlot}
-                className="text-xs font-bold bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg self-start sm:self-auto transition-colors"
-              >
-                + Tambah Anggota ({formData.members.length}/3 Orang)
+              <button type="button" onClick={addMemberSlot} className="text-xs font-bold bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-lg self-start sm:self-auto transition-colors">
+                + Add Member ({formData.members.length}/3)
               </button>
             )}
           </div>
@@ -333,123 +265,60 @@ export default function RegisterLombaPage() {
                 
                 <div className="flex justify-between items-center mb-6 pb-3 border-b border-white/10">
                   <span className="text-xs font-bold text-sunlight-orange bg-sunlight-orange/10 px-3 py-1.5 rounded-md uppercase tracking-widest">
-                    {member.isLeader ? "★ Ketua Tim / Individu" : `Anggota Tambahan ${index}`}
+                    {member.isLeader ? "★ Team Leader / Individual" : `Additional Member ${index}`}
                   </span>
-                  
-                  {!member.isLeader && (
-                    <button
-                      type="button"
-                      onClick={() => removeMemberSlot(index)}
-                      className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
-                    >
-                      Hapus Anggota
-                    </button>
-                  )}
+                  {!member.isLeader && <button type="button" onClick={() => removeMemberSlot(index)} className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors">Remove Member</button>}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                  
-                  {/* KOLOM KIRI: PAS FOTO & KTM (2 Kolom) */}
                   <div className="md:col-span-2 grid grid-cols-2 gap-4 h-max">
                     <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-xl p-3 bg-black/20">
                        {member.photoUrl ? (
-                         <Image src={member.photoUrl} alt="Pas Foto" width={320} height={128} unoptimized className="w-full h-32 object-cover rounded-md mb-3 border border-white/20 shadow-lg" />
+                         <Image src={member.photoUrl} alt="Photo" width={320} height={128} unoptimized className="w-full h-32 object-cover rounded-md mb-3 border border-white/20 shadow-lg" />
                        ) : (
-                         <div className="w-full h-32 bg-white/5 rounded-md mb-3 flex items-center justify-center text-xs text-silver-shine text-center px-2">Pas Foto 3x4</div>
+                         <div className="w-full h-32 bg-white/5 rounded-md mb-3 flex items-center justify-center text-xs text-silver-shine text-center px-2">3x4 Photo</div>
                       )}
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res: CloudinaryResult) => { 
-                          if(typeof res.info === "object" && res.info?.secure_url) {
-                            handleMemberChange(index, "photoUrl", res.info.secure_url);
-                          }
-                        }}
-                      >
-                        {({ open }) => (
-                          <button type="button" onClick={() => open()} className="text-[10px] bg-sunlight-orange text-blue-marine font-bold px-2 py-2 rounded-md w-full hover:bg-yellow-400 transition-colors">
-                            {member.photoUrl ? "Ganti Foto" : "Unggah Foto"}
-                          </button>
-                        )}
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res: CloudinaryResult) => { if(typeof res.info === "object" && res.info?.secure_url) handleMemberChange(index, "photoUrl", res.info.secure_url); }}>
+                        {({ open }) => <button type="button" onClick={() => open()} className="text-[10px] bg-sunlight-orange text-blue-marine font-bold px-2 py-2 rounded-md w-full hover:bg-yellow-400 transition-colors">{member.photoUrl ? "Change Photo" : "Upload Photo"}</button>}
                       </CldUploadWidget>
                     </div>
 
                     <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-xl p-3 bg-black/20">
                        {member.ktmUrl ? (
-                         <Image src={member.ktmUrl} alt="KTM" width={320} height={128} unoptimized className="w-full h-32 object-cover rounded-md mb-3 border border-white/20 shadow-lg" />
+                         <Image src={member.ktmUrl} alt="Student ID" width={320} height={128} unoptimized className="w-full h-32 object-cover rounded-md mb-3 border border-white/20 shadow-lg" />
                        ) : (
-                         <div className="w-full h-32 bg-white/5 rounded-md mb-3 flex items-center justify-center text-xs text-silver-shine text-center px-2">KTM / Pelajar</div>
+                         <div className="w-full h-32 bg-white/5 rounded-md mb-3 flex items-center justify-center text-xs text-silver-shine text-center px-2">Student ID</div>
                       )}
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res: CloudinaryResult) => { 
-                          if(typeof res.info === "object" && res.info?.secure_url) {
-                            handleMemberChange(index, "ktmUrl", res.info.secure_url);
-                          }
-                        }}
-                      >
-                        {({ open }) => (
-                          <button type="button" onClick={() => open()} className="text-[10px] bg-sunlight-orange text-blue-marine font-bold px-2 py-2 rounded-md w-full hover:bg-yellow-400 transition-colors">
-                            {member.ktmUrl ? "Ganti KTM" : "Unggah KTM"}
-                          </button>
-                        )}
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res: CloudinaryResult) => { if(typeof res.info === "object" && res.info?.secure_url) handleMemberChange(index, "ktmUrl", res.info.secure_url); }}>
+                        {({ open }) => <button type="button" onClick={() => open()} className="text-[10px] bg-sunlight-orange text-blue-marine font-bold px-2 py-2 rounded-md w-full hover:bg-yellow-400 transition-colors">{member.ktmUrl ? "Change ID" : "Upload ID"}</button>}
                       </CldUploadWidget>
                     </div>
                   </div>
 
-                  {/* KOLOM KANAN: INPUT BIODATA (3 Kolom) */}
                   <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-5 h-max">
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-silver-shine mb-2">Nama Lengkap Sesuai Identitas</label>
-                      <input
-                        required
-                        type="text"
-                        className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors"
-                        value={member.fullName}
-                        onChange={(e) => handleMemberChange(index, "fullName", e.target.value)}
-                      />
+                      <label className="block text-xs font-semibold text-silver-shine mb-2">Full Name (as per ID)</label>
+                      <input required type="text" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.fullName} onChange={(e) => handleMemberChange(index, "fullName", e.target.value)} />
                     </div>
-
                     <div>
-                      <label className="block text-xs font-semibold text-silver-shine mb-2">Email Aktif</label>
-                      <input
-                        required
-                        type="email"
-                        placeholder="nama@email.com"
-                        className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors"
-                        value={member.email}
-                        onChange={(e) => handleMemberChange(index, "email", e.target.value)}
-                      />
+                      <label className="block text-xs font-semibold text-silver-shine mb-2">Active Email</label>
+                      <input required type="email" placeholder="name@email.com" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.email} onChange={(e) => handleMemberChange(index, "email", e.target.value)} />
                     </div>
-
                     <div>
-                      <label className="block text-xs font-semibold text-silver-shine mb-2">No. WhatsApp</label>
-                      <input
-                        required
-                        type="tel"
-                        placeholder="08xxxxxxxx"
-                        className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors"
-                        value={member.phoneNumber}
-                        onChange={(e) => handleMemberChange(index, "phoneNumber", e.target.value)}
-                      />
+                      <label className="block text-xs font-semibold text-silver-shine mb-2">WhatsApp Number</label>
+                      <input required type="tel" placeholder="08xxxxxxxx" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.phoneNumber} onChange={(e) => handleMemberChange(index, "phoneNumber", e.target.value)} />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-silver-shine mb-2">Kelas / Semester</label>
-                      {/* DROPDOWN DINAMIS BERDASARKAN KATEGORI LOMBA */}
-                      <select
-                        required
-                        disabled={formData.compeType === ""}
-                        className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors disabled:opacity-50"
-                        value={member.grade}
-                        onChange={(e) => handleMemberChange(index, "grade", e.target.value)}
-                      >
-                        <option value="" disabled>-- Pilih Kelas / Semester --</option>
+                      <label className="block text-xs font-semibold text-silver-shine mb-2">Grade / Semester</label>
+                      <select required disabled={formData.compeType === ""} className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors disabled:opacity-50" value={member.grade} onChange={(e) => handleMemberChange(index, "grade", e.target.value)}>
+                        <option value="" disabled>-- Select Grade / Semester --</option>
                         {!isMahasiswa ? (
                           <>
-                            <option value="Kelas 10">Kelas 10 (SMA/MA/SMK)</option>
-                            <option value="Kelas 11">Kelas 11 (SMA/MA/SMK)</option>
-                            <option value="Kelas 12">Kelas 12 (SMA/MA/SMK)</option>
-                            <option value="Lainnya (SMA Sederajat)">Lainnya (Tingkat SMA Sederajat)</option>
+                            <option value="10th Grade">10th Grade</option>
+                            <option value="11th Grade">11th Grade</option>
+                            <option value="12th Grade">12th Grade</option>
+                            <option value="Other (High School)">Other (High School Level)</option>
                           </>
                         ) : (
                           <>
@@ -461,89 +330,42 @@ export default function RegisterLombaPage() {
                             <option value="Semester 6">Semester 6</option>
                             <option value="Semester 7">Semester 7</option>
                             <option value="Semester 8">Semester 8</option>
-                            <option value="Lainnya (S1)">Lainnya (Tingkat S1)</option>
+                            <option value="Other (Undergraduate)">Other (Undergraduate Level)</option>
                           </>
                         )}
                       </select>
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-silver-shine mb-2">Link Profil Instagram Peserta</label>
-                      <input
-                        required
-                        type="url"
-                        placeholder="https://instagram.com/username"
-                        className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors"
-                        value={member.igAccountLink}
-                        onChange={(e) => handleMemberChange(index, "igAccountLink", e.target.value)}
-                      />
+                      <label className="block text-xs font-semibold text-silver-shine mb-2">Instagram Profile Link</label>
+                      <input required type="url" placeholder="https://instagram.com/username" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.igAccountLink} onChange={(e) => handleMemberChange(index, "igAccountLink", e.target.value)} />
                     </div>
 
-                    {/* TOMBOL UPLOAD BUKTI (TANPA PREVIEW FOTO) */}
                     <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res: CloudinaryResult) => { 
-                          if(typeof res.info === "object" && res.info?.secure_url) {
-                            handleMemberChange(index, "proofFollowUrl", res.info.secure_url);
-                          }
-                        }}
-                      >
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res: CloudinaryResult) => { if(typeof res.info === "object" && res.info?.secure_url) handleMemberChange(index, "proofFollowUrl", res.info.secure_url); }}>
                         {({ open }) => (
-                          <button 
-                            type="button" 
-                            onClick={() => open()} 
-                            className={`w-full text-xs font-bold px-4 py-3 rounded-lg transition-colors border ${
-                              member.proofFollowUrl 
-                              ? "bg-green-500/20 text-green-400 border-green-500/30" 
-                              : "bg-white/5 text-silver-shine border-white/20 hover:bg-white/10 hover:text-white"
-                            }`}
-                          >
-                            {member.proofFollowUrl ? "✓ Bukti Follow Instagram (Selesai)" : "Upload Bukti Follow IG EUREKA"}
+                          <button type="button" onClick={() => open()} className={`w-full text-xs font-bold px-4 py-3 rounded-lg transition-colors border ${member.proofFollowUrl ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-white/5 text-silver-shine border-white/20 hover:bg-white/10 hover:text-white"}`}>
+                            {member.proofFollowUrl ? "✓ IG Follow Proof (Done)" : "Upload EUREKA IG Follow Proof"}
                           </button>
                         )}
                       </CldUploadWidget>
 
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res: CloudinaryResult) => { 
-                          if(typeof res.info === "object" && res.info?.secure_url) {
-                            handleMemberChange(index, "proofShareUrl", res.info.secure_url);
-                          }
-                        }}
-                      >
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res: CloudinaryResult) => { if(typeof res.info === "object" && res.info?.secure_url) handleMemberChange(index, "proofShareUrl", res.info.secure_url); }}>
                         {({ open }) => (
-                          <button 
-                            type="button" 
-                            onClick={() => open()} 
-                            className={`w-full text-xs font-bold px-4 py-3 rounded-lg transition-colors border ${
-                              member.proofShareUrl 
-                              ? "bg-green-500/20 text-green-400 border-green-500/30" 
-                              : "bg-white/5 text-silver-shine border-white/20 hover:bg-white/10 hover:text-white"
-                            }`}
-                          >
-                            {member.proofShareUrl ? "✓ Bukti Share Poster (Selesai)" : "Upload Bukti Share Poster & BC"}
+                          <button type="button" onClick={() => open()} className={`w-full text-xs font-bold px-4 py-3 rounded-lg transition-colors border ${member.proofShareUrl ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-white/5 text-silver-shine border-white/20 hover:bg-white/10 hover:text-white"}`}>
+                            {member.proofShareUrl ? "✓ Poster Share Proof (Done)" : "Upload Poster & BC Share Proof"}
                           </button>
                         )}
                       </CldUploadWidget>
                     </div>
-
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <button 
-            type="submit" 
-            disabled={isSaving}
-            className="w-full bg-sunlight-orange text-blue-marine font-bold py-4 rounded-xl hover:bg-yellow-400 transition-colors disabled:opacity-50 mt-10 text-sm sm:text-base shadow-lg"
-          >
-            {isSaving 
-              ? "Menyimpan Proses..." 
-              : isEditMode 
-                ? "Simpan Pembaruan Data" 
-                : "Daftarkan Tim & Lanjutkan"}
+          <button type="submit" disabled={isSaving} className="w-full bg-sunlight-orange text-blue-marine font-bold py-4 rounded-xl hover:bg-yellow-400 transition-colors disabled:opacity-50 mt-10 text-sm sm:text-base shadow-lg">
+            {isSaving ? "Saving Process..." : isEditMode ? "Save Data Updates" : "Register Team & Proceed"}
           </button>
         </form>
       </div>

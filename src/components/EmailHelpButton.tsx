@@ -34,7 +34,7 @@ export default function EmailHelpButton() {
       onClick={handleClick}
       className="inline-flex w-full justify-center rounded-full border border-sunlight-orange/40 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
     >
-      {isCopied ? "Hubungi via Email (tersalin)" : "Hubungi via Email"}
+      {isCopied ? "Hubungi via Email (tersalin)" : "Email"}
     </button>
   );
 }

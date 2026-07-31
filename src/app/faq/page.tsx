@@ -94,9 +94,19 @@ const faqs: { question: string; answer: string; category: Category }[] = [
 ];
 
 export default function FaqPageV2() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "(Nomor WA belum tersedia)";
-  const whatsappTemplate = encodeURIComponent(
-    "Halo tim helpdesk EUREKA 2026, saya ingin menanyakan masalah terkait pendaftaran lomba."
+  const whatsappNumberGen = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "6283148657849";
+  const whatsappTemplateGen = encodeURIComponent(
+    "Halo tim helpdesk EUREKA 2026, ada yang ingin saya tanyakan terkait Eureka! ITB 2026 ini. [Jelaskan keperluan Anda]"
+  );
+
+  const whatsappNumberCompe = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "62895324405010";
+  const whatsappTemplateCompe = encodeURIComponent(
+    "Halo tim helpdesk EUREKA 2026, ada yang ingin saya tanyakan terkait [sebutkan jenis kompetisi yang ingin ditanyakan]."
+  );
+
+  const whatsappNumberTech = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "6285139556416";
+  const whatsappTemplateTech = encodeURIComponent(
+    "Halo tim helpdesk EUREKA 2026, saya mengalami kendala teknis [sebutkan kendala teknis yang dialami]. Mohon bantuannya."
   );
 
   const [query, setQuery] = useState("");
@@ -294,11 +304,35 @@ export default function FaqPageV2() {
                   className="w-full rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine hover:bg-yellow-400"
                 >
                   <a
-                    href={`https://wa.me/${whatsappNumber}?text=${whatsappTemplate}`}
+                    href={`https://wa.me/${whatsappNumberGen}?text=${whatsappTemplateGen}`}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Hubungi via WhatsApp
+                    General (WhatsApp)
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  className="w-full rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine hover:bg-yellow-400"
+                >
+                  <a
+                    href={`https://wa.me/${whatsappNumberCompe}?text=${whatsappTemplateCompe}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Kompetisi (WhatsApp)
+                  </a>
+                </Button>
+                <Button
+                  asChild
+                  className="w-full rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine hover:bg-yellow-400"
+                >
+                  <a
+                    href={`https://wa.me/${whatsappNumberTech}?text=${whatsappTemplateTech}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Teknis (WhatsApp)
                   </a>
                 </Button>
               </div>

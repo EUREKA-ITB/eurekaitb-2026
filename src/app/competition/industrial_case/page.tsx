@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCircle, ChevronRight } from "lucide-react";
+import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCircle, ChevronRight, Wallet } from "lucide-react";
+import { COMPETITION_PRICING, PHASE_NAMES, formatIDR, getCurrentPhase } from "@/lib/competition-config";
+import type { CompeType, Phase } from "@/lib/competition-config";
 
 type DocItem = { id: string; title: string; url: string; };
 type TimelineItem = { date: string; title: string; desc: string; };
@@ -56,8 +58,11 @@ export default function IndustrialCasePage() {
   return <CompetitionTemplate formatName={formatName} lombaId={lombaId} info={info} documents={documents} activeDoc={activeDoc} activePdfIndex={activePdfIndex} setActivePdfIndex={setActivePdfIndex} timelineData={timelineData} faqData={faqData} hadiah={hadiah} />;
 }
 
-// Bantuan Template Visual
+/* Bantuan Template Visual Utama */
 function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, activePdfIndex, setActivePdfIndex, timelineData, faqData, hadiah }: TemplateProps) {
+  const pricing = COMPETITION_PRICING[lombaId as CompeType];
+  const currentPhase = getCurrentPhase();
+
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans overflow-x-hidden pt-24 pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full flex flex-col gap-16">
@@ -84,6 +89,28 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
                 Daftar Kompetisi Ini <ChevronRight size={16} />
               </Link>
             </div>
+          </div>
+        </section>
+
+        {/* REGISTRATION FEE SECTION DENGAN SOROTAN FASE AKTIF */}
+        <section className="relative z-10 py-10">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl font-bold flex items-center justify-center gap-3"><Wallet className="text-sunlight-orange" /> Registration Fee</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {(["early_bird", "normal", "late"] as const).map((phaseKey) => {
+              const isActive = currentPhase === phaseKey;
+              return (
+                <div key={phaseKey} className={`p-6 rounded-3xl text-center transition-all duration-300 ${isActive ? "bg-gradient-to-b from-sunlight-orange/20 to-transparent border border-sunlight-orange/50 shadow-[0_0_25px_rgba(255,184,0,0.2)] transform md:-translate-y-2" : "bg-white/5 border border-white/10 opacity-60 hover:opacity-100"}`}>
+                  {isActive && <div className="text-[10px] font-bold bg-sunlight-orange text-blue-marine px-3 py-1 rounded-full inline-block mb-4 uppercase tracking-widest">Active Phase</div>}
+                  <p className={`text-xs uppercase tracking-widest mb-2 ${isActive ? "text-sunlight-orange font-bold" : "text-silver-shine"}`}>{PHASE_NAMES[phaseKey]}</p>
+                  <h3 className="text-2xl font-bold text-white">{formatIDR(pricing[phaseKey])}</h3>
+                  <p className="text-xs text-silver-shine mt-3">
+                    {phaseKey === "early_bird" ? "Aug 16 - Aug 29, 2026" : phaseKey === "normal" ? "Aug 30 - Sep 19, 2026" : "Sep 20 - Sep 30, 2026"}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -122,7 +149,7 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
           </div>
         </section>
 
-        <section className="relative z-10 py-10">
+        <section className="relative z-10 py-10 border-t border-white/10">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl font-bold flex items-center justify-center gap-3"><Calendar className="text-sunlight-orange" /> Timeline Kompetisi</h2>
           </div>
