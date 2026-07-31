@@ -10,6 +10,7 @@ import LogoutModal from "./LogoutModal";
 export default function Navbar({ session }: { session: Session | null }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isMobileCompeOpen, setIsMobileCompeOpen] = useState<boolean>(false);
 
   const competitionLinks = [
     { label: "Physics Olympiad", href: "/competition/physics_olympiad" },
@@ -35,15 +36,26 @@ export default function Navbar({ session }: { session: Session | null }) {
               <span className="font-display font-bold text-lg sm:text-xl tracking-widest text-white truncate">
                 EUREKA! <span className="text-sunlight-orange">ITB 2026</span>
               </span>
-              <span className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-silver-shine">ITB Official Event</span>
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-silver-shine">HIMAFI ITB Official Event</span>
             </Link>
           </div>
 
           <div className="hidden lg:flex items-center gap-2 xl:gap-3">
-            <Link href="/" className="px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Home</Link>
+            <Link 
+              href="/" 
+              onClick={(e) => {
+                if (typeof window !== 'undefined' && window.location.hostname.includes('mini-competition')) {
+                  e.preventDefault();
+                  window.location.href = 'https://eurekaitb2026.vercel.app'; 
+                }
+              }}
+              className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors"
+            >
+              Home
+            </Link>
             
             <div className="relative group">
-              <button className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">
+              <button className="flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">
                 Competitions <ChevronDown size={16} />
               </button>
               <div className="absolute top-full right-0 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -59,19 +71,12 @@ export default function Navbar({ session }: { session: Session | null }) {
               </div>
             </div>
 
-           <Link href="/side-event" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
-                <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Mini Competition</Link>
-                <Link href="/faq-v2" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
-                <Link href="/about" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>About</Link>
-
-            {session && (
-              <Link href="/dashboard" className="px-4 py-2 rounded-full text-sm font-bold text-sunlight-orange bg-sunlight-orange/10 hover:bg-sunlight-orange/20 transition-colors ml-1">
-                Dashboard
-              </Link>
-            )}
+            <Link href="/mini-competition" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Mini Competition</Link>
+            <Link href="/faq" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
+            <Link href="/about" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">About</Link>
 
             {session ? (
-              <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1.5 pr-4 gap-3 ml-2 hover:bg-white/10 transition-colors">
+              <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1.5 pr-4 gap-3 ml-1 hover:bg-white/10 transition-colors">
                 <Link href="/dashboard" className="flex items-center gap-3 group" title="Buka Dashboard">
                   {session.user?.image ? (
                     <Image src={session.user.image} alt="User" width={32} height={32} unoptimized className="w-8 h-8 rounded-full border border-sunlight-orange object-cover group-hover:scale-105 transition-transform" />
@@ -96,14 +101,13 @@ export default function Navbar({ session }: { session: Session | null }) {
                 </button>
               </div>
             ) : (
-              <Link href="/login" className="hidden lg:flex px-6 py-2.5 rounded-full bg-sunlight-orange text-blue-marine hover:bg-yellow-400 transition-all text-sm font-bold">
+              <Link href="/login" className="hidden lg:flex px-5 py-2.5 rounded-full bg-sunlight-orange text-blue-marine hover:bg-yellow-400 transition-all text-sm font-bold ml-1">
                 Sign In / Sign Up
               </Link>
             )}
           </div>
         </div>
 
-        {/* Dropdown Mobile Menu */}
         {isOpen && (
           <div className="lg:hidden absolute top-20 left-0 w-full md:w-[420px] bg-[#0a102b]/96 backdrop-blur-2xl border-b border-white/10 shadow-2xl md:min-h-[calc(100vh-80px)] overflow-y-auto transition-all">
             <div className="p-6 md:p-8 flex flex-col h-full gap-6">
@@ -146,11 +150,44 @@ export default function Navbar({ session }: { session: Session | null }) {
                     </Link>
                   </>
                 )}
+                
                 <p className="px-2 pt-2 mt-2 text-[10px] uppercase tracking-[0.35em] text-silver-shine">Navigation</p>
-                <Link href="/" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Home</Link>
-                <Link href="/competition/physics_olympiad" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
-                <Link href="/side-event" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Side Event</Link>
-                <Link href="/faq-v2" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
+                
+                <Link 
+                  href="/" 
+                  onClick={(e) => {
+                    if (typeof window !== 'undefined' && window.location.hostname.includes('mini-competition')) {
+                      e.preventDefault();
+                      window.location.href = 'https://eurekaitb2026.vercel.app'; 
+                    } else {
+                      setIsOpen(false);
+                    }
+                  }}
+                  className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10"
+                >
+                  Home
+                </Link>
+
+                <div className="w-full flex flex-col">
+                  <button 
+                    onClick={() => setIsMobileCompeOpen(!isMobileCompeOpen)}
+                    className="w-full text-left p-4 rounded-xl font-bold text-white/80 hover:bg-white/5 flex justify-between items-center transition-colors"
+                  >
+                    <span>Competitions</span>
+                    <ChevronDown size={16} className={`transition-transform ${isMobileCompeOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  
+                  {isMobileCompeOpen && (
+                    <div className="flex flex-col pl-4 border-l border-white/10 ml-6 gap-1 mb-2 mt-1">
+                      <Link href="/competition/physics_olympiad" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
+                      <Link href="/competition/science_project" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Science Project</Link>
+                      <Link href="/competition/industrial_case" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Industrial Case</Link>
+                    </div>
+                  )}
+                </div>
+
+                <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Mini Competition</Link>
+                <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
                 <Link href="/about" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>About</Link>
               </div>
               <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>
