@@ -8,13 +8,6 @@ const competitionCards = [
   { title: "Industrial Case Competition", tagline: "Tim - Mahasiswa S1", description: "Kompetisi ini cocok bagi kamu yang ingin melatih kemampuan analisis permasalahan serta memberikan solusi inovatif suatu kasus industri.", href: "/competition/industrial_case" },
 ];
 
-const timelineItems = [
-  { date: "Nov 2025", title: "Launch & Registration", desc: "Pendaftaran dibuka dan guidebook mulai diumumkan." },
-  { date: "Feb 2026", title: "Screening & Admin Check", desc: "Verifikasi biodata, administrasi, dan kelengkapan dokumen." },
-  { date: "Mar 2026", title: "Preliminary Round", desc: "Babak awal kompetisi dilaksanakan sesuai cabang masing-masing." },
-  { date: "Apr 2026", title: "Announcement Stage", desc: "Pengumuman hasil, daftar lolos, dan arahan tahap selanjutnya." },
-];
-
 const faqPreview = [
   { q: "Apa saja cabang lombanya?", a: "Main Competition : Physics Olympiad untuk individu SMA, Science Project untuk tim SMA, dan Industrial Case untuk tim mahasiswa S1. Mini Competition : Essay, Short Video, dan Poster, untuk siswa (SMA) dan mahasiswa." },
   { q: "Kapan pendaftaran ditutup?", a: "Ikuti timeline resmi di halaman utama dan setiap halaman kompetisi. Status terbaru akan selalu ditampilkan di portal ini." },
@@ -49,7 +42,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 2. TIMELINE SECTION (Menggunakan Komponen Stafmu) */}
+      {/* 2. TIMELINE SECTION */}
       <section id="timeline" className="px-4 sm:px-6 py-20 border-t border-white/5 bg-black/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">

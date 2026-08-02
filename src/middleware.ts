@@ -18,6 +18,17 @@ export async function middleware(request: NextRequest) {
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
+  // LOCK MAIN WEB
+  const isLocked = process.env.LOCK_MAIN_WEB === 'true';
+  const isMainWebPath = path === '/' || path.startsWith('/faq') || path.startsWith('/about');
+
+  if (isLocked && isMainWebPath) {
+    const isAdmin = token?.role === 'admin' || token?.role === 'admin_se';
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/mini-competition', request.url));
+    }
+  }
+
   const isProtectedPath = path.startsWith('/dashboard') || path.startsWith('/settings') || path.startsWith('/competition');
   if (isProtectedPath) {
     if (!token) {
@@ -50,6 +61,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/', 
+    '/faq/:path*',          
     '/dashboard/:path*',
     '/settings/:path*',
     '/competition/:path*',
