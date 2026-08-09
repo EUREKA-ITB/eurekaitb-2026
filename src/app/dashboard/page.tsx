@@ -8,6 +8,7 @@ import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
 import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users } from "lucide-react";
 import Image from "next/image";
+import AbstractPortalClient from "./AbstractPortalClient"; // FITUR BARU
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -33,22 +34,46 @@ export default async function DashboardPage() {
 
   let isVerified = false;
   let isPending = false;
+  let isPO = false;
+  let isSPC = false;
+  let isICC = false;
+  let abstractStatus = "waiting";
+  let abstractUrl = null;
+  
   let participantNumber = "";
   let cbtPassword = "";
 
   if (hasRegistered) {
     isVerified = userTeam[0].statusPayment === "verified";
     isPending = userTeam[0].statusPayment === "pending";
+    
+    isPO = userTeam[0].compeType === "physics_olympiad";
+    isSPC = userTeam[0].compeType === "science_project";
+    isICC = userTeam[0].compeType === "industrial_case";
+    abstractStatus = userTeam[0].abstractStatus;
+    abstractUrl = userTeam[0].abstractUrl;
 
     participantNumber = userTeam[0].participantNumber || "MENUNGGU VERIFIKASI";
     cbtPassword = userTeam[0].cbtPassword || "******";
 
     membersData = await db.select().from(teamMembers).where(eq(teamMembers.teamId, userTeam[0].id));
-
     membersData.sort((a, b) => Number(b.isLeader || false) - Number(a.isLeader || false));
   }
 
-  const currentStep = !hasRegistered ? 1 : (isVerified ? 3 : (isPending ? 2.5 : 2));
+  // LOGIC PROGRESS TRACKER (Disesuaikan Jenis Lomba)
+  let currentStep = 1;
+  if (hasRegistered) {
+    if (isPO) {
+       currentStep = isVerified ? 3 : (isPending ? 2.5 : 2);
+    } else {
+       // SPC / ICC
+       if (abstractStatus === "passed") {
+          currentStep = isVerified ? 3 : (isPending ? 2.5 : 2);
+       } else {
+          currentStep = 1; // Masih fase seleksi abstrak
+       }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden">
@@ -75,19 +100,23 @@ export default async function DashboardPage() {
           
           <div className="relative z-10 w-full md:w-1/3">
             <h2 className="font-display text-xl font-bold text-white mb-2">Status Pendaftaran</h2>
-            <p className="text-silver-shine text-sm">Ikuti alur untuk mendapatkan Nomor Peserta Resmi.</p>
+            <p className="text-silver-shine text-sm">Ikuti alur untuk menjadi peserta resmi EUREKA.</p>
           </div>
 
           <div className="relative z-10 w-full md:w-2/3 flex items-center justify-between">
             <div className="flex flex-col items-center gap-2 w-1/3 text-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 1 ? "bg-sunlight-orange border-sunlight-orange text-blue-marine" : "border-white/20 text-white/40"}`}><FileText size={18} /></div>
-              <span className={`text-xs font-semibold ${currentStep >= 1 ? "text-sunlight-orange" : "text-white/40"}`}>Biodata Tim</span>
+              <span className={`text-xs font-semibold ${currentStep >= 1 ? "text-sunlight-orange" : "text-white/40"}`}>
+                {(isSPC || isICC) ? "Pendaftaran" : "Biodata Tim"}
+              </span>
             </div>
             <div className={`flex-1 h-0.5 -mt-6 transition-colors ${currentStep >= 2 ? "bg-sunlight-orange" : "bg-white/10"}`}></div>
             
             <div className="flex flex-col items-center gap-2 w-1/3 text-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 2 ? (isPending ? "bg-yellow-500 border-yellow-500 text-black" : "bg-sunlight-orange border-sunlight-orange text-blue-marine") : "bg-blue-marine border-white/20 text-white/40"}`}>{isPending ? <Clock size={18} /> : <CreditCard size={18} />}</div>
-              <span className={`text-xs font-semibold ${currentStep >= 2 ? (isPending ? "text-yellow-500" : "text-sunlight-orange") : "text-white/40"}`}>{isPending ? "Verifikasi Admin" : "Pembayaran"}</span>
+              <span className={`text-xs font-semibold ${currentStep >= 2 ? (isPending ? "text-yellow-500" : "text-sunlight-orange") : "text-white/40"}`}>
+                {isPending ? "Verifikasi Admin" : ((isSPC || isICC) ? "Pembayaran" : "Pembayaran")}
+              </span>
             </div>
             <div className={`flex-1 h-0.5 -mt-6 transition-colors ${currentStep >= 3 ? "bg-sunlight-orange" : "bg-white/10"}`}></div>
             
@@ -109,76 +138,70 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex flex-col gap-8 w-full box-border">
             
-            {/* VERIFIED: MUNCUL KARTU PESERTA & AKSES LOMBA */}
-            {isVerified && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* 1. KARTU TANDA PESERTA */}
-                <div className="lg:col-span-1 bg-gradient-to-br from-sunlight-orange to-yellow-600 p-1 rounded-3xl shadow-2xl relative overflow-hidden group">
-                  <div className="bg-blue-marine/90 w-full h-full rounded-[22px] p-6 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden">
-                    <div className="absolute -right-10 -top-10 opacity-10 pointer-events-none">
-                      <QrCode size={150} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-sunlight-orange uppercase tracking-widest mb-1">Official Participant</p>
-                      <h3 className="font-display text-2xl font-bold text-white mb-6 break-words">{userTeam[0].teamName}</h3>
-                      <div className="space-y-3 text-xs mb-8">
-                        <div>
-                          <p className="text-silver-shine">Kategori Lomba</p>
-                          <p className="font-bold text-white uppercase">{userTeam[0].compeType.replace("_", " ")}</p>
-                        </div>
-                        <div>
-                          <p className="text-silver-shine">Asal Institusi</p>
-                          <p className="font-bold text-white">{userTeam[0].institutionName}</p>
+            {/* =========================================================================
+                [STATE 1]: KHUSUS SPC/ICC MASIH FASE SELEKSI ABSTRAK (BELUM LOLOS/FAILED)
+                ========================================================================= */}
+            {(isSPC || isICC) && (abstractStatus === "waiting" || abstractStatus === "failed") && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border">
+                {/* KARTU PESERTA REDUP (SISI KIRI) */}
+                <div className="flex flex-col gap-4">
+                  <div className="bg-gradient-to-br from-white/10 to-white/5 p-1 rounded-3xl shadow-xl relative overflow-hidden group grayscale-[50%] opacity-80">
+                    <div className="bg-blue-marine/95 w-full h-full rounded-[22px] p-6 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden">
+                      <div className="absolute right-4 top-4 bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 text-[10px] font-bold px-3 py-1 rounded-full tracking-widest uppercase">
+                        {abstractStatus === "failed" ? "GUGUR SELEKSI" : "SELEKSI ABSTRAK"}
+                      </div>
+                      <div className="mt-6">
+                        <p className="text-[10px] font-bold text-silver-shine uppercase tracking-widest mb-1">Nama Tim</p>
+                        <h3 className="font-display text-2xl font-bold text-white mb-6 break-words">{userTeam[0].teamName}</h3>
+                        <div className="space-y-3 text-xs mb-4">
+                          <div>
+                            <p className="text-silver-shine">Kategori Lomba</p>
+                            <p className="font-bold text-white uppercase">{userTeam[0].compeType.replace("_", " ")}</p>
+                          </div>
+                          <div>
+                            <p className="text-silver-shine">Asal Institusi</p>
+                            <p className="font-bold text-white">{userTeam[0].institutionName}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="pt-4 border-t border-white/20">
-                      <p className="text-[10px] text-silver-shine mb-1">Nomor Registrasi:</p>
-                      <p className="font-mono text-xl font-bold text-white tracking-widest">{participantNumber}</p>
                     </div>
                   </div>
+                  {abstractStatus !== "failed" && (
+                    <Link href="/dashboard/register-lomba" className="w-full text-center border-2 border-white/20 text-white font-bold py-3.5 rounded-xl hover:bg-white/10 transition-colors text-sm shadow-md">
+                      Edit Biodata Pendaftaran
+                    </Link>
+                  )}
                 </div>
 
-                {/* 2. AKSES RUANG KOMPETISI */}
-                <div className="lg:col-span-2 bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl">
-                  <h2 className="font-display text-2xl font-bold text-white mb-6">Portal Ruang Lomba</h2>
-                  
-                  {userTeam[0].compeType === "physics_olympiad" ? (
-                    // TAMPILAN KHUSUS PHYSICS OLYMPIAD
-                    <div className="space-y-6">
-                      <div className="bg-gradient-to-r from-blue-900/40 to-black/40 border border-white/10 rounded-2xl p-6">
-                        <h3 className="text-white font-bold mb-2">Penyisihan & Semifinal: Platform Ujian CBT</h3>
-                        <p className="text-sm text-silver-shine mb-4">Gunakan kredensial di bawah ini untuk mengakses platform ujian eksternal EUREKA.</p>
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">User:</p><p className="font-mono font-bold">{participantNumber}</p></div>
-                          <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">Pass:</p><p className="font-mono font-bold">{cbtPassword}</p></div>
-                        </div>
-                        <a href="https://cbt.indolat.com" target="_blank" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">Masuk Platform Ujian</a>
-                      </div>
+                {/* PORTAL SUBMISI ABSTRAK (SISI KANAN) */}
+                <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl flex flex-col justify-center items-center">
+                  {abstractStatus === "failed" ? (
+                    <div className="text-center text-red-400">
+                      <Lock size={40} className="mx-auto mb-4 opacity-50" />
+                      <h3 className="font-bold text-xl mb-2">Mohon Maaf</h3>
+                      <p className="text-sm text-silver-shine">Tim Anda belum berhasil lolos pada tahapan seleksi abstrak ini. Tetap semangat!</p>
                     </div>
                   ) : (
-                    // TAMPILAN KHUSUS SP & ICC (SUBMISI BERKAS)
-                    <div className="bg-black/30 border border-dashed border-white/20 rounded-2xl p-6 text-center">
-                      <FileText size={40} className="text-silver-shine mb-4 mx-auto opacity-50" />
-                      <p className="text-white font-bold mb-2">Portal Submisi Karya</p>
-                      <p className="text-xs text-silver-shine mb-6 max-w-sm mx-auto">
-                        Unggah dokumen teknis, proposal, atau laporan sesuai jadwal yang ditentukan.
-                      </p>
-                      <Link href={`/competition/${userTeam[0].compeType}/submit`} className="bg-sunlight-orange text-blue-marine font-bold px-6 py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">
-                        Buka Ruang Submisi
-                      </Link>
-                    </div>
+                    <AbstractPortalClient currentUrl={abstractUrl} />
                   )}
                 </div>
               </div>
             )}
 
-            {/* BELUM VERIFIED (UNPAID / PENDING) */}
-            {!isVerified && (
+
+            {/* =========================================================================
+                [STATE 2]: LULUS ABSTRAK TAPI BELUM BAYAR/PENDING (SPC/ICC) ATAU PHYSICS OLYMPIAD 
+                ========================================================================= */}
+            {(!isVerified && (isPO || abstractStatus === "passed")) && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border">
-                {/* KARTU IDENTITAS SEMENTARA */}
+                {/* KARTU DATA (SISI KIRI) */}
                 <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm flex flex-col justify-between">
                   <div>
+                    {abstractStatus === "passed" && (
+                       <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
+                         <p className="text-sm font-bold text-green-400 flex items-center gap-2"><CheckCircle2 size={16}/> Selamat! Tim Anda lolos seleksi abstrak.</p>
+                       </div>
+                    )}
                     <p className="text-silver-shine text-xs uppercase tracking-wider mb-2 flex items-center gap-2"><Users size={16}/> Data Pendaftaran</p>
                     <h3 className="font-display text-2xl font-bold text-white mb-6">{userTeam[0].teamName}</h3>
                     <div className="space-y-4 text-sm bg-black/20 p-5 rounded-xl border border-white/5">
@@ -190,7 +213,8 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                  {userTeam[0].statusPayment === "unpaid" ? (
+                  
+                  {isPO && userTeam[0].statusPayment === "unpaid" ? (
                     <Link href="/dashboard/register-lomba" className="w-full text-center border-2 border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/10 transition-colors text-sm mt-6 block">
                       Edit Biodata Pendaftaran
                     </Link>
@@ -201,7 +225,7 @@ export default async function DashboardPage() {
                   )}
                 </div>
 
-                {/* KARTU INFO PEMBAYARAN */}
+                {/* KARTU PEMBAYARAN (SISI KANAN) */}
                 <div className={`border p-6 sm:p-8 rounded-3xl backdrop-blur-sm flex flex-col justify-between relative overflow-hidden ${isPending ? "bg-yellow-500/10 border-yellow-500/30" : "bg-gradient-to-br from-white/5 to-sunlight-orange/10 border-white/10"}`}>
                   <div className="relative z-10">
                     <h3 className="font-display text-xl font-bold mb-4 text-white flex items-center gap-2">
@@ -227,7 +251,80 @@ export default async function DashboardPage() {
               </div>
             )}
 
-            {/* DETAIL ANGGOTA TIM */}
+
+            {/* =========================================================================
+                [STATE 3]: LULUS DAN VERIFIED (ALL COMPE)
+                ========================================================================= */}
+            {isVerified && (
+              <div className={`grid grid-cols-1 ${isPO ? "lg:grid-cols-3" : "lg:grid-cols-2"} gap-6`}>
+                
+                {/* KARTU TANDA PESERTA (SISI KIRI) */}
+                <div className="lg:col-span-1 bg-gradient-to-br from-sunlight-orange to-yellow-600 p-1 rounded-3xl shadow-2xl relative overflow-hidden group">
+                  <div className="bg-blue-marine/90 w-full h-full rounded-[22px] p-6 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden">
+                    <div className="absolute -right-10 -top-10 opacity-10 pointer-events-none">
+                      <QrCode size={150} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold text-sunlight-orange uppercase tracking-widest mb-1 flex items-center justify-between">
+                        Official Participant
+                        <span className="bg-green-500 text-white px-2 py-0.5 rounded-md text-[8px] tracking-normal">VERIFIED</span>
+                      </p>
+                      <h3 className="font-display text-2xl font-bold text-white mb-6 break-words mt-2">{userTeam[0].teamName}</h3>
+                      <div className="space-y-3 text-xs mb-8">
+                        <div>
+                          <p className="text-silver-shine">Kategori Lomba</p>
+                          <p className="font-bold text-white uppercase">{userTeam[0].compeType.replace("_", " ")}</p>
+                        </div>
+                        <div>
+                          <p className="text-silver-shine">Asal Institusi</p>
+                          <p className="font-bold text-white">{userTeam[0].institutionName}</p>
+                        </div>
+                      </div>
+                    </div>
+                    {isPO && (
+                      <div className="pt-4 border-t border-white/20">
+                        <p className="text-[10px] text-silver-shine mb-1">Nomor Registrasi:</p>
+                        <p className="font-mono text-xl font-bold text-white tracking-widest">{participantNumber}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* SISI KANAN KHUSUS PHYSICS OLYMPIAD -> PLATFORM CBT */}
+                {isPO && (
+                  <div className="lg:col-span-2 bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl">
+                    <h2 className="font-display text-2xl font-bold text-white mb-6">Portal Ruang Lomba</h2>
+                    <div className="space-y-6">
+                      <div className="bg-gradient-to-r from-blue-900/40 to-black/40 border border-white/10 rounded-2xl p-6">
+                        <h3 className="text-white font-bold mb-2">Penyisihan & Semifinal: Platform Ujian CBT</h3>
+                        <p className="text-sm text-silver-shine mb-4">Gunakan kredensial di bawah ini untuk mengakses platform ujian eksternal EUREKA.</p>
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">User:</p><p className="font-mono font-bold">{participantNumber}</p></div>
+                          <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">Pass:</p><p className="font-mono font-bold">{cbtPassword}</p></div>
+                        </div>
+                        <a href="https://cbt.indolat.com" target="_blank" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">Masuk Platform Ujian</a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* SISI KANAN KHUSUS SPC/ICC -> WELCOME MESSAGE FULL PAPER */}
+                {(isSPC || isICC) && (
+                  <div className="lg:col-span-1 bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl flex flex-col justify-center text-center">
+                    <Trophy size={48} className="text-sunlight-orange mx-auto mb-4" />
+                    <h2 className="font-display text-2xl font-bold text-white mb-2">Pendaftaran Selesai!</h2>
+                    <p className="text-sm text-silver-shine mb-6">
+                      Selamat, tim Anda telah resmi terdaftar sebagai Finalis EUREKA! ITB 2026. Persiapkan rancangan Full Paper dan presentasi terbaik kalian. Petunjuk teknis selanjutnya akan dikirimkan melalui grup peserta resmi.
+                    </p>
+                    <Link href={`/competition/${userTeam[0].compeType}`} className="w-full block bg-white/10 text-white font-bold py-3 rounded-xl text-sm transition-colors hover:bg-white/20 border border-white/20">
+                      Baca Ulang Guidebook
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* DETAIL ANGGOTA TIM (ALL STATE) */}
             <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm w-full mt-2">
               <h3 className="font-display text-lg font-bold mb-6 text-white border-b border-white/10 pb-4">Struktur Anggota Tim</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

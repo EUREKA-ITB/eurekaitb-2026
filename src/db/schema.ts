@@ -5,6 +5,8 @@ export const roleEnum = pgEnum("role", ["admin", "admin_se", "participant"]);
 export const compeTypeEnum = pgEnum("compe_type", ["physics_olympiad", "science_project", "industrial_case"]);
 export const paymentStatusEnum = pgEnum("payment_status", ["unpaid", "pending", "verified", "rejected"]);
 export const registrationPhaseEnum = pgEnum("registration_phase", ["early_bird", "normal", "late"]);
+// FITUR BARU: Enum untuk status abstrak
+export const abstractStatusEnum = pgEnum("abstract_status", ["waiting", "passed", "failed"]); 
 
 export const users = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -28,6 +30,9 @@ export const teams = pgTable("teams", {
   compeType: compeTypeEnum("compe_type").notNull(),
   registrationPhase: registrationPhaseEnum("registration_phase").notNull(),
   statusPayment: paymentStatusEnum("payment_status").default("unpaid").notNull(),
+  // FITUR BARU: Kolom link abstrak & status abstrak
+  abstractUrl: text("abstract_url"), 
+  abstractStatus: abstractStatusEnum("abstract_status").default("waiting").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   participantNumber: varchar("participant_number", { length: 50 }),
   cbtPassword: varchar("cbt_password", { length: 50 }),

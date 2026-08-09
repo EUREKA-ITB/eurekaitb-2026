@@ -23,6 +23,7 @@ interface RequestBody {
   compeType: "physics_olympiad" | "science_project" | "industrial_case";
   teamName: string;
   institutionName: string;
+  abstractUrl: string; // FITUR BARU
   members: MemberPayload[];
 }
 
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
     if (!session || !session.user?.email) return NextResponse.json({ error: "Access denied." }, { status: 401 });
 
     const body = (await req.json()) as RequestBody;
-    const { compeType, teamName, institutionName, members } = body;
+    const { compeType, teamName, institutionName, abstractUrl, members } = body;
 
     if (!compeType || !teamName || !institutionName || members.length === 0) {
       return NextResponse.json({ error: "All essential fields are required!" }, { status: 400 });
@@ -89,14 +90,14 @@ export async function POST(req: Request) {
         );
       }
       await db.update(teams).set({
-        teamName, institutionName, compeType
+        teamName, institutionName, compeType, abstractUrl: abstractUrl || null
       }).where(eq(teams.id, existingTeam[0].id));
       targetTeamId = existingTeam[0].id;
 
       await db.delete(teamMembers).where(eq(teamMembers.teamId, targetTeamId));
     } else {
       const newTeam = await db.insert(teams).values({
-        userId, teamName, institutionName, compeType, registrationPhase: activePhase,
+        userId, teamName, institutionName, compeType, registrationPhase: activePhase, abstractUrl: abstractUrl || null
       }).returning({ id: teams.id });
       targetTeamId = newTeam[0].id;
     }
