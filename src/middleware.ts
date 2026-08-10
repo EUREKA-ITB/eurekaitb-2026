@@ -18,16 +18,29 @@ export async function middleware(request: NextRequest) {
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
-  // LOCK MAIN WEB
+  // ==========================================
+  // LOCK MAIN WEB (DIPERKETAT!)
+  // ==========================================
   const isLocked = process.env.LOCK_MAIN_WEB === 'true';
-  const isMainWebPath = path === '/' || path.startsWith('/faq') || path.startsWith('/about');
+  
+  // FITUR BARU: Tambahkan halaman auth dan dashboard ke dalam daftar gembok
+  const isMainWebPath = 
+    path === '/' || 
+    path.startsWith('/faq') || 
+    path.startsWith('/about') ||
+    path.startsWith('/login') ||    // Gembok akses login
+    path.startsWith('/register') || // Gembok akses register
+    path.startsWith('/dashboard') || // Gembok akses dashboard
+    path.startsWith('/competition');
 
   if (isLocked && isMainWebPath) {
     const isAdmin = token?.role === 'admin' || token?.role === 'admin_se';
     if (!isAdmin) {
+      // Jika bukan admin, tendang ke mini compe!
       return NextResponse.redirect(new URL('/mini-competition', request.url));
     }
   }
+  // ==========================================
 
   const isProtectedPath = path.startsWith('/dashboard') || path.startsWith('/settings') || path.startsWith('/competition');
   if (isProtectedPath) {
@@ -61,11 +74,14 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/', 
-    '/faq/:path*',          
+    '/faq/:path*', 
+    '/about/:path*',          
     '/dashboard/:path*',
     '/settings/:path*',
     '/competition/:path*',
     '/adm-se/:path*',
-    '/admin-se/:path*'
+    '/admin-se/:path*',
+    '/login/:path*',
+    '/register/:path*'
   ],
 };

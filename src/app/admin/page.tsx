@@ -6,7 +6,7 @@ import { users, teams, documents, teamMembers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import AdminTable from "./AdminTable"; 
-import LogoutButton from "@/components/LogoutButton"; // <-- Import LogoutButton
+import LogoutButton from "@/components/LogoutButton";
 
 export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -14,22 +14,37 @@ export default async function AdminDashboardPage() {
 
   // PROTEKSI SUPER KETAT: Hanya akun admin
   const dbUser = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
-  if (dbUser.length === 0 || dbUser[0].role !== "admin") {
+  if (dbUser.length === 0 || (dbUser[0].role !== "admin" && dbUser[0].role !== "admin_se")) {
     redirect("/dashboard"); 
   }
 
-  // Tarik SEMUA data (Teams, Documents untuk Bukti Bayar, TeamMembers untuk KTM)
+  // Tarik SEMUA data sekaligus
   const allTeams = await db.select().from(teams);
   const allDocs = await db.select().from(documents);
-  const allMembers = await db.select().from(teamMembers); // <-- Tarik anggota tim
+  const allMembers = await db.select().from(teamMembers); 
 
-  // Gabungkan data dengan aman
-  const teamsWithDocs = allTeams.map((team) => {
-    // Cari bukti transfer (masih di tabel documents)
+  // Mapping data super lengkap untuk AdminTable
+  const teamsWithDetails = allTeams.map((team) => {
+    // Cari bukti transfer 
     const doc = allDocs.find((d) => d.teamId === team.id);
     
-    // Cari KTM dari Ketua Tim di tabel teamMembers
-    const leader = allMembers.find((m) => m.teamId === team.id && m.isLeader);
+    // Tarik semua anggota untuk tim ini
+    const members = allMembers.filter((m) => m.teamId === team.id).map(m => ({
+      id: m.id,
+      fullName: m.fullName,
+      email: m.email,
+      phoneNumber: m.phoneNumber,
+      isLeader: m.isLeader,
+      grade: m.grade,
+      photoUrl: m.photoUrl,
+      ktmUrl: m.ktmUrl,
+      proofFollowUrl: m.proofFollowUrl,
+      proofShareUrl: m.proofShareUrl,
+      igAccountLink: m.igAccountLink
+    }));
+
+    // Ekstrak info ketua untuk kontak darurat di tabel depan
+    const leader = members.find((m) => m.isLeader) || members[0];
 
     return { 
       id: team.id,
@@ -37,10 +52,18 @@ export default async function AdminDashboardPage() {
       institutionName: team.institutionName,
       compeType: team.compeType,
       statusPayment: team.statusPayment,
+      abstractStatus: team.abstractStatus,
+      abstractUrl: team.abstractUrl,
+      caseChoice: team.caseChoice,
       document: { 
-        urlIdentitas: leader?.ktmUrl || null, // <-- Sekarang narik dari KTM Ketua
         urlPayment: doc?.urlPayment || null 
-      } 
+      },
+      leaderContact: {
+        name: leader?.fullName || "-",
+        email: leader?.email || "-",
+        phone: leader?.phoneNumber || "-"
+      },
+      members: members
     };
   });
 
@@ -51,13 +74,13 @@ export default async function AdminDashboardPage() {
         {/* HEADER ADMIN */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-red-500/30 pb-6">
           <div>
-            <div className="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-widest uppercase">
-              Admin Mode
+            <div className="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-widest uppercase shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+              Administrator Mode
             </div>
             <h1 className="font-display text-3xl font-bold text-white mb-1">
               Data Pendaftar EUREKA 2026
             </h1>
-            <p className="text-silver-shine text-sm">Akses penuh ke seluruh data peserta.</p>
+            <p className="text-silver-shine text-sm">Pusat komando verifikasi dan validasi peserta.</p>
           </div>
           <div className="mt-4 md:mt-0 flex gap-4 items-center">
             <Link 
@@ -66,14 +89,12 @@ export default async function AdminDashboardPage() {
             >
               Mode Peserta
             </Link>
-            
-            {/* Pakai Tombol Instan, Bebas Boros Page */}
             <LogoutButton /> 
           </div>
         </header>
 
-        {/* TABEL DATA */}
-        <AdminTable initialData={teamsWithDocs} />
+        {/* TABEL DATA DENGAN TABS & MODAL */}
+        <AdminTable initialData={teamsWithDetails} />
 
       </div>
     </div>

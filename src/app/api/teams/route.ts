@@ -78,30 +78,45 @@ export async function POST(req: Request) {
     const userId = dbUser[0].id;
 
     const existingTeam = await db.select().from(teams).where(eq(teams.userId, userId)).limit(1);
-    let targetTeamId = "";
     
+    let targetTeamId = "";
     const activePhase = getCurrentPhase();
 
     if (existingTeam.length > 0) {
       if (existingTeam[0].statusPayment !== "unpaid") {
-        return NextResponse.json(
-          { error: "Data cannot be edited because payment is being processed or verified!" }, 
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Data cannot be edited because payment is processed!" }, { status: 403 });
       }
-      await db.update(teams).set({
-        teamName, institutionName, compeType, abstractUrl: abstractUrl || null
-      }).where(eq(teams.id, existingTeam[0].id));
-      targetTeamId = existingTeam[0].id;
 
+      // --- LOGIC RESET OTOMATIS JIKA GANTI LOMBA ---
+      const isSwitchingCompe = existingTeam[0].compeType !== compeType;
+      
+      await db.update(teams).set({
+        teamName,
+        institutionName,
+        compeType,
+        // Jika ganti lomba, reset abstrak dan pilihan kasus ke null/default
+        abstractUrl: isSwitchingCompe ? null : (abstractUrl || existingTeam[0].abstractUrl),
+        abstractStatus: isSwitchingCompe ? "waiting" : existingTeam[0].abstractStatus,
+        caseChoice: isSwitchingCompe ? null : existingTeam[0].caseChoice
+      }).where(eq(teams.id, existingTeam[0].id));
+      
+      targetTeamId = existingTeam[0].id;
+      // Hapus member lama untuk diisi ulang
       await db.delete(teamMembers).where(eq(teamMembers.teamId, targetTeamId));
     } else {
       const newTeam = await db.insert(teams).values({
-        userId, teamName, institutionName, compeType, registrationPhase: activePhase, abstractUrl: abstractUrl || null
+        userId, 
+        teamName, 
+        institutionName, 
+        compeType, 
+        registrationPhase: activePhase, 
+        abstractUrl: abstractUrl || null,
+        abstractStatus: "waiting"
       }).returning({ id: teams.id });
       targetTeamId = newTeam[0].id;
     }
 
+    // Insert Member Baru
     for (const member of members) {
       if (member.fullName.trim() !== "") {
         await db.insert(teamMembers).values({
@@ -122,6 +137,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ message: "Data successfully saved!" }, { status: 200 });
   } catch (error: unknown) {
+    console.error("Teams POST Error:", error);
     return NextResponse.json({ error: "Server error occurred." }, { status: 500 });
   }
 }

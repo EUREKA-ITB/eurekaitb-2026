@@ -16,14 +16,18 @@ export async function PATCH(req: Request) {
     const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
     if (userTeam.length === 0) return NextResponse.json({ error: "Team not found" }, { status: 404 });
 
-    const { abstractUrl } = await req.json();
-    if (!abstractUrl) {
-      return NextResponse.json({ error: "Abstract URL is required" }, { status: 400 });
+    if (userTeam[0].compeType !== "industrial_case") {
+      return NextResponse.json({ error: "Invalid competition type" }, { status: 400 });
     }
 
-    await db.update(teams).set({ abstractUrl, abstractStatus: "waiting" }).where(eq(teams.id, userTeam[0].id));
+    const { caseChoice } = await req.json();
+    if (!caseChoice) {
+      return NextResponse.json({ error: "Case choice is required" }, { status: 400 });
+    }
 
-    return NextResponse.json({ message: "Abstract uploaded successfully" }, { status: 200 });
+    await db.update(teams).set({ caseChoice }).where(eq(teams.id, userTeam[0].id));
+
+    return NextResponse.json({ message: "Case choice updated successfully" }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

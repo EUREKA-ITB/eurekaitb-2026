@@ -35,7 +35,6 @@ const createEmptyMember = (isLeader: boolean): MemberInput => ({
   igAccountLink: "", proofFollowUrl: "", proofShareUrl: "", isLeader: isLeader,
 });
 
-// Helper aman tanpa tipe 'any' untuk mengambil secure_url dari Cloudinary
 const getSecureUrlFromUpload = (result: unknown): string | null => {
   if (result && typeof result === "object" && "info" in result) {
     const info = (result as { info?: unknown }).info;
@@ -78,9 +77,7 @@ export default function RegisterLombaPage() {
               setIsFetching(false);
               return; 
             }
-
             setIsEditMode(true);
-            
             let validMembers: Partial<MemberInput>[] = Array.isArray(data.members) && data.members.length > 0 ? data.members : [createEmptyMember(true)];
             validMembers = validMembers.sort((a: Partial<MemberInput>, b: Partial<MemberInput>) => Number(b.isLeader || false) - Number(a.isLeader || false));
 
@@ -106,7 +103,6 @@ export default function RegisterLombaPage() {
         setIsFetching(false);
       }
     };
-
     fetchExistingData();
   }, []);
 
@@ -166,9 +162,9 @@ export default function RegisterLombaPage() {
         return;
       }
 
-      // Validasi Abstrak untuk SPC & ICC disamakan
-      if ((formData.compeType === "science_project" || formData.compeType === "industrial_case") && !formData.abstractUrl) {
-        alert("PENTING: Tim wajib mengunggah file abstrak saat pendaftaran awal!");
+      // SPC wajib abstrak di awal, ICC tidak
+      if (formData.compeType === "science_project" && !formData.abstractUrl) {
+        alert("PENTING: Tim SPC wajib mengunggah file abstrak saat pendaftaran awal!");
         setIsSaving(false);
         return;
       }
@@ -204,7 +200,7 @@ export default function RegisterLombaPage() {
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 text-red-400 font-bold text-2xl">!</div>
           <h2 className="font-display text-2xl font-bold mb-4">Akses Formulir Terkunci</h2>
           <p className="text-silver-shine text-sm leading-relaxed mb-8">
-            Akun Anda saat ini telah terdaftar untuk <span className="text-white font-bold capitalize">{lockedCompeName}</span> dan sedang dalam tahap verifikasi pembayaran atau telah diverifikasi. 
+            Akun Anda saat ini telah terdaftar untuk <span className="text-white font-bold capitalize">{lockedCompeName}</span> dan sedang dalam tahap verifikasi atau pembayaran. 
           </p>
           <Link href="/dashboard" className="inline-block bg-sunlight-orange text-blue-marine font-bold px-8 py-3 rounded-xl hover:bg-yellow-400 transition-colors">Kembali ke Dashboard</Link>
         </div>
@@ -279,13 +275,7 @@ export default function RegisterLombaPage() {
                        ) : (
                          <div className="w-full h-32 bg-white/5 rounded-md mb-3 flex items-center justify-center text-xs text-silver-shine text-center px-2">Pas Foto 3x4</div>
                       )}
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res) => {
-                          const url = getSecureUrlFromUpload(res);
-                          if (url) handleMemberChange(index, "photoUrl", url);
-                        }}
-                      >
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res) => { const url = getSecureUrlFromUpload(res); if (url) handleMemberChange(index, "photoUrl", url); }}>
                         {({ open }) => <button type="button" onClick={() => open()} className="text-[10px] bg-sunlight-orange text-blue-marine font-bold px-2 py-2 rounded-md w-full hover:bg-yellow-400 transition-colors">{member.photoUrl ? "Ubah Foto" : "Unggah Foto"}</button>}
                       </CldUploadWidget>
                     </div>
@@ -296,13 +286,7 @@ export default function RegisterLombaPage() {
                        ) : (
                          <div className="w-full h-32 bg-white/5 rounded-md mb-3 flex items-center justify-center text-xs text-silver-shine text-center px-2">KTM / Kartu Pelajar</div>
                       )}
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res) => {
-                          const url = getSecureUrlFromUpload(res);
-                          if (url) handleMemberChange(index, "ktmUrl", url);
-                        }}
-                      >
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res) => { const url = getSecureUrlFromUpload(res); if (url) handleMemberChange(index, "ktmUrl", url); }}>
                         {({ open }) => <button type="button" onClick={() => open()} className="text-[10px] bg-sunlight-orange text-blue-marine font-bold px-2 py-2 rounded-md w-full hover:bg-yellow-400 transition-colors">{member.ktmUrl ? "Ubah Kartu" : "Unggah Kartu"}</button>}
                       </CldUploadWidget>
                     </div>
@@ -355,13 +339,7 @@ export default function RegisterLombaPage() {
                     </div>
 
                     <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res) => {
-                          const url = getSecureUrlFromUpload(res);
-                          if (url) handleMemberChange(index, "proofFollowUrl", url);
-                        }}
-                      >
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res) => { const url = getSecureUrlFromUpload(res); if (url) handleMemberChange(index, "proofFollowUrl", url); }}>
                         {({ open }) => (
                           <button type="button" onClick={() => open()} className={`w-full text-xs font-bold px-4 py-3 rounded-lg transition-colors border ${member.proofFollowUrl ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-white/5 text-silver-shine border-white/20 hover:bg-white/10 hover:text-white"}`}>
                             {member.proofFollowUrl ? "✓ Bukti Follow IG (Selesai)" : "Unggah Bukti Follow IG EUREKA"}
@@ -369,13 +347,7 @@ export default function RegisterLombaPage() {
                         )}
                       </CldUploadWidget>
 
-                      <CldUploadWidget 
-                        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                        onSuccess={(res) => {
-                          const url = getSecureUrlFromUpload(res);
-                          if (url) handleMemberChange(index, "proofShareUrl", url);
-                        }}
-                      >
+                      <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res) => { const url = getSecureUrlFromUpload(res); if (url) handleMemberChange(index, "proofShareUrl", url); }}>
                         {({ open }) => (
                           <button type="button" onClick={() => open()} className={`w-full text-xs font-bold px-4 py-3 rounded-lg transition-colors border ${member.proofShareUrl ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-white/5 text-silver-shine border-white/20 hover:bg-white/10 hover:text-white"}`}>
                             {member.proofShareUrl ? "✓ Bukti Share Poster (Selesai)" : "Unggah Bukti Share Poster & BC"}
@@ -389,21 +361,15 @@ export default function RegisterLombaPage() {
             ))}
           </div>
 
-          {/* Submisi Abstrak SPC & ICC DIBIKIN SAMA (Muncul untuk keduanya) */}
-          {(formData.compeType === "science_project" || formData.compeType === "industrial_case") && (
+          {/* HANYA MUNCUL JIKA SPC: SUBMISI ABSTRAK */}
+          {formData.compeType === "science_project" && (
             <div className="mt-8 mb-6 p-6 bg-blue-900/40 border border-blue-500/30 rounded-2xl">
               <h3 className="font-display text-lg font-bold text-white mb-2 flex items-center gap-2">
                 <FileText size={20} className="text-sunlight-orange"/> Submisi Dokumen Abstrak
               </h3>
-              <p className="text-xs text-silver-shine mb-4">Khusus untuk kategori SPC dan ICC, abstrak awal wajib diunggah bersamaan dengan form pendaftaran ini. Format PDF, maksimal ukuran 5MB.</p>
+              <p className="text-xs text-silver-shine mb-4">Khusus untuk kategori SPC, abstrak awal wajib diunggah bersamaan dengan form pendaftaran ini. Format PDF, maksimal ukuran 5MB.</p>
               
-              <CldUploadWidget 
-                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-                onSuccess={(res) => {
-                  const url = getSecureUrlFromUpload(res);
-                  if (url) setFormData(prev => ({...prev, abstractUrl: url}));
-                }}
-              >
+              <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={(res) => { const url = getSecureUrlFromUpload(res); if (url) setFormData(prev => ({...prev, abstractUrl: url})); }}>
                 {({ open }) => (
                   <button type="button" onClick={() => open()} className={`w-full md:w-auto text-sm font-bold px-6 py-3 rounded-xl transition-colors border shadow-lg ${formData.abstractUrl ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-sunlight-orange text-blue-marine hover:bg-yellow-400"}`}>
                     {formData.abstractUrl ? "✓ Dokumen Abstrak Berhasil Diunggah (Klik untuk Ubah)" : "Unggah Dokumen Abstrak (Wajib)"}
