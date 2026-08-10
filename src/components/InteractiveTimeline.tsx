@@ -193,8 +193,8 @@ export default function InteractiveTimeline() {
       <div className="flex justify-center items-center gap-2 mb-8 flex-wrap">
         {[
           { id: "all", label: "Semua Event" },
-          { id: "active", label: "🔥 Berlangsung" },
-          { id: "upcoming", label: "⏳ Mendatang" },
+          { id: "active", label: "Berlangsung" },
+          { id: "upcoming", label: "Mendatang" },
           { id: "past", label: "✓ Selesai" },
         ].map((tab) => (
           <button

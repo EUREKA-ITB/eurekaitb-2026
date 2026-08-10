@@ -27,7 +27,7 @@ export default function Navbar({ session }: { session: Session | null }) {
             <button 
               onClick={() => setIsOpen(!isOpen)} 
               className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-white/10 bg-white/5 text-white hover:text-sunlight-orange hover:bg-white/10 transition-colors shrink-0"
-              aria-label="Buka menu"
+              aria-label="Open menu"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -76,29 +76,36 @@ export default function Navbar({ session }: { session: Session | null }) {
             <Link href="/about" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">About</Link>
 
             {session ? (
-              <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1.5 pr-4 gap-3 ml-1 hover:bg-white/10 transition-colors">
-                <Link href="/dashboard" className="flex items-center gap-3 group" title="Buka Dashboard">
-                  {session.user?.image ? (
-                    <Image src={session.user.image} alt="User" width={32} height={32} unoptimized className="w-8 h-8 rounded-full border border-sunlight-orange object-cover group-hover:scale-105 transition-transform" />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-sunlight-orange text-blue-marine flex items-center justify-center font-bold text-sm group-hover:scale-105 transition-transform">
-                      {session.user?.name?.charAt(0)}
-                    </div>
-                  )}
-                  <div className="flex flex-col text-left mr-2">
-                    <span className="text-[10px] text-silver-shine uppercase tracking-wider group-hover:text-white transition-colors">Masuk sebagai</span>
-                    <span className="text-sm font-bold text-sunlight-orange leading-tight">{session.user?.name}</span>
-                  </div>
+              <div className="flex items-center gap-2 ml-2">
+                {/* --- EKSPLISIT TOMBOL DASHBOARD DI DESKTOP --- */}
+                <Link href="/dashboard" className="hidden xl:flex px-4 py-2 rounded-full text-sm font-bold bg-sunlight-orange/10 text-sunlight-orange border border-sunlight-orange/30 hover:bg-sunlight-orange hover:text-blue-marine transition-colors">
+                  Dashboard
                 </Link>
-                <div className="w-px h-6 bg-white/20"></div>
-                <Link href="/settings" className="text-silver-shine hover:text-white transition-colors" title="Pengaturan Akun"><Settings size={18} /></Link>
-                <button 
-                  onClick={() => setIsLogoutModalOpen(true)}
-                  className="flex items-center gap-2 text-sm font-bold text-maroon-flash hover:text-red-400 transition-colors ml-1"
-                  title="Logout"
-                >
-                  <LogOut size={18} />
-                </button>
+                
+                <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1.5 pr-4 gap-3 ml-1 hover:bg-white/10 transition-colors">
+                  <Link href="/dashboard" className="flex items-center gap-3 group" title="Open Dashboard">
+                    {session.user?.image ? (
+                      <Image src={session.user.image} alt="User" width={32} height={32} unoptimized className="w-8 h-8 rounded-full border border-sunlight-orange object-cover group-hover:scale-105 transition-transform" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-sunlight-orange text-blue-marine flex items-center justify-center font-bold text-sm group-hover:scale-105 transition-transform">
+                        {session.user?.name?.charAt(0)}
+                      </div>
+                    )}
+                    <div className="flex flex-col text-left mr-2">
+                      <span className="text-[10px] text-silver-shine uppercase tracking-wider group-hover:text-white transition-colors">Logged in as</span>
+                      <span className="text-sm font-bold text-sunlight-orange leading-tight">{session.user?.name}</span>
+                    </div>
+                  </Link>
+                  <div className="w-px h-6 bg-white/20"></div>
+                  <Link href="/settings" className="text-silver-shine hover:text-white transition-colors" title="Account Settings"><Settings size={18} /></Link>
+                  <button 
+                    onClick={() => setIsLogoutModalOpen(true)}
+                    className="flex items-center gap-2 text-sm font-bold text-maroon-flash hover:text-red-400 transition-colors ml-1"
+                    title="Logout"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </div>
               </div>
             ) : (
               <Link href="/login" className="hidden lg:flex px-5 py-2.5 rounded-full bg-sunlight-orange text-blue-marine hover:bg-yellow-400 transition-all text-sm font-bold ml-1">
@@ -121,7 +128,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                         <div className="w-12 h-12 rounded-full bg-sunlight-orange text-blue-marine flex items-center justify-center font-bold text-xl">{session.user?.name?.charAt(0)}</div>
                       )}
                       <div className="text-left flex-1 overflow-hidden">
-                        <p className="text-silver-shine text-xs uppercase tracking-wider mb-1">Masuk sebagai</p>
+                        <p className="text-silver-shine text-xs uppercase tracking-wider mb-1">Logged in as</p>
                         <p className="text-white font-bold text-lg leading-tight truncate">{session.user?.name}</p>
                       </div>
                     </div>
@@ -143,10 +150,10 @@ export default function Navbar({ session }: { session: Session | null }) {
                 {session && (
                   <>
                     <Link href="/dashboard" className="w-full text-left p-4 rounded-2xl font-bold text-blue-marine bg-sunlight-orange hover:bg-yellow-400 transition-colors shadow-lg flex justify-between items-center" onClick={() => setIsOpen(false)}>
-                      <div className="flex items-center gap-2"><LayoutDashboard size={18} /><span>Dashboard Peserta</span></div><span>→</span>
+                      <div className="flex items-center gap-2"><LayoutDashboard size={18} /><span>Participant Dashboard</span></div><span>→</span>
                     </Link>
                     <Link href="/settings" className="w-full text-left p-4 rounded-2xl font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex justify-between items-center" onClick={() => setIsOpen(false)}>
-                      <div className="flex items-center gap-2"><Settings size={18} /><span>Pengaturan Akun</span></div>
+                      <div className="flex items-center gap-2"><Settings size={18} /><span>Account Settings</span></div>
                     </Link>
                   </>
                 )}
@@ -187,7 +194,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 </div>
 
                 <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Mini Competition</Link>
-                <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>FAQ Umum</Link>
+                <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>General FAQ</Link>
                 <Link href="/about" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>About</Link>
               </div>
               <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>

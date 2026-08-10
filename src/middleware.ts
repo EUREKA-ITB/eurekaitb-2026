@@ -19,29 +19,28 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
   // ==========================================
-  // LOCK MAIN WEB (DIPERKETAT!)
+  // LOCK MAIN WEB LOGIC
   // ==========================================
   const isLocked = process.env.LOCK_MAIN_WEB === 'true';
   
-  // FITUR BARU: Tambahkan halaman auth dan dashboard ke dalam daftar gembok
-  const isMainWebPath = 
-    path === '/' || 
-    path.startsWith('/faq') || 
-    path.startsWith('/about') ||
-    path.startsWith('/login') ||    // Gembok akses login
-    path.startsWith('/register') || // Gembok akses register
-    path.startsWith('/dashboard') || // Gembok akses dashboard
-    path.startsWith('/competition');
-
-  if (isLocked && isMainWebPath) {
+  if (isLocked) {
     const isAdmin = token?.role === 'admin' || token?.role === 'admin_se';
-    if (!isAdmin) {
-      // Jika bukan admin, tendang ke mini compe!
+    const isParticipant = token?.role === 'participant';
+
+    // Jika peserta yang sudah login mencoba akses dashboard/kompetisi saat web dikunci -> Tendang ke mini compe
+    if (isParticipant && (path.startsWith('/dashboard') || path.startsWith('/competition') || path.startsWith('/settings'))) {
+      return NextResponse.redirect(new URL('/mini-competition', request.url));
+    }
+
+    // Gembok halaman publik utama (Landing page, FAQ, About) untuk non-admin
+    const isPublicLockedPath = path === '/' || path.startsWith('/faq') || path.startsWith('/about');
+    if (isPublicLockedPath && !isAdmin) {
       return NextResponse.redirect(new URL('/mini-competition', request.url));
     }
   }
   // ==========================================
 
+  // Proteksi path yang wajib login
   const isProtectedPath = path.startsWith('/dashboard') || path.startsWith('/settings') || path.startsWith('/competition');
   if (isProtectedPath) {
     if (!token) {
@@ -51,6 +50,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Proteksi khusus Admin (adm-se)
   if (path.startsWith('/adm-se')) {
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url));
@@ -80,8 +80,6 @@ export const config = {
     '/settings/:path*',
     '/competition/:path*',
     '/adm-se/:path*',
-    '/admin-se/:path*',
-    '/login/:path*',
-    '/register/:path*'
+    '/admin-se/:path*'
   ],
 };

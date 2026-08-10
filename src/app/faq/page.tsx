@@ -128,8 +128,8 @@ export default function FaqPageV2() {
       <div className="mx-auto max-w-6xl">
         {/* HERO + SEARCH */}
         <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 sm:p-8 md:p-10 backdrop-blur-sm shadow-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.35em] text-silver-shine mb-5">
-            <Sparkles size={14} className="text-sunlight-orange" /> FAQ & Helpdesk
+          <div className="inline-flex items-center gap-2 rounded-full px-1 py-1.5 text-s font-bold uppercase tracking-[0.35em] text-sunlight-orange mb-5">
+            FAQ & Helpdesk
           </div>
           <h1 className="font-display text-4xl sm:text-5xl font-bold max-w-2xl">
             Cari jawaban lebih cepat lewat pencarian & kategori
