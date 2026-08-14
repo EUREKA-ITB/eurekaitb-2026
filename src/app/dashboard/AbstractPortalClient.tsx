@@ -10,7 +10,7 @@ interface CloudinaryResult {
 }
 
 // FORMAT COUNTDOWN GLOBAL (Misal: 15 Agustus 2026 Jam 00:00 WIB)
-const REVEAL_DATE = new Date("2026-08-15T00:00:00+07:00").getTime();
+const REVEAL_DATE = new Date("2026-08-14T00:00:00+07:00").getTime();
 
 export default function AbstractPortalClient({ 
   currentUrl, 
