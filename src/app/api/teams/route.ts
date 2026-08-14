@@ -15,6 +15,8 @@ interface MemberPayload {
   ktmUrl: string;
   proofFollowUrl: string;
   proofShareUrl: string;
+  proofStoryCompeUrl: string;
+  proofTwibbonUrl: string;
   isLeader: boolean;
   igAccountLink: string;
 }
@@ -23,7 +25,7 @@ interface RequestBody {
   compeType: "physics_olympiad" | "science_project" | "industrial_case";
   teamName: string;
   institutionName: string;
-  abstractUrl: string; // FITUR BARU
+  abstractUrl: string;
   members: MemberPayload[];
 }
 
@@ -49,6 +51,8 @@ export async function GET() {
       ktmUrl: teamMembers.ktmUrl,
       proofFollowUrl: teamMembers.proofFollowUrl,
       proofShareUrl: teamMembers.proofShareUrl,
+      proofStoryCompeUrl: teamMembers.proofStoryCompeUrl,
+      proofTwibbonUrl: teamMembers.proofTwibbonUrl,
       igAccountLink: teamMembers.igAccountLink,
       isLeader: teamMembers.isLeader,
     }).from(teamMembers).where(eq(teamMembers.teamId, userTeam[0].id));
@@ -83,25 +87,27 @@ export async function POST(req: Request) {
     const activePhase = getCurrentPhase();
 
     if (existingTeam.length > 0) {
+      // PROTEKSI PERMANEN UNTUK SPC DAN ICC
+      if (existingTeam[0].compeType === "science_project" || existingTeam[0].compeType === "industrial_case") {
+         return NextResponse.json({ error: "Data SPC dan ICC telah dikunci permanen setelah registrasi." }, { status: 403 });
+      }
+      
       if (existingTeam[0].statusPayment !== "unpaid") {
         return NextResponse.json({ error: "Data cannot be edited because payment is processed!" }, { status: 403 });
       }
 
-      // --- LOGIC RESET OTOMATIS JIKA GANTI LOMBA ---
       const isSwitchingCompe = existingTeam[0].compeType !== compeType;
       
       await db.update(teams).set({
         teamName,
         institutionName,
         compeType,
-        // Jika ganti lomba, reset abstrak dan pilihan kasus ke null/default
         abstractUrl: isSwitchingCompe ? null : (abstractUrl || existingTeam[0].abstractUrl),
         abstractStatus: isSwitchingCompe ? "waiting" : existingTeam[0].abstractStatus,
         caseChoice: isSwitchingCompe ? null : existingTeam[0].caseChoice
       }).where(eq(teams.id, existingTeam[0].id));
       
       targetTeamId = existingTeam[0].id;
-      // Hapus member lama untuk diisi ulang
       await db.delete(teamMembers).where(eq(teamMembers.teamId, targetTeamId));
     } else {
       const newTeam = await db.insert(teams).values({
@@ -116,7 +122,6 @@ export async function POST(req: Request) {
       targetTeamId = newTeam[0].id;
     }
 
-    // Insert Member Baru
     for (const member of members) {
       if (member.fullName.trim() !== "") {
         await db.insert(teamMembers).values({
@@ -129,6 +134,8 @@ export async function POST(req: Request) {
           ktmUrl: member.ktmUrl, 
           proofFollowUrl: member.proofFollowUrl,
           proofShareUrl: member.proofShareUrl,
+          proofStoryCompeUrl: member.proofStoryCompeUrl,
+          proofTwibbonUrl: member.proofTwibbonUrl,
           igAccountLink: member.igAccountLink,          
           isLeader: member.isLeader,
         });

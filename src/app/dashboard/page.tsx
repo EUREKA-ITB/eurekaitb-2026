@@ -143,7 +143,6 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex flex-col w-full box-border">
             
-            {/* TAHAP 1 SPC/ICC: WAITING ABSTRACT (MENUNGGU/UPLOAD) */}
             {(isSPC || isICC) && abstractStatus === "waiting" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border mb-8">
                 <div className="flex flex-col gap-4">
@@ -174,11 +173,12 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                  <Link href="/dashboard/register-lomba" className="w-full text-center border border-white/20 text-white font-bold py-3.5 rounded-xl hover:bg-white/10 transition-colors text-sm shadow-md">
-                    Edit Registration Data
-                  </Link>
                   
-                  {/* LINK WA MUNCUL DI SINI UNTUK SPC/ICC */}
+                  {/* UBAH TOMBOL EDIT JADI GABOK UNTUK SPC DAN ICC */}
+                  <div className="w-full text-center border border-white/20 bg-black/40 text-silver-shine font-bold py-3.5 rounded-xl text-sm shadow-md flex items-center justify-center gap-2 cursor-not-allowed">
+                    <Lock size={16}/> Data Registrasi Terkunci
+                  </div>
+                  
                   <a href={waGroupLinks[userTeam[0].compeType as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                     <MessageCircle size={18}/> Join WhatsApp Group
                   </a>
@@ -194,7 +194,6 @@ export default async function DashboardPage() {
               </div>
             )}
 
-            {/* TAHAP 2 SPC/ICC: PENGUMUMAN ABSTRAK LULUS/GAGAL */}
             {(isSPC || isICC) && abstractStatus !== "waiting" && !isVerified && (
               <div className={`p-6 sm:p-8 rounded-3xl backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center gap-6 w-full mb-8 relative overflow-hidden transition-all ${
                 abstractStatus === "passed" 
@@ -219,7 +218,6 @@ export default async function DashboardPage() {
               </div>
             )}
 
-            {/* TAHAP PAYMENT (UNTUK PO ATAU SPC/ICC YANG LULUS ABSTRAK TAPI BELUM LUNAS) */}
             {(!isVerified && (isPO || ((isSPC || isICC) && abstractStatus !== "waiting"))) && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border mb-8">
                 <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm flex flex-col justify-between">
@@ -246,7 +244,6 @@ export default async function DashboardPage() {
                     </div>
                   )}
 
-                  {/* LINK WA TETAP MUNCUL DI SINI JIKA MEREKA SPC/ICC AGAR TIDAK HILANG SAAT BAYAR */}
                   {(isSPC || isICC) && (
                     <a href={waGroupLinks[userTeam[0].compeType as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3 rounded-xl hover:bg-green-500/30 transition-colors text-sm mt-4 flex items-center justify-center gap-2">
                       <MessageCircle size={16}/> Join WhatsApp Group
@@ -299,7 +296,6 @@ export default async function DashboardPage() {
               </div>
             )}
 
-            {/* TAHAP AKHIR: FULLY VERIFIED (MUNCUL CBT UNTUK PO, FULL PAPER UNTUK SPC/ICC) */}
             {isVerified && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 
@@ -335,7 +331,6 @@ export default async function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* LINK WA TETAP MUNCUL DI SINI UNTUK SEMUA (KHUSUS PO BARU MUNCUL DI SINI) */}
                   <a href={waGroupLinks[userTeam[0].compeType as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                     <MessageCircle size={18}/> Join WhatsApp Group
                   </a>

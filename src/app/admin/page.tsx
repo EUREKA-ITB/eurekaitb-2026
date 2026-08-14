@@ -22,7 +22,6 @@ export default async function AdminDashboardPage() {
   const allMembers = await db.select().from(teamMembers); 
 
   const teamsWithDetails = allTeams.map((team) => {
-    // Cari bukti transfer 
     const doc = allDocs.find((d) => d.teamId === team.id);
 
     const members = allMembers.filter((m) => m.teamId === team.id).map(m => ({
@@ -36,6 +35,8 @@ export default async function AdminDashboardPage() {
       ktmUrl: m.ktmUrl,
       proofFollowUrl: m.proofFollowUrl,
       proofShareUrl: m.proofShareUrl,
+      proofStoryCompeUrl: m.proofStoryCompeUrl, // URL BARU
+      proofTwibbonUrl: m.proofTwibbonUrl, // URL BARU
       igAccountLink: m.igAccountLink
     }));
 
@@ -59,8 +60,7 @@ export default async function AdminDashboardPage() {
         phone: leader?.phoneNumber || "-"
       },
       members: members,
-      verifiedBy: team.verifiedBy || null, // NAMA ADMIN VERIFIKATOR
-
+      verifiedBy: team.verifiedBy || null,
       participantNumber: team.participantNumber || null,
       cbtPassword: team.cbtPassword || null
     };
@@ -70,7 +70,6 @@ export default async function AdminDashboardPage() {
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden pt-28">
       <div className="max-w-7xl mx-auto w-full">
         
-        {/* HEADER ADMIN */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-red-500/30 pb-6">
           <div>
             <div className="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-widest uppercase shadow-[0_0_15px_rgba(239,68,68,0.5)]">
@@ -92,7 +91,6 @@ export default async function AdminDashboardPage() {
           </div>
         </header>
 
-        {/* TABEL DATA DENGAN TABS & MODAL */}
         <AdminTable initialData={teamsWithDetails} />
 
       </div>

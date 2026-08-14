@@ -9,7 +9,8 @@ import { saveAs } from "file-saver";
 
 interface TeamMember {
   id: string; fullName: string; email: string; phoneNumber: string; isLeader: boolean | null; grade: string;
-  photoUrl: string | null; ktmUrl: string | null; proofFollowUrl: string | null; proofShareUrl: string | null; igAccountLink: string | null;
+  photoUrl: string | null; ktmUrl: string | null; proofFollowUrl: string | null; proofShareUrl: string | null;
+  proofStoryCompeUrl: string | null; proofTwibbonUrl: string | null; igAccountLink: string | null;
 }
 
 interface AdminTeamData {
@@ -33,10 +34,8 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedTeam, setSelectedTeam] = useState<AdminTeamData | null>(null);
 
-  // KUNCI UTAMA: Sync data dari Server ke Client secara background
   useEffect(() => {
     setTeams(initialData);
-    // Jika modal View Details sedang terbuka, update juga isinya!
     if (selectedTeam) {
       const updatedSelected = initialData.find(t => t.id === selectedTeam.id);
       if (updatedSelected) setSelectedTeam(updatedSelected);
@@ -134,7 +133,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   const handleVerify = async (teamId: string, target: "abstract" | "payment", newStatus: string) => {
     setIsProcessing(teamId);
     
-    // Optimistic Update UI (Supaya UI langsung bereaksi tanpa loading)
     setTeams(prevTeams => prevTeams.map(t => {
       if (t.id === teamId) {
         if (target === "abstract") {
@@ -142,7 +140,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
           return {
             ...t,
             abstractStatus: newStatus,
-            statusPayment: isCanceled ? "unpaid" : t.statusPayment, // INSTANT AUTO CANCEL DI UI
+            statusPayment: isCanceled ? "unpaid" : t.statusPayment, 
             verifiedBy: isCanceled ? null : t.verifiedBy
           };
         }
@@ -159,15 +157,10 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
         body: JSON.stringify({ teamId, updateTarget: target, newStatus }),
       });
       if (!res.ok) throw new Error("Failed to update status");
-      
       toast.success(`Success! Data updated.`);
-      
-      // PENTING: Panggil router.refresh() untuk update data di background (CBT, dll) 
-      // TANPA meriset state Active Tab.
       router.refresh(); 
     } catch (error) {
       toast.error("Verification failed. Please try again.");
-      // Kalau error (misal internet mati), kembalikan data ke awal dari prop server
       setTeams(initialData); 
     } finally {
       setIsProcessing(null);
@@ -391,8 +384,12 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                         <p className="text-xs text-silver-shine">{member.phoneNumber}</p>
                       </div>
                       <div className="grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-white/10 text-[10px] font-bold">
-                        {member.photoUrl ? <a href={member.photoUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">Photo</a> : <span className="text-red-400 text-center py-1.5">No Photo</span>}
-                        {member.ktmUrl ? <a href={member.ktmUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">ID Card</a> : <span className="text-red-400 text-center py-1.5">No ID</span>}
+                        {member.photoUrl ? <a href={member.photoUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">Photo</a> : <span className="text-red-400 text-center py-1.5 bg-red-500/10">No Photo</span>}
+                        {member.ktmUrl ? <a href={member.ktmUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">ID Card</a> : <span className="text-red-400 text-center py-1.5 bg-red-500/10">No ID</span>}
+                        {member.proofFollowUrl ? <a href={member.proofFollowUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Follow IG</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Follow IG</span>}
+                        {member.proofShareUrl ? <a href={member.proofShareUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Story Umum</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Story Umum</span>}
+                        {member.proofStoryCompeUrl ? <a href={member.proofStoryCompeUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Story Compe</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Story Compe</span>}
+                        {member.proofTwibbonUrl ? <a href={member.proofTwibbonUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Twibbon</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Twibbon</span>}
                       </div>
                     </div>
                   ))}

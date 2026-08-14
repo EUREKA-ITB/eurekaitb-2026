@@ -50,6 +50,8 @@ export const teamMembers = pgTable("team_members", {
   ktmUrl: text("ktm_url"), 
   proofFollowUrl: text("proof_follow_url"),
   proofShareUrl: text("proof_share_url"),
+  proofStoryCompeUrl: text("proof_story_compe_url"),
+  proofTwibbonUrl: text("proof_twibbon_url"),
   igAccountLink: text("ig_account_link").notNull(),
   isLeader: boolean("is_leader").default(false).notNull(), 
 });
