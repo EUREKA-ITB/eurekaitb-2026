@@ -5,7 +5,8 @@ import { db } from "@/db";
 import { users, teams } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function PATCH(req: Request) {
+// UBAH JADI POST AGAR SINKRON DENGAN CLIENT (AbstractPortalClient.tsx)
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -16,12 +17,18 @@ export async function PATCH(req: Request) {
     const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
     if (userTeam.length === 0) return NextResponse.json({ error: "Team not found" }, { status: 404 });
 
-    const { abstractUrl } = await req.json();
+    // TANGKAP caseChoice JUGA DARI PAYLOAD (KHUSUS ICC)
+    const { abstractUrl, caseChoice } = await req.json();
     if (!abstractUrl) {
       return NextResponse.json({ error: "Abstract URL is required" }, { status: 400 });
     }
 
-    await db.update(teams).set({ abstractUrl, abstractStatus: "waiting" }).where(eq(teams.id, userTeam[0].id));
+    // UPDATE DATABASE (Sekalian simpan caseChoice jika ada isinya)
+    if (caseChoice) {
+      await db.update(teams).set({ abstractUrl, abstractStatus: "waiting", caseChoice }).where(eq(teams.id, userTeam[0].id));
+    } else {
+      await db.update(teams).set({ abstractUrl, abstractStatus: "waiting" }).where(eq(teams.id, userTeam[0].id));
+    }
 
     return NextResponse.json({ message: "Abstract uploaded successfully" }, { status: 200 });
   } catch (error) {

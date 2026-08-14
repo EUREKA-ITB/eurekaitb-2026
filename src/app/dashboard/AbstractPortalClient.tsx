@@ -25,12 +25,10 @@ export default function AbstractPortalClient({
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedCase, setSelectedCase] = useState(currentCase || "");
   
-  // LOGIC COUNTDOWN (Langsung inisialisasi true jika bukan industrial_case)
   const [timeLeft, setTimeLeft] = useState<{d: number, h: number, m: number, s: number} | null>(null);
   const [isRevealed, setIsRevealed] = useState<boolean>(compeType !== "industrial_case");
 
   useEffect(() => {
-    // Jika bukan industrial case, langsung abaikan timer
     if (compeType !== "industrial_case") return;
 
     const checkReveal = () => {
@@ -60,7 +58,7 @@ export default function AbstractPortalClient({
       setIsUpdating(true);
       try {
         const response = await fetch("/api/teams/abstract", {
-          method: "POST",
+          method: "POST", // PASTIKAN INI POST AGAR MATCH DENGAN BACKEND
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             abstractUrl: res.info.secure_url,
@@ -80,7 +78,6 @@ export default function AbstractPortalClient({
     }
   };
 
-  // TAMPILAN COUNTDOWN ICC
   if (compeType === "industrial_case" && !isRevealed) {
     return (
       <div className="bg-black/30 border border-dashed border-white/20 rounded-2xl p-6 text-center w-full">
@@ -101,7 +98,6 @@ export default function AbstractPortalClient({
     );
   }
 
-  // TAMPILAN UPLOAD NORMAL (SPC & ICC PASCA-REVEAL)
   return (
     <div className="bg-black/30 border border-dashed border-white/20 rounded-2xl p-6 text-center w-full">
       <UploadCloud size={40} className={`mx-auto mb-4 ${currentUrl ? "text-green-400" : "text-sunlight-orange"}`} />
@@ -113,7 +109,6 @@ export default function AbstractPortalClient({
           : "Unggah dokumen abstrak awal tim Anda untuk mengikuti proses seleksi administrasi."}
       </p>
 
-      {/* DROPDOWN KHUSUS ICC */}
       {compeType === "industrial_case" && !currentUrl && (
         <div className="mb-6 max-w-xs mx-auto text-left">
           <label className="block text-xs font-bold text-silver-shine mb-2">Pilih Kasus Industri:</label>
@@ -133,7 +128,12 @@ export default function AbstractPortalClient({
       {isUpdating ? (
         <div className="text-sm font-bold text-silver-shine animate-pulse">Menyimpan dokumen...</div>
       ) : (
-        <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} onSuccess={handleUploadSuccess}>
+        <CldUploadWidget 
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
+          // KUNCI CUMA BISA PDF / DOC / DOCX DI SINI
+          options={{ maxFiles: 1, clientAllowedFormats: ["pdf", "doc", "docx"], resourceType: "auto" }}
+          onSuccess={handleUploadSuccess}
+        >
           {({ open }) => (
             <button 
               type="button" 

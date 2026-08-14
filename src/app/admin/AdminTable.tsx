@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Search, X, Users, FileText, CheckCircle2, Clock, MessageCircle, DownloadCloud, ShieldCheck, Key } from "lucide-react";
@@ -32,6 +32,16 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedTeam, setSelectedTeam] = useState<AdminTeamData | null>(null);
+
+  // KUNCI UTAMA: Sync data dari Server ke Client secara background
+  useEffect(() => {
+    setTeams(initialData);
+    // Jika modal View Details sedang terbuka, update juga isinya!
+    if (selectedTeam) {
+      const updatedSelected = initialData.find(t => t.id === selectedTeam.id);
+      if (updatedSelected) setSelectedTeam(updatedSelected);
+    }
+  }, [initialData]);
 
   const filteredTeams = teams.filter(t => {
     const matchTab = activeTab === "ALL" || t.compeType === activeTab;
@@ -123,6 +133,26 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
 
   const handleVerify = async (teamId: string, target: "abstract" | "payment", newStatus: string) => {
     setIsProcessing(teamId);
+    
+    // Optimistic Update UI (Supaya UI langsung bereaksi tanpa loading)
+    setTeams(prevTeams => prevTeams.map(t => {
+      if (t.id === teamId) {
+        if (target === "abstract") {
+          const isCanceled = newStatus === "waiting" || newStatus === "failed";
+          return {
+            ...t,
+            abstractStatus: newStatus,
+            statusPayment: isCanceled ? "unpaid" : t.statusPayment, // INSTANT AUTO CANCEL DI UI
+            verifiedBy: isCanceled ? null : t.verifiedBy
+          };
+        }
+        if (target === "payment") {
+          return { ...t, statusPayment: newStatus };
+        }
+      }
+      return t;
+    }));
+
     try {
       const res = await fetch("/api/verify", {
         method: "PATCH", headers: { "Content-Type": "application/json" },
@@ -130,10 +160,16 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
       });
       if (!res.ok) throw new Error("Failed to update status");
       
-      toast.success(`Success! Data updated. Reloading...`);
-      window.location.reload(); 
+      toast.success(`Success! Data updated.`);
+      
+      // PENTING: Panggil router.refresh() untuk update data di background (CBT, dll) 
+      // TANPA meriset state Active Tab.
+      router.refresh(); 
     } catch (error) {
       toast.error("Verification failed. Please try again.");
+      // Kalau error (misal internet mati), kembalikan data ke awal dari prop server
+      setTeams(initialData); 
+    } finally {
       setIsProcessing(null);
     } 
   };
@@ -195,7 +231,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
             <tr className="border-b border-white/10 text-silver-shine text-xs uppercase tracking-wider bg-black/20">
               <th className="p-5 font-semibold">Team Profile</th>
               <th className="p-5 font-semibold">Leader Contact</th>
-              {/* LOGIKA HIDE KOLOM ABSTRAK UNTUK PHYSICS OLYMPIAD */}
               {activeTab !== "physics_olympiad" && (
                 <th className="p-5 font-semibold text-center">Abstract Status</th>
               )}
@@ -206,7 +241,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
           <tbody>
             {filteredTeams.length === 0 ? (
               <tr>
-                {/* Atur colspan dinamis agar text "No data" rapi di tengah */}
                 <td colSpan={activeTab !== "physics_olympiad" ? 5 : 4} className="p-10 text-center text-silver-shine">No data found.</td>
               </tr>
             ) : (
@@ -221,7 +255,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                     <p className="text-xs text-silver-shine">{team.leaderContact.phone}</p>
                   </td>
                   
-                  {/* LOGIKA HIDE SEL ABSTRAK UNTUK PHYSICS OLYMPIAD */}
                   {activeTab !== "physics_olympiad" && (
                     <td className="p-5 text-center">
                       {team.compeType === "physics_olympiad" ? (

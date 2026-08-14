@@ -33,11 +33,29 @@ export async function PATCH(req: Request) {
     const currentTeam = await db.select().from(teams).where(eq(teams.id, teamId)).limit(1);
     if (currentTeam.length === 0) return NextResponse.json({ error: "Tim tidak ditemukan" }, { status: 404 });
 
+    // ==========================================
+    // LOGIKA ABSTRAK (TERMASUK AUTO-CANCEL PAYMENT)
+    // ==========================================
     if (updateTarget === "abstract") {
-      await db.update(teams).set({ abstractStatus: newStatus as AbstractStatus }).where(eq(teams.id, teamId));
+      if (newStatus === "waiting" || newStatus === "failed") {
+        // JIKA DIBATALKAN ATAU DITOLAK -> KEMBALIKAN PAYMENT JADI UNPAID!
+        await db.update(teams).set({ 
+          abstractStatus: newStatus as AbstractStatus,
+          statusPayment: "unpaid", 
+          verifiedBy: null
+        }).where(eq(teams.id, teamId));
+      } else {
+        // JIKA DILULUSKAN (PASSED)
+        await db.update(teams).set({ 
+          abstractStatus: newStatus as AbstractStatus 
+        }).where(eq(teams.id, teamId));
+      }
       return NextResponse.json({ message: `Status abstrak diubah menjadi ${newStatus}` }, { status: 200 });
     }
 
+    // ==========================================
+    // LOGIKA PAYMENT & CBT GENERATOR
+    // ==========================================
     if (updateTarget === "payment") {
       if (newStatus === "verified" && !currentTeam[0].participantNumber) {
         const sameCategoryTeams = await db
@@ -67,7 +85,7 @@ export async function PATCH(req: Request) {
           statusPayment: newStatus as PaymentStatus,
           participantNumber,
           cbtPassword,
-          verifiedBy: dbUser[0].name // LOG NAMA ADMIN
+          verifiedBy: dbUser[0].name 
         }).where(eq(teams.id, teamId));
       } 
       else {
