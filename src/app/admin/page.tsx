@@ -12,23 +12,19 @@ export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.email) redirect("/login");
 
-  // PROTEKSI SUPER KETAT: Hanya akun admin
   const dbUser = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
   if (dbUser.length === 0 || (dbUser[0].role !== "admin" && dbUser[0].role !== "admin_se")) {
     redirect("/dashboard"); 
   }
 
-  // Tarik SEMUA data sekaligus
   const allTeams = await db.select().from(teams);
   const allDocs = await db.select().from(documents);
   const allMembers = await db.select().from(teamMembers); 
 
-  // Mapping data super lengkap untuk AdminTable
   const teamsWithDetails = allTeams.map((team) => {
     // Cari bukti transfer 
     const doc = allDocs.find((d) => d.teamId === team.id);
-    
-    // Tarik semua anggota untuk tim ini
+
     const members = allMembers.filter((m) => m.teamId === team.id).map(m => ({
       id: m.id,
       fullName: m.fullName,
@@ -43,7 +39,6 @@ export default async function AdminDashboardPage() {
       igAccountLink: m.igAccountLink
     }));
 
-    // Ekstrak info ketua untuk kontak darurat di tabel depan
     const leader = members.find((m) => m.isLeader) || members[0];
 
     return { 
@@ -63,7 +58,11 @@ export default async function AdminDashboardPage() {
         email: leader?.email || "-",
         phone: leader?.phoneNumber || "-"
       },
-      members: members
+      members: members,
+      verifiedBy: team.verifiedBy || null, // NAMA ADMIN VERIFIKATOR
+
+      participantNumber: team.participantNumber || null,
+      cbtPassword: team.cbtPassword || null
     };
   });
 
@@ -80,7 +79,7 @@ export default async function AdminDashboardPage() {
             <h1 className="font-display text-3xl font-bold text-white mb-1">
               Data Pendaftar EUREKA 2026
             </h1>
-            <p className="text-silver-shine text-sm">Pusat komando verifikasi dan validasi peserta.</p>
+            <p className="text-silver-shine text-sm">Pusat verifikasi dan validasi peserta.</p>
           </div>
           <div className="mt-4 md:mt-0 flex gap-4 items-center">
             <Link 

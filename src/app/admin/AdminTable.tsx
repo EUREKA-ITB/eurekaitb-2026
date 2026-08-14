@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Search, X, Users, FileText, CheckCircle2, Clock, MessageCircle, DownloadCloud, ShieldCheck } from "lucide-react";
+import { Search, X, Users, FileText, CheckCircle2, Clock, MessageCircle, DownloadCloud, ShieldCheck, Key } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -19,6 +19,8 @@ interface AdminTeamData {
   leaderContact: { name: string; email: string; phone: string };
   members: TeamMember[];
   verifiedBy?: string | null; 
+  participantNumber?: string | null;
+  cbtPassword?: string | null;
 }
 
 export default function AdminTable({ initialData }: { initialData: AdminTeamData[] }) {
@@ -46,12 +48,21 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   };
 
   const handleExportCSV = () => {
-    const headers = ["Team Name", "Institution", "Category", "Team Leader", "WhatsApp", "Email", "Abstract Status", "Payment Status", "Admin Verifier", "Abstract Link", "Payment Link"];
+    const headers = [
+      "Team Name", "Institution", "Category", "Team Leader", "WhatsApp", "Email", 
+      "Abstract Status", "Payment Status", "Admin Verifier", 
+      "CBT Username (Reg Num)", "CBT Password",
+      "Abstract Link", "Payment Link"
+    ];
+    
     const rows = filteredTeams.map(t => [
       `"${t.teamName}"`, `"${t.institutionName}"`, t.compeType, 
       `"${t.leaderContact.name}"`, `"${t.leaderContact.phone}"`, `"${t.leaderContact.email}"`,
-      t.abstractStatus, t.statusPayment, t.verifiedBy || "-", t.abstractUrl || "Empty", t.document.urlPayment || "Empty"
+      t.abstractStatus, t.statusPayment, t.verifiedBy || "-", 
+      `"${t.participantNumber || "-"}"`, `"${t.cbtPassword || "-"}"`, 
+      t.abstractUrl || "Empty", t.document.urlPayment || "Empty"
     ]);
+    
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -119,21 +130,12 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
       });
       if (!res.ok) throw new Error("Failed to update status");
       
-      setTeams(teams.map(t => {
-        if (t.id === teamId) {
-          if (target === "abstract") return { ...t, abstractStatus: newStatus };
-          if (target === "payment") return { ...t, statusPayment: newStatus };
-        }
-        return t;
-      }));
-      toast.success(`Success! Data updated.`);
-      router.refresh();
+      toast.success(`Success! Data updated. Reloading...`);
+      window.location.reload(); 
     } catch (error) {
       toast.error("Verification failed. Please try again.");
-    } finally {
       setIsProcessing(null);
-      if (selectedTeam?.id === teamId) setSelectedTeam(null);
-    }
+    } 
   };
 
   return (
@@ -193,14 +195,20 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
             <tr className="border-b border-white/10 text-silver-shine text-xs uppercase tracking-wider bg-black/20">
               <th className="p-5 font-semibold">Team Profile</th>
               <th className="p-5 font-semibold">Leader Contact</th>
-              <th className="p-5 font-semibold text-center">Abstract Status</th>
+              {/* LOGIKA HIDE KOLOM ABSTRAK UNTUK PHYSICS OLYMPIAD */}
+              {activeTab !== "physics_olympiad" && (
+                <th className="p-5 font-semibold text-center">Abstract Status</th>
+              )}
               <th className="p-5 font-semibold text-center">Payment Status</th>
               <th className="p-5 font-semibold text-right">Actions & Verification</th>
             </tr>
           </thead>
           <tbody>
             {filteredTeams.length === 0 ? (
-              <tr><td colSpan={5} className="p-10 text-center text-silver-shine">No data found.</td></tr>
+              <tr>
+                {/* Atur colspan dinamis agar text "No data" rapi di tengah */}
+                <td colSpan={activeTab !== "physics_olympiad" ? 5 : 4} className="p-10 text-center text-silver-shine">No data found.</td>
+              </tr>
             ) : (
               filteredTeams.map((team) => (
                 <tr key={team.id} className="border-b border-white/5 hover:bg-white/5 transition-colors text-sm">
@@ -212,15 +220,20 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                     <p className="font-bold text-white">{team.leaderContact.name}</p>
                     <p className="text-xs text-silver-shine">{team.leaderContact.phone}</p>
                   </td>
-                  <td className="p-5 text-center">
-                    {team.compeType === "physics_olympiad" ? (
-                      <span className="text-silver-shine text-xs">-</span>
-                    ) : (
-                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${team.abstractStatus === "passed" ? "bg-green-500/20 text-green-400" : team.abstractStatus === "failed" ? "bg-red-500/20 text-red-400" : "bg-white/10 text-white"}`}>
-                        {team.abstractStatus}
-                      </span>
-                    )}
-                  </td>
+                  
+                  {/* LOGIKA HIDE SEL ABSTRAK UNTUK PHYSICS OLYMPIAD */}
+                  {activeTab !== "physics_olympiad" && (
+                    <td className="p-5 text-center">
+                      {team.compeType === "physics_olympiad" ? (
+                        <span className="text-silver-shine text-xs">-</span>
+                      ) : (
+                        <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${team.abstractStatus === "passed" ? "bg-green-500/20 text-green-400" : team.abstractStatus === "failed" ? "bg-red-500/20 text-red-400" : "bg-white/10 text-white"}`}>
+                          {team.abstractStatus}
+                        </span>
+                      )}
+                    </td>
+                  )}
+
                   <td className="p-5 text-center">
                     <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${team.statusPayment === "verified" ? "bg-green-500/20 text-green-400" : team.statusPayment === "pending" ? "bg-yellow-500/20 text-yellow-500" : "bg-white/10 text-white"}`}>
                       {team.statusPayment}
@@ -287,6 +300,23 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
             </div>
 
             <div className="p-6 overflow-y-auto flex-1 space-y-8">
+              
+              {selectedTeam.statusPayment === "verified" && selectedTeam.participantNumber && (
+                <div className="bg-gradient-to-r from-sunlight-orange/20 to-transparent p-5 rounded-2xl border border-sunlight-orange/40 shadow-[0_0_15px_rgba(255,184,0,0.1)]">
+                  <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-sunlight-orange"><Key size={18}/> CBT Credentials (Indolat)</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 bg-black/40 rounded-xl border border-white/10">
+                      <p className="text-[10px] uppercase tracking-wider text-silver-shine mb-1">CBT Username</p>
+                      <p className="font-mono font-bold text-white text-lg tracking-wider">{selectedTeam.participantNumber}</p>
+                    </div>
+                    <div className="p-4 bg-black/40 rounded-xl border border-white/10">
+                      <p className="text-[10px] uppercase tracking-wider text-silver-shine mb-1">CBT Password</p>
+                      <p className="font-mono font-bold text-white text-lg tracking-wider">{selectedTeam.cbtPassword || "N/A"}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText size={18} className="text-sunlight-orange"/> Files & Administration</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
