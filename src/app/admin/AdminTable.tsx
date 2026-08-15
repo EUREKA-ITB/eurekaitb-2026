@@ -43,7 +43,9 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   }, [initialData]);
 
   const filteredTeams = teams.filter(t => {
-    const matchTab = activeTab === "ALL" || t.compeType === activeTab;
+    // FIX: Normalize database underscore (_) to hyphen (-) for comparison
+    const dbType = t.compeType.replace(/_/g, "-");
+    const matchTab = activeTab === "ALL" || dbType === activeTab;
     const matchSearch = t.teamName.toLowerCase().includes(searchQuery.toLowerCase()) || 
                         t.institutionName.toLowerCase().includes(searchQuery.toLowerCase());
     return matchTab && matchSearch;
@@ -65,7 +67,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     ];
     
     const rows = filteredTeams.map(t => [
-      `"${t.teamName}"`, `"${t.institutionName}"`, t.compeType, 
+      `"${t.teamName}"`, `"${t.institutionName}"`, t.compeType.replace(/_/g, "-"), 
       `"${t.leaderContact.name}"`, `"${t.leaderContact.phone}"`, `"${t.leaderContact.email}"`,
       t.abstractStatus, t.statusPayment, t.verifiedBy || "-", 
       `"${t.participantNumber || "-"}"`, `"${t.cbtPassword || "-"}"`, 
@@ -190,12 +192,12 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
 
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
         <div className="flex bg-white/5 border border-white/10 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
-          {["ALL", "physics_olympiad", "science_project", "industrial_case"].map(tab => (
+          {["ALL", "physics-olympiad", "science-project", "industrial-case"].map(tab => (
             <button 
               key={tab} onClick={() => setActiveTab(tab)}
               className={`px-5 py-2.5 rounded-lg text-sm font-bold capitalize whitespace-nowrap transition-colors ${activeTab === tab ? "bg-sunlight-orange text-blue-marine shadow-md" : "text-silver-shine hover:text-white"}`}
             >
-              {tab === "ALL" ? "All Categories" : tab.replace("_", " ")}
+              {tab === "ALL" ? "All Categories" : tab.replace(/-/g, " ")}
             </button>
           ))}
         </div>
@@ -224,7 +226,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
             <tr className="border-b border-white/10 text-silver-shine text-xs uppercase tracking-wider bg-black/20">
               <th className="p-5 font-semibold">Team Profile</th>
               <th className="p-5 font-semibold">Leader Contact</th>
-              {activeTab !== "physics_olympiad" && (
+              {activeTab !== "physics-olympiad" && (
                 <th className="p-5 font-semibold text-center">Abstract Status</th>
               )}
               <th className="p-5 font-semibold text-center">Payment Status</th>
@@ -234,21 +236,21 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
           <tbody>
             {filteredTeams.length === 0 ? (
               <tr>
-                <td colSpan={activeTab !== "physics_olympiad" ? 5 : 4} className="p-10 text-center text-silver-shine">No data found.</td>
+                <td colSpan={activeTab !== "physics-olympiad" ? 5 : 4} className="p-10 text-center text-silver-shine">No data found.</td>
               </tr>
             ) : (
               filteredTeams.map((team) => (
                 <tr key={team.id} className="border-b border-white/5 hover:bg-white/5 transition-colors text-sm">
                   <td className="p-5">
                     <p className="font-bold text-sunlight-orange text-base">{team.teamName}</p>
-                    <p className="text-xs text-silver-shine capitalize">{team.institutionName} • {team.compeType.replace("_", " ")}</p>
+                    <p className="text-xs text-silver-shine capitalize">{team.institutionName} • {team.compeType.replace(/_/g, "-")}</p>
                   </td>
                   <td className="p-5">
                     <p className="font-bold text-white">{team.leaderContact.name}</p>
                     <p className="text-xs text-silver-shine">{team.leaderContact.phone}</p>
                   </td>
                   
-                  {activeTab !== "physics_olympiad" && (
+                  {activeTab !== "physics-olympiad" && (
                     <td className="p-5 text-center">
                       {team.compeType === "physics_olympiad" ? (
                         <span className="text-silver-shine text-xs">-</span>
@@ -313,7 +315,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
               <div>
                 <h2 className="font-display text-2xl font-bold text-sunlight-orange">{selectedTeam.teamName}</h2>
-                <p className="text-sm text-silver-shine capitalize">{selectedTeam.institutionName} • {selectedTeam.compeType.replace("_", " ")}</p>
+                <p className="text-sm text-silver-shine capitalize">{selectedTeam.institutionName} • {selectedTeam.compeType.replace(/_/g, "-")}</p>
               </div>
               <div className="flex gap-3 items-center">
                 <button onClick={() => sendWhatsApp(selectedTeam, "tagih")} className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors" title="Send Payment Reminder (WA)">
@@ -387,8 +389,8 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                         {member.photoUrl ? <a href={member.photoUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">Photo</a> : <span className="text-red-400 text-center py-1.5 bg-red-500/10">No Photo</span>}
                         {member.ktmUrl ? <a href={member.ktmUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">ID Card</a> : <span className="text-red-400 text-center py-1.5 bg-red-500/10">No ID</span>}
                         {member.proofFollowUrl ? <a href={member.proofFollowUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Follow IG</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Follow IG</span>}
-                        {member.proofShareUrl ? <a href={member.proofShareUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Story Umum</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Story Umum</span>}
-                        {member.proofStoryCompeUrl ? <a href={member.proofStoryCompeUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Story Compe</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Story Compe</span>}
+                        {member.proofShareUrl ? <a href={member.proofShareUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Main Story</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Main Story</span>}
+                        {member.proofStoryCompeUrl ? <a href={member.proofStoryCompeUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Compe Story</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Compe Story</span>}
                         {member.proofTwibbonUrl ? <a href={member.proofTwibbonUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Twibbon</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Twibbon</span>}
                       </div>
                     </div>

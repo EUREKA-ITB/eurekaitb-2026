@@ -26,10 +26,10 @@ export default function AbstractPortalClient({
   const [selectedCase, setSelectedCase] = useState(currentCase || "");
   
   const [timeLeft, setTimeLeft] = useState<{d: number, h: number, m: number, s: number} | null>(null);
-  const [isRevealed, setIsRevealed] = useState<boolean>(compeType !== "industrial_case");
+  const [isRevealed, setIsRevealed] = useState<boolean>(compeType !== "industrial-case");
 
   useEffect(() => {
-    if (compeType !== "industrial_case") return;
+    if (compeType !== "industrial-case") return;
 
     const checkReveal = () => {
       const now = new Date().getTime();
@@ -62,36 +62,36 @@ export default function AbstractPortalClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             abstractUrl: res.info.secure_url,
-            caseChoice: compeType === "industrial_case" ? selectedCase : null
+            caseChoice: compeType === "industrial-case" ? selectedCase : null
           }),
         });
         if (response.ok) {
           router.refresh(); 
         } else {
-          alert("Gagal menyimpan dokumen ke database.");
+          alert("Failed to save the document to the database.");
         }
       } catch (error) {
-        alert("Terjadi kesalahan jaringan.");
+        alert("A network error occurred.");
       } finally {
         setIsUpdating(false);
       }
     }
   };
 
-  if (compeType === "industrial_case" && !isRevealed) {
+  if (compeType === "industrial-case" && !isRevealed) {
     return (
       <div className="bg-black/30 border border-dashed border-white/20 rounded-2xl p-6 text-center w-full">
         <Lock size={40} className="mx-auto mb-4 text-silver-shine opacity-50" />
-        <p className="text-white font-bold mb-2 text-xl">Reveal Case Belum Dibuka</p>
+        <p className="text-white font-bold mb-2 text-xl">Case Reveal Not Yet Open</p>
         <p className="text-xs text-silver-shine mb-6 max-w-sm mx-auto">
-          Kasus industri akan diumumkan serentak setelah pendaftaran ditutup.
+          The industrial case will be announced simultaneously after registration closes.
         </p>
         {timeLeft && (
           <div className="flex justify-center gap-4 text-sunlight-orange font-mono font-bold text-2xl">
-            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.d}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Hari</span></div>
-            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.h}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Jam</span></div>
-            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.m}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Menit</span></div>
-            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.s}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Detik</span></div>
+            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.d}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Days</span></div>
+            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.h}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Hours</span></div>
+            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.m}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Minutes</span></div>
+            <div className="flex flex-col"><span className="bg-white/5 px-3 py-2 rounded-lg border border-white/10">{timeLeft.s}</span><span className="text-[10px] text-silver-shine mt-1 font-sans">Seconds</span></div>
           </div>
         )}
       </div>
@@ -102,22 +102,22 @@ export default function AbstractPortalClient({
     <div className="bg-black/30 border border-dashed border-white/20 rounded-2xl p-6 text-center w-full">
       <UploadCloud size={40} className={`mx-auto mb-4 ${currentUrl ? "text-green-400" : "text-sunlight-orange"}`} />
       
-      <p className="text-white font-bold mb-2">Portal Submisi Abstrak</p>
+      <p className="text-white font-bold mb-2">Abstract Submission Portal</p>
       <p className="text-xs text-silver-shine mb-6 max-w-sm mx-auto">
         {currentUrl 
-          ? "Dokumen abstrak Anda telah tersimpan. Anda dapat mengubahnya selama masa seleksi belum berakhir." 
-          : "Unggah dokumen abstrak awal tim Anda untuk mengikuti proses seleksi administrasi."}
+          ? "Your abstract document has been saved. You can update it as long as the selection period has not ended." 
+          : "Upload your team's initial abstract document to participate in the administrative selection process."}
       </p>
 
-      {compeType === "industrial_case" && !currentUrl && (
+      {compeType === "industrial-case" && !currentUrl && (
         <div className="mb-6 max-w-xs mx-auto text-left">
-          <label className="block text-xs font-bold text-silver-shine mb-2">Pilih Kasus Industri:</label>
+          <label className="block text-xs font-bold text-silver-shine mb-2">Select Industrial Case:</label>
           <select 
             value={selectedCase} 
             onChange={(e) => setSelectedCase(e.target.value)}
             className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors"
           >
-            <option value="" disabled>-- Pilih Kasus --</option>
+            <option value="" disabled>-- Select Case --</option>
             <option value="Case A: Supply Chain">Case A: Supply Chain</option>
             <option value="Case B: Sustainability">Case B: Sustainability</option>
             <option value="Case C: Manufacturing">Case C: Manufacturing</option>
@@ -126,7 +126,7 @@ export default function AbstractPortalClient({
       )}
 
       {isUpdating ? (
-        <div className="text-sm font-bold text-silver-shine animate-pulse">Menyimpan dokumen...</div>
+        <div className="text-sm font-bold text-silver-shine animate-pulse">Saving document...</div>
       ) : (
         <CldUploadWidget 
           uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
@@ -138,8 +138,8 @@ export default function AbstractPortalClient({
             <button 
               type="button" 
               onClick={() => {
-                if (compeType === "industrial_case" && !currentUrl && !selectedCase) {
-                  alert("Harap pilih kasus industri terlebih dahulu!");
+                if (compeType === "industrial-case" && !currentUrl && !selectedCase) {
+                  alert("Please select an industrial case first!");
                   return;
                 }
                 open();
@@ -150,7 +150,7 @@ export default function AbstractPortalClient({
                   : "bg-sunlight-orange text-blue-marine hover:bg-yellow-400"
               }`}
             >
-              {currentUrl ? <><CheckCircle2 size={16}/> Ubah File Abstrak</> : "Unggah Dokumen Sekarang"}
+              {currentUrl ? <><CheckCircle2 size={16}/> Update Abstract File</> : "Upload Document Now"}
             </button>
           )}
         </CldUploadWidget>
@@ -158,7 +158,7 @@ export default function AbstractPortalClient({
       
       {currentUrl && (
         <div className="mt-4 text-[10px] text-silver-shine italic">
-          *Mengunggah ulang akan menimpa file abstrak sebelumnya.
+          *Re-uploading will overwrite the previous abstract file.
         </div>
       )}
     </div>

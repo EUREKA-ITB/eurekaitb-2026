@@ -14,48 +14,51 @@ interface EventItem {
 const timelineEvents: EventItem[] = [
   {
     id: 1,
-    startDate: "2026-06-01",
-    endDate: "2026-07-15",
-    dateLabel: "1 Jun – 15 Jul 2026",
-    title: "Sosialisasi & Pre-Event",
-    description:
-      "Rangkaian webinar dan sosialisasi kompetisi ke seluruh SMA & Perguruan Tinggi.",
+    startDate: "2026-07-25",
+    endDate: "2026-09-13",
+    dateLabel: "25 Jul - 13 Sep 2026",
+    title: "Pre Event : Mini competition",
+    description: "Kegiatan kompetisi EUREKA! ITB 2026 sebelum main competition",
   },
   {
     id: 2,
-    startDate: "2026-07-16",
-    endDate: "2026-08-15",
-    dateLabel: "16 Jul – 15 Agt 2026",
-    title: "Pendaftaran Buka",
-    description:
-      "Pembukaan pendaftaran resmi gelombang utama peserta EUREKA! ITB 2026.",
+    startDate: "2026-08-16",
+    endDate: "2026-08-29",
+    dateLabel: "16 Agu - 29 Agu 2026",
+    title: "Wave 1 Registration of Main Competition",
+    description: "Pendaftaran kompetisi utama EUREKA! ITB 2026",
   },
   {
     id: 3,
-    startDate: "2026-08-16",
-    endDate: "2026-09-05",
-    dateLabel: "16 Agt – 5 Sep 2026",
-    title: "Babak Penyisihan",
-    description:
-      "Pengerjaan soal ujian dan pengumpulan abstrak proyek secara daring.",
+    startDate: "2026-08-30",
+    endDate: "2026-09-19",
+    dateLabel: "30 Agu - 19 Sep 2026",
+    title: "Wave 2 Registration of Main Competition",
+    description: "Pendaftaran kompetisi utama EUREKA! ITB 2026",
   },
   {
     id: 4,
-    startDate: "2026-09-06",
-    endDate: "2026-09-20",
-    dateLabel: "6 Sep – 20 Sep 2026",
-    title: "Pengumuman Finalis",
-    description:
-      "Pengumuman tim dan peserta terbaik yang lolos ke tahap Grand Final.",
+    startDate: "2026-09-20",
+    endDate: "2026-09-30",
+    dateLabel: "20 Sep - 30 Sep 2026",
+    title: "Wave 3 Registration of Main Competition",
+    description: "Pendaftaran kompetisi utama EUREKA! ITB 2026",
   },
   {
     id: 5,
-    startDate: "2026-10-10",
-    endDate: "2026-10-12",
-    dateLabel: "10 – 12 Oktober 2026",
-    title: "Grand Final & Exhibition",
-    description:
-      "Presentasi proyek, babak final offline, dan pameran teknologi di Kampus ITB.",
+    startDate: "2026-10-01",
+    endDate: "2026-11-27",
+    dateLabel: "Okt - Nov 2026",
+    title: "Selection Phase of Main Competition",
+    description: "Tahapan penyeleksian peserta menuju final",
+  },
+  {
+    id: 6,
+    startDate: "2026-11-28",
+    endDate: "2026-11-29",
+    dateLabel: "28-29 Nov 2026",
+    title: "Grand Final & Main Event",
+    description: "Tahap final kompetisi dan main event (Ceremonial, Campus tour, Seminar & Expo, Gala Dinner, and Awarding Night)",
   },
 ];
 
@@ -166,10 +169,11 @@ function TiltCard({
   );
 }
 
+// Definisikan tipe untuk filter secara eksplisit agar bebas dari any error
+type FilterOptions = "all" | "active" | "upcoming" | "past";
+
 export default function InteractiveTimeline() {
-  const [activeFilter, setActiveFilter] = useState<
-    "all" | "active" | "upcoming" | "past"
-  >("all");
+  const [activeFilter, setActiveFilter] = useState<FilterOptions>("all");
   const today = new Date();
 
   const filteredEvents = timelineEvents.filter((event) => {
@@ -199,7 +203,8 @@ export default function InteractiveTimeline() {
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveFilter(tab.id as any)}
+            // Menggunakan casting ke tipe FilterOptions agar tidak any
+            onClick={() => setActiveFilter(tab.id as FilterOptions)}
             className={`px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 border ${
               activeFilter === tab.id
                 ? "bg-sunlight-orange text-blue-marine border-sunlight-orange shadow-[0_0_12px_rgba(245,158,11,0.4)]"

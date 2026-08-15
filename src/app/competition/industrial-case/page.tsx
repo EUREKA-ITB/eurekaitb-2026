@@ -27,37 +27,41 @@ type TemplateProps = {
 
 export default function IndustrialCasePage() {
   const formatName = "INDUSTRIAL CASE";
-  const lombaId = "industrial_case"; 
+  const lombaId = "industrial-case"; 
   
   const info = { 
     type: "Group (2 - 3 Members)", 
-    desc: "The EUREKA 2026 Industrial Case Competition is a real-world case study event for undergraduate students across Indonesia. Test your team's analytical and strategic skills in solving modern industrial problems." 
+    desc: "Kompetisi ini cocok bagi kamu yang ingin melatih kemampuan analisis permasalahan serta memberikan solusi inovatif suatu kasus industri." 
   };
 
   const documents = [
-    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/industrial_case.pdf" },
-    { id: "format_pitchdeck", title: "Pitch Deck Format", url: "/guidebooks/format_pitch_ic.pdf" },
+    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/industrial-case.pdf" },
+    { id: "format_pitchdeck", title: "Pitch Deck Format", url: "/guidebooks/format-pitch-ic.pdf" },
   ];
   
   const [activePdfIndex, setActivePdfIndex] = useState(0);
   const activeDoc = documents[activePdfIndex];
 
   const timelineData = [
-    { date: "Nov 12 - Feb 10", title: "Registration & Case Distribution", desc: "Online participant registration and initial case distribution." },
-    { date: "Feb 28, 2026", title: "Finalists Announcement", desc: "Announcement of the best teams selected to pitch their solutions." },
-    { date: "May 2 - 4, 2026", title: "Final Presentation", desc: "Live solution pitching in front of the judges at the ITB Ganesha Campus." },
+    { date: "Aug 16 - 29, 2026", title: "Wave 1 Registration", desc: "Pendaftaran peserta secara online." },
+    { date: "Aug 30 - Sep 19, 2026", title: "Wave 2 Registration", desc: "Pendaftaran peserta secara online." },
+    { date: "Sep 20 - 30, 2026", title: "Wave 3 Registration", desc: "Pendaftaran peserta dan secara online." },
+    { date: "Oct 05, 2026", title: "Case Release", desc: "Pengumuman case secara serentak setelah seluruh gelombang pendaftaran berakhir." },
+    { date: "Oct 05 - 15, 2026", title: "Preliminary Round", desc: "Pengumpulan berkas abstrak secara online." },
+    { date: "Oct 23 - Nov 07, 2026", title: "Semifinal Round", desc: "Pengumpulan full paper secara online." },
+    { date: "Nov 28 - 29, 2026", title: "Final Round", desc: "Dilaksanakan secara luring di Kampus ITB Ganesha." },
   ];
 
   const faqData = [
-    { q: "Is this competition open to all university majors?", a: "Yes, this competition is open to all active undergraduate students from various majors across Indonesia." },
-    { q: "Can team members be from different universities?", a: "No, it is strictly prohibited. All team members must be from the same university." },
+    { q: "Apakah kompetisi ini boleh diikuti oleh semua prodi atau jurusan?", a: "Boleh, tidak ada batasan terkait prodi atau jurusan untuk mengikuti kompetisi ini." },
+    { q: "Apakah anggota tim diperbolehkan berbeda instansi?", a: "Tidak, anggota tim wajib berasal dari instansi yang sama." },
   ];
 
   const hadiah = { 
     juara1: "Rp 5.000.000", 
     juara2: "Rp 3.500.000", 
     juara3: "Rp 2.000.000",
-    specialTitle: "Best Innovation"
+    specialTitle: "Best Categories"
   };
 
   return <CompetitionTemplate formatName={formatName} lombaId={lombaId} info={info} documents={documents} activeDoc={activeDoc} activePdfIndex={activePdfIndex} setActivePdfIndex={setActivePdfIndex} timelineData={timelineData} faqData={faqData} hadiah={hadiah} />;
@@ -174,9 +178,9 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               <div className="w-10 h-10 bg-white/2 rounded-full flex items-center justify-center text-xl border border-white-200"><LucideMedal size={18}/></div>
               <h4 className="text-xl font-bold text-white uppercase tracking-wider">{hadiah.specialTitle}</h4>
             </div>
-            <div className="flex flex-wrap justify-center gap-3 text-xs sm:text-sm text-silver-shine font-semibold">
-              <span className="bg-black/40 py-2 px-5 rounded-full border border-white/10">Benefit 1</span>
-              <span className="bg-black/40 py-2 px-5 rounded-full border border-white/10">Benefit 2</span>
+            <div className="flex flex-wrap justify-center gap-3 text-xs sm:text-sm text-silver-shine font-bold">
+              <span className="py-2 px-5 rounded-full border border-white/10">Best Paper</span>
+              <span className="py-2 px-5 rounded-full border border-white/10">Best Presentation</span>
             </div>
           </div>
 

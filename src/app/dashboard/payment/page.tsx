@@ -78,7 +78,7 @@ export default async function PaymentPage() {
               <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 mb-8">
                 <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-4">
                   <span className="font-semibold text-gray-700">Competition Category</span>
-                  <span className="font-bold uppercase">{userTeam[0].compeType.replace("_", " ")}</span>
+                  <span className="font-bold uppercase">{userTeam[0].compeType.replace("-", " ")}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-gray-700">Total Payment</span>
@@ -131,7 +131,7 @@ export default async function PaymentPage() {
                     <h2 className="font-display text-xl font-bold mb-6 border-b border-white/10 pb-4">Invoice Details</h2>
                     
                     <div className="space-y-4 mb-8 text-sm">
-                      <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{userTeam[0].compeType.replace("_", " ")}</span></div>
+                      <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{userTeam[0].compeType.replace("-", " ")}</span></div>
                       <div className="flex justify-between"><span className="text-silver-shine">Base Ticket Price</span><span className="font-semibold">{formatIDR(basePrice)}</span></div>
                       <div className="flex justify-between items-center"><span className="text-silver-shine">System Unique Code</span><span className="font-semibold text-sunlight-orange font-mono bg-sunlight-orange/10 px-2 py-0.5 rounded">+{uniqueCode}</span></div>
                     </div>

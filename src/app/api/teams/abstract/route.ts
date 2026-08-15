@@ -5,7 +5,6 @@ import { db } from "@/db";
 import { users, teams } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-// UBAH JADI POST AGAR SINKRON DENGAN CLIENT (AbstractPortalClient.tsx)
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);

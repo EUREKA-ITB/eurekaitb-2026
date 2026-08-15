@@ -25,42 +25,44 @@ type TemplateProps = {
   hadiah: Hadiah;
 };
 
-export default function ScienceProjectPage() {
-  const formatName = "SCIENCE PROJECT";
-  const lombaId = "science_project"; 
+export default function PhysicsOlympiadPage() {
+  const formatName = "PHYSICS OLYMPIAD";
+  const lombaId = "physics-olympiad"; 
   
   const info = { 
-    type: "Group (2 - 3 Members)", 
-    desc: "The EUREKA! ITB 2026 Science Project Competition is a national-level science innovation event for high school students. Designed for participants to develop science-based ideas and innovations as a team." 
+    type: "Individual", 
+    desc: "Physics Olympiad EUREKA! ITB 2026 adalah kompetisi olimpiade fisika tingkat nasional bagi pelajar SMA/Sederajat. Dirancang untuk mengukur penguasaan dan problem solving konsep fisika secara mendalam." 
   };
 
   const documents = [
-    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/science_project.pdf" },
-    { id: "format_laporan", title: "Report Format", url: "/guidebooks/format_laporan_sp.pdf" },
+    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/physics-olympiad.pdf" },
+    { id: "silabus", title: "Syllabus & Guidelines", url: "/guidebooks/silabus-physics-olympiad.pdf" },
   ];
   
   const [activePdfIndex, setActivePdfIndex] = useState(0);
   const activeDoc = documents[activePdfIndex];
 
   const timelineData = [
-    { date: "Aug 16 - 29, 2026", title: "Wave 1 Registration", desc: "Online participant registration and abstract submission." },
-    { date: "Aug 30 - Sep 19, 2026", title: "Wave 2 Registration", desc: "Online participant registration and abstract submission." },
-    { date: "Sep 20 - 30, 2026", title: "Wave 3 Registration", desc: "Online participant registration and abstract submission." },
-    { date: "Oct 31, 2026", title: "Semifinal Round", desc: "Online full paper submission for qualified teams." },
-    { date: "Nov 28 - 29, 2026", title: "Final Round", desc: "Held offline at the ITB Ganesha Campus." },
+    { date: "Aug 16 - 29, 2026", title: "Wave 1 Registration", desc: "Pendaftaran peserta dan verifikasi berkas secara online." },
+    { date: "Aug 30 - Sep 19, 2026", title: "Wave 2 Registration", desc: "Pendaftaran peserta dan verifikasi berkas secara online." },
+    { date: "Sep 20 - 30, 2026", title: "Wave 3 Registration", desc: "Pendaftaran peserta dan verifikasi berkas secara online." },
+    { date: "Oct 08, 2026", title: "Technical Meeting", desc: "Dilaksanakan secara online. Peserta wajib hadir untuk mendapatkan informasi teknis lomba." },
+    { date: "Oct 10, 2026", title: "Preliminary Round", desc: "Dilaksanakan serentak secara online melalui platform CBT." },
+    { date: "Oct 31, 2026", title: "Semifinal Round", desc: "Dilaksanakan serentak secara online melalui platform CBT." },
+    { date: "Nov 28 - 29, 2026", title: "Final & Grand Final", desc: "Dilaksanakan secara luring di Kampus ITB Ganesha." },
   ];
 
   const faqData = [
-    { q: "Are finalists required to attend offline at ITB?", a: "Yes, for the final round, participants are strictly required to attend offline at the ITB Ganesha Campus." },
+    { q: "Is it allowed to register for the Physics Olympiad and another competition branch at the same time?", a: "Yes, as long as the competition schedules do not clash with each other." },
+    { q: "Are finalists required to attend offline at ITB?", a: "Yes, for the final and grand final rounds, participants are strictly required to attend offline at the ITB Ganesha Campus." },
     { q: "What if a finalist is suddenly unable to attend?", a: "Participant confirmation must be made no later than the technical meeting stage for finalists." },
-    { q: "Can we change team members in the middle of the competition?", a: "Member replacement can be done up to 7 days before the final stage by submitting an official letter." },
   ];
 
   const hadiah = { 
     juara1: "Rp 5.000.000", 
     juara2: "Rp 3.500.000", 
     juara3: "Rp 2.000.000",
-    specialTitle: "Best Paper"
+    specialTitle: "Best Category"
   };
 
   return <CompetitionTemplate formatName={formatName} lombaId={lombaId} info={info} documents={documents} activeDoc={activeDoc} activePdfIndex={activePdfIndex} setActivePdfIndex={setActivePdfIndex} timelineData={timelineData} faqData={faqData} hadiah={hadiah} />;
@@ -177,9 +179,8 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               <div className="w-10 h-10 bg-white/2 rounded-full flex items-center justify-center text-xl border border-white-200"><LucideMedal size={18}/></div>
               <h4 className="text-xl font-bold text-white uppercase tracking-wider">{hadiah.specialTitle}</h4>
             </div>
-            <div className="flex flex-wrap justify-center gap-3 text-xs sm:text-sm text-silver-shine font-semibold">
-              <span className="bg-black/40 py-2 px-5 rounded-full border border-white/10">Benefit 1</span>
-              <span className="bg-black/40 py-2 px-5 rounded-full border border-white/10">Benefit 2</span>
+            <div className="flex flex-wrap justify-center gap-3 text-xs sm:text-sm text-silver-shine font-bold">
+              <span className="px-5 rounded-full border border-white/10">Honorable Mention</span>
             </div>
           </div>
 

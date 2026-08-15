@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  const validCompetitions = ['physics_olympiad', 'science_project', 'industrial_case'];
+  const validCompetitions = ['physics-olympiad', 'science-project', 'industrial-case'];
   if (path.startsWith('/competition/')) {
     const category = path.split('/')[2];
     if (category && !validCompetitions.includes(category)) {

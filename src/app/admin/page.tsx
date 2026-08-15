@@ -76,16 +76,16 @@ export default async function AdminDashboardPage() {
               Administrator Mode
             </div>
             <h1 className="font-display text-3xl font-bold text-white mb-1">
-              Data Pendaftar EUREKA 2026
+              EUREKA 2026 Registrant Data
             </h1>
-            <p className="text-silver-shine text-sm">Pusat verifikasi dan validasi peserta.</p>
+            <p className="text-silver-shine text-sm">Participant verification and validation center.</p>
           </div>
           <div className="mt-4 md:mt-0 flex gap-4 items-center">
             <Link 
               href="/dashboard" 
               className="px-5 py-2 rounded-full border border-white/20 hover:bg-white/10 transition-colors text-sm font-semibold"
             >
-              Mode Peserta
+              Participant Mode
             </Link>
             <LogoutButton /> 
           </div>

@@ -13,9 +13,9 @@ export default function Navbar({ session }: { session: Session | null }) {
   const [isMobileCompeOpen, setIsMobileCompeOpen] = useState<boolean>(false);
 
   const competitionLinks = [
-    { label: "Physics Olympiad", href: "/competition/physics_olympiad" },
-    { label: "Science Project", href: "/competition/science_project" },
-    { label: "Industrial Case", href: "/competition/industrial_case" },
+    { label: "Physics Olympiad", href: "/competition/physics-olympiad" },
+    { label: "Science Project", href: "/competition/science-project" },
+    { label: "Industrial Case", href: "/competition/industrial-case" },
   ];
 
   return (
@@ -186,9 +186,9 @@ export default function Navbar({ session }: { session: Session | null }) {
                   
                   {isMobileCompeOpen && (
                     <div className="flex flex-col pl-4 border-l border-white/10 ml-6 gap-1 mb-2 mt-1">
-                      <Link href="/competition/physics_olympiad" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
-                      <Link href="/competition/science_project" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Science Project</Link>
-                      <Link href="/competition/industrial_case" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Industrial Case</Link>
+                      <Link href="/competition/physics-olympiad" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Physics Olympiad</Link>
+                      <Link href="/competition/science-project" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Science Project</Link>
+                      <Link href="/competition/industrial-case" className="w-full text-left p-3 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors" onClick={() => setIsOpen(false)}>Industrial Case</Link>
                     </div>
                   )}
                 </div>

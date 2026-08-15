@@ -2,7 +2,7 @@ import { pgTable, uuid, varchar, timestamp, pgEnum, text, boolean, primaryKey, i
 import type { AdapterAccount } from "next-auth/adapters";
 
 export const roleEnum = pgEnum("role", ["admin", "admin_se", "participant"]);
-export const compeTypeEnum = pgEnum("compe_type", ["physics_olympiad", "science_project", "industrial_case"]);
+export const compeTypeEnum = pgEnum("compe_type", ["physics-olympiad", "science-project", "industrial-case"]);
 export const paymentStatusEnum = pgEnum("payment_status", ["unpaid", "pending", "verified", "rejected"]);
 export const registrationPhaseEnum = pgEnum("registration_phase", ["early_bird", "normal", "late"]);
 export const abstractStatusEnum = pgEnum("abstract_status", ["waiting", "passed", "failed"]); 

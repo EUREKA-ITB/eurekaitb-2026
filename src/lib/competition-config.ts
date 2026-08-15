@@ -1,5 +1,21 @@
 export type Phase = "early_bird" | "normal" | "late";
-export type CompeType = "physics_olympiad" | "science_project" | "industrial_case";
+export type CompeType = "physics-olympiad" | "science-project" | "industrial-case";
+
+// --- JEMBATAN KE DATABASE (POSTGRES ENUM PAKAI UNDERSCORE) ---
+export type CompeDBType = "physics_olympiad" | "science_project" | "industrial_case";
+
+export const slugToDB: Record<CompeType, CompeDBType> = {
+  "physics-olympiad": "physics_olympiad",
+  "science-project": "science_project",
+  "industrial-case": "industrial_case",
+};
+
+export const dbToSlug: Record<CompeDBType, CompeType> = {
+  "physics_olympiad": "physics-olympiad",
+  "science_project": "science-project",
+  "industrial_case": "industrial-case",
+};
+// -------------------------------------------------------------
 
 export const PHASE_NAMES: Record<Phase, string> = {
   early_bird: "Wave 1",
@@ -8,9 +24,9 @@ export const PHASE_NAMES: Record<Phase, string> = {
 };
 
 export const COMPETITION_PRICING: Record<CompeType, Record<Phase, number>> = {
-  physics_olympiad: { early_bird: 75000, normal: 100000, late: 125000 },
-  science_project: { early_bird: 100000, normal: 125000, late: 150000 },
-  industrial_case: { early_bird: 100000, normal: 125000, late: 150000 },
+  "physics-olympiad": { early_bird: 75000, normal: 100000, late: 125000 },
+  "science-project": { early_bird: 100000, normal: 125000, late: 150000 },
+  "industrial-case": { early_bird: 100000, normal: 125000, late: 150000 },
 };
 
 export function getCurrentPhase(): Phase {

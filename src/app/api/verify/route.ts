@@ -63,7 +63,7 @@ export async function PATCH(req: Request) {
           .from(teams)
           .where(eq(teams.compeType, currentTeam[0].compeType));
 
-        const code = currentTeam[0].compeType === "physics_olympiad" ? "PO" : currentTeam[0].compeType === "science_project" ? "SP" : "IC";
+        const code = currentTeam[0].compeType === "physics-olympiad" ? "PO" : currentTeam[0].compeType === "science-project" ? "SP" : "IC";
         const prefix = `E26-${code}-`;
 
         let highestSequence = 0;

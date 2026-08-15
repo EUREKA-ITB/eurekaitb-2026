@@ -3,9 +3,9 @@ import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy } from "lucide
 import InteractiveTimeline from "@/components/InteractiveTimeline";
 
 const competitionCards = [
-  { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang ingin mengukur penguasaan dan problem solving konsep fisika secara mendalam.", href: "/competition/physics_olympiad" },
-  { title: "Science Project Competition", tagline: "Tim - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang mau mengembangkan ide dan inovasi berbasis sains secara tim.", href: "/competition/science_project" },
-  { title: "Industrial Case Competition", tagline: "Tim - Mahasiswa S1", description: "Kompetisi ini cocok bagi kamu yang ingin melatih kemampuan analisis permasalahan serta memberikan solusi inovatif suatu kasus industri.", href: "/competition/industrial_case" },
+  { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang ingin mengukur penguasaan dan problem solving konsep fisika secara mendalam.", href: "/competition/physics-olympiad" },
+  { title: "Science Project Competition", tagline: "Tim - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang mau mengembangkan ide dan inovasi berbasis sains secara tim.", href: "/competition/science-project" },
+  { title: "Industrial Case Competition", tagline: "Tim - Mahasiswa S1", description: "Kompetisi ini cocok bagi kamu yang ingin melatih kemampuan analisis permasalahan serta memberikan solusi inovatif suatu kasus industri.", href: "/competition/industrial-case" },
 ];
 
 const faqPreview = [

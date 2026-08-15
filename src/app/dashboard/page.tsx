@@ -44,14 +44,18 @@ export default async function DashboardPage() {
   
   let participantNumber = "";
   let cbtPassword = "";
+  let compeTypeSlug = "";
 
   if (hasRegistered) {
     isVerified = userTeam[0].statusPayment === "verified";
     isPending = userTeam[0].statusPayment === "pending";
     
-    isPO = userTeam[0].compeType === "physics_olympiad";
-    isSPC = userTeam[0].compeType === "science_project";
-    isICC = userTeam[0].compeType === "industrial_case";
+    // NORMALISASI: Ubah underscore dari DB ("science_project") menjadi hyphen ("science-project")
+    compeTypeSlug = userTeam[0].compeType.replace(/_/g, "-");
+
+    isPO = compeTypeSlug === "physics-olympiad";
+    isSPC = compeTypeSlug === "science-project";
+    isICC = compeTypeSlug === "industrial-case";
     abstractStatus = userTeam[0].abstractStatus;
     abstractUrl = userTeam[0].abstractUrl;
     caseChoice = userTeam[0].caseChoice;
@@ -77,9 +81,9 @@ export default async function DashboardPage() {
   }
 
   const waGroupLinks = {
-    physics_olympiad: "https://chat.whatsapp.com/po_link",
-    science_project: "https://chat.whatsapp.com/spc_link",
-    industrial_case: "https://chat.whatsapp.com/icc_link",
+    "physics-olympiad": "https://chat.whatsapp.com/po_link",
+    "science-project": "https://chat.whatsapp.com/spc_link",
+    "industrial-case": "https://chat.whatsapp.com/icc_link",
   };
 
   return (
@@ -157,7 +161,7 @@ export default async function DashboardPage() {
                         <div className="space-y-3 text-xs mb-4">
                           <div>
                             <p className="text-silver-shine">Category</p>
-                            <p className="font-bold text-white uppercase">{userTeam[0].compeType.replace("_", " ")}</p>
+                            <p className="font-bold text-white uppercase">{compeTypeSlug.replace(/-/g, " ")}</p>
                           </div>
                           <div>
                             <p className="text-silver-shine">Institution</p>
@@ -174,12 +178,11 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   
-                  {/* UBAH TOMBOL EDIT JADI GABOK UNTUK SPC DAN ICC */}
                   <div className="w-full text-center border border-white/20 bg-black/40 text-silver-shine font-bold py-3.5 rounded-xl text-sm shadow-md flex items-center justify-center gap-2 cursor-not-allowed">
                     <Lock size={16}/> Data Registrasi Terkunci
                   </div>
                   
-                  <a href={waGroupLinks[userTeam[0].compeType as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
+                  <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                     <MessageCircle size={18}/> Join WhatsApp Group
                   </a>
                 </div>
@@ -187,7 +190,7 @@ export default async function DashboardPage() {
                 <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl flex flex-col justify-center items-center">
                   <AbstractPortalClient 
                     currentUrl={abstractUrl} 
-                    compeType={userTeam[0].compeType} 
+                    compeType={compeTypeSlug} 
                     currentCase={caseChoice} 
                   />
                 </div>
@@ -226,7 +229,7 @@ export default async function DashboardPage() {
                     <h3 className="font-display text-2xl font-bold text-white mb-6">{userTeam[0].teamName}</h3>
                     <div className="space-y-4 text-sm bg-black/20 p-5 rounded-xl border border-white/5">
                       <div className="flex justify-between items-center border-b border-white/10 pb-3 gap-2">
-                        <span className="text-silver-shine">Category</span><span className="font-semibold capitalize text-sunlight-orange text-right">{userTeam[0].compeType.replace("_", " ")}</span>
+                        <span className="text-silver-shine">Category</span><span className="font-semibold capitalize text-sunlight-orange text-right">{compeTypeSlug.replace(/-/g, " ")}</span>
                       </div>
                       <div className="flex justify-between items-center pt-1 gap-2">
                         <span className="text-silver-shine">Institution</span><span className="font-semibold text-right">{userTeam[0].institutionName}</span>
@@ -245,7 +248,7 @@ export default async function DashboardPage() {
                   )}
 
                   {(isSPC || isICC) && (
-                    <a href={waGroupLinks[userTeam[0].compeType as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3 rounded-xl hover:bg-green-500/30 transition-colors text-sm mt-4 flex items-center justify-center gap-2">
+                    <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3 rounded-xl hover:bg-green-500/30 transition-colors text-sm mt-4 flex items-center justify-center gap-2">
                       <MessageCircle size={16}/> Join WhatsApp Group
                     </a>
                   )}
@@ -314,7 +317,7 @@ export default async function DashboardPage() {
                         <div className="space-y-3 text-xs mb-8">
                           <div>
                             <p className="text-silver-shine">Category</p>
-                            <p className="font-bold text-white uppercase">{userTeam[0].compeType.replace("_", " ")}</p>
+                            <p className="font-bold text-white uppercase">{compeTypeSlug.replace(/-/g, " ")}</p>
                           </div>
                           <div>
                             <p className="text-silver-shine">Institution</p>
@@ -331,7 +334,7 @@ export default async function DashboardPage() {
                     </div>
                   </div>
 
-                  <a href={waGroupLinks[userTeam[0].compeType as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
+                  <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                     <MessageCircle size={18}/> Join WhatsApp Group
                   </a>
                 </div>
@@ -360,7 +363,7 @@ export default async function DashboardPage() {
                     <p className="text-sm text-silver-shine mb-6 max-w-lg mx-auto">
                       Congratulations! You are officially registered as a Finalist. Please upload your Full Paper and presentation according to the Guidebook schedule.
                     </p>
-                    <Link href={`/competition/${userTeam[0].compeType}`} className="inline-block bg-white/10 text-white font-bold px-8 py-3 rounded-xl text-sm transition-colors hover:bg-white/20 border border-white/20">
+                    <Link href={`/competition/${compeTypeSlug}`} className="inline-block bg-white/10 text-white font-bold px-8 py-3 rounded-xl text-sm transition-colors hover:bg-white/20 border border-white/20">
                       Open Submission Room
                     </Link>
                   </div>

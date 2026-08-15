@@ -22,7 +22,7 @@ interface MemberPayload {
 }
 
 interface RequestBody {
-  compeType: "physics_olympiad" | "science_project" | "industrial_case";
+  compeType: "physics-olympiad" | "science-project" | "industrial-case";
   teamName: string;
   institutionName: string;
   abstractUrl: string;
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
 
     if (existingTeam.length > 0) {
       // PROTEKSI PERMANEN UNTUK SPC DAN ICC
-      if (existingTeam[0].compeType === "science_project" || existingTeam[0].compeType === "industrial_case") {
+      if (existingTeam[0].compeType === "science-project" || existingTeam[0].compeType === "industrial-case") {
          return NextResponse.json({ error: "Data SPC dan ICC telah dikunci permanen setelah registrasi." }, { status: 403 });
       }
       

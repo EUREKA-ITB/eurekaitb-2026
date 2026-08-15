@@ -16,7 +16,7 @@ export async function PATCH(req: Request) {
     const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
     if (userTeam.length === 0) return NextResponse.json({ error: "Team not found" }, { status: 404 });
 
-    if (userTeam[0].compeType !== "industrial_case") {
+    if (userTeam[0].compeType !== "industrial-case") {
       return NextResponse.json({ error: "Invalid competition type" }, { status: 400 });
     }
 
