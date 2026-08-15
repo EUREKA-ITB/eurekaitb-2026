@@ -22,6 +22,9 @@ const funnelDisplay = Funnel_Display({
 export const metadata: Metadata = {
   title: "EUREKA! ITB 2026",
   description: "Official Website of EUREKA! ITB 2026",
+  icons: {
+    icon: "/icon.png",
+  }
 };
 
 export default async function RootLayout({
