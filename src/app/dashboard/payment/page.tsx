@@ -29,7 +29,10 @@ export default async function PaymentPage() {
   
   const teamPhase = userTeam[0].registrationPhase as Phase;
   const phaseName = PHASE_NAMES[teamPhase];
-  const basePrice = getPrice(userTeam[0].compeType as CompeType, teamPhase);
+  
+  // NORMALISASI: Ubah underscore dari DB menjadi hyphen agar terbaca oleh config
+  const normalizedCompeType = userTeam[0].compeType.replace(/_/g, "-") as CompeType;
+  const basePrice = getPrice(normalizedCompeType, teamPhase);
   
   const uniqueCode = parseInt((leader?.phoneNumber || "000").slice(-3)) || 0; 
   const totalPayment = basePrice + uniqueCode;
@@ -78,7 +81,7 @@ export default async function PaymentPage() {
               <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 mb-8">
                 <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-4">
                   <span className="font-semibold text-gray-700">Competition Category</span>
-                  <span className="font-bold uppercase">{userTeam[0].compeType.replace("-", " ")}</span>
+                  <span className="font-bold uppercase">{normalizedCompeType.replace(/-/g, " ")}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-gray-700">Total Payment</span>
@@ -131,7 +134,7 @@ export default async function PaymentPage() {
                     <h2 className="font-display text-xl font-bold mb-6 border-b border-white/10 pb-4">Invoice Details</h2>
                     
                     <div className="space-y-4 mb-8 text-sm">
-                      <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{userTeam[0].compeType.replace("-", " ")}</span></div>
+                      <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{normalizedCompeType.replace(/-/g, " ")}</span></div>
                       <div className="flex justify-between"><span className="text-silver-shine">Base Ticket Price</span><span className="font-semibold">{formatIDR(basePrice)}</span></div>
                       <div className="flex justify-between items-center"><span className="text-silver-shine">System Unique Code</span><span className="font-semibold text-sunlight-orange font-mono bg-sunlight-orange/10 px-2 py-0.5 rounded">+{uniqueCode}</span></div>
                     </div>
@@ -155,10 +158,12 @@ export default async function PaymentPage() {
                       <div className="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10 mb-4 hover:border-white/30 transition-colors">
                         <div className="bg-blue-600/20 text-blue-400 p-3 rounded-lg"><Building size={24} /></div>
                         <div>
-                          <p className="font-bold text-white text-sm mb-1">Bank Transfer (BCA / Mandiri)</p>
-                          <div className="text-sm font-mono text-sunlight-orange mb-1">1234 567 890 <span className="text-xs text-silver-shine font-sans">(BCA)</span></div>
-                          <div className="text-sm font-mono text-sunlight-orange">0987 654 321 <span className="text-xs text-silver-shine font-sans">(Mandiri)</span></div>
-                          <p className="text-xs text-silver-shine mt-2">a.n. <span className="text-white font-semibold">EUREKA ITB Treasurer</span></p>
+                          <p className="font-bold text-white text-sm mb-1">Bank Transfer</p>
+                          <p className="text-xs text-silver-shine mb-2">BRI / Blu BCA</p>
+                          <div className="text-sm font-mono text-sunlight-orange mb-1">3287 0103 8671 537 <span className="text-xs text-silver-shine font-sans">(BRI)</span></div>
+                          <p className="text-xs text-silver-shine mb-2">a.n. <span className="text-white font-semibold">Azizah Pribadi Istiqomah</span></p>
+                          <div className="text-sm font-mono text-sunlight-orange mb-1">0025 5263 9906 <span className="text-xs text-silver-shine font-sans">(Blu)</span></div>
+                          <p className="text-xs text-silver-shine mb-2">a.n. <span className="text-white font-semibold">Rizka Hasna Tiara</span></p>
                         </div>
                       </div>
 
@@ -166,25 +171,23 @@ export default async function PaymentPage() {
                         <div className="bg-green-500/20 text-green-400 p-3 rounded-lg"><Wallet size={24} /></div>
                         <div className="flex-1">
                           <p className="font-bold text-white text-sm mb-1">E-Wallet Transfer</p>
-                          <p className="text-xs text-silver-shine mb-2">GoPay / ShopeePay / DANA / OVO</p>
-                          <div className="text-sm font-mono text-sunlight-orange mb-2">0812 3456 7890</div>
-                          <p className="text-xs text-silver-shine">a.n. <span className="text-white font-semibold">EUREKA ITB Treasurer</span></p>
+                          <p className="text-xs text-silver-shine mb-2">GoPay / ShopeePay / DANA</p>
+                          <div className="text-sm font-mono text-sunlight-orange mb-2">0895632139070</div>
+                          <p className="text-xs text-silver-shine">a.n. <span className="text-white font-semibold">Azizah Pribadi Istiqomah</span></p>
                         </div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/30 transition-colors text-center sm:text-left">
                         <div className="bg-white p-3 rounded-xl shadow-lg w-full max-w-[220px] sm:w-[150px] sm:max-w-none flex flex-col items-center shrink-0">
-                           <div className="w-full aspect-square border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 rounded-lg mb-3">
-                             <p className="text-xs text-gray-400 text-center font-bold tracking-widest">QRIS<br/>COMING<br/>SOON</p>
-                           </div>
-                           <a href="#" download="QRIS_EUREKA2026.png" className="w-full flex items-center justify-center gap-2 bg-blue-marine text-white text-xs font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-colors border border-blue-800">
+                           <div className="w-full aspect-square border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 rounded-lg mb-3"></div>
+                           <a href="/QRIS-EUREKA2026.jpg" download="QRIS-EUREKA2026.jpg" className="w-full flex items-center justify-center gap-2 bg-blue-marine text-white text-xs font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-colors border border-blue-800">
                               <Download size={14} /> Download
                            </a>
                         </div>
                         <div className="flex-1 w-full">
                           <p className="font-bold text-white text-xl sm:text-lg mb-1">QRIS</p>
                           <p className="text-sm text-silver-shine mb-2">Scan to Pay</p>
-                          <p className="text-sm text-silver-shine">a.n. <span className="text-white font-semibold">EUREKA ITB Treasurer</span></p>
+                          <p className="text-sm text-silver-shine">a.n. <span className="text-white font-semibold">EUREKA ITB 2026</span></p>
                         </div>
                       </div>
 

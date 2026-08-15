@@ -7,8 +7,8 @@ export default function CountdownTimer({ registeredAt }: { registeredAt: Date | 
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
-    // Batas waktu: 24 Jam after tanggal pendaftaran
-    const targetTime = new Date(registeredAt).getTime() + 24 * 60 * 60 * 1000;
+    // Batas waktu: 3 Jam after tanggal pendaftaran
+    const targetTime = new Date(registeredAt).getTime() + 3 * 60 * 60 * 1000;
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
