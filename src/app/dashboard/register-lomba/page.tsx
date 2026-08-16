@@ -249,11 +249,19 @@ export default function RegisterLombaPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 border-b border-white/10 pb-10">
             <div className="md:col-span-2">
               <label htmlFor="compeTypeSelect" className="block text-sm font-semibold mb-2">Competition Category</label>
-              <select id="compeTypeSelect" name="compeType" required className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.compeType} onChange={handleCompeTypeChange}>
-                <option value="" disabled>-- Select Competition --</option>
-                <option value="physics-olympiad">Physics Olympiad (High School - Individual)</option>
-                <option value="science-project">Science Project (High School - Team)</option>
-                <option value="industrial-case">Industrial Case (Undergraduate - Team)</option>
+              <select 
+                  id="compeTypeSelect" 
+                  name="compeType" 
+                  required 
+                  key={formData.compeType} 
+                  className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" 
+                  value={formData.compeType} 
+                  onChange={handleCompeTypeChange}
+              >
+                  <option value="" disabled>-- Select Competition --</option>
+                  <option value="physics-olympiad">Physics Olympiad (High School - Individual)</option>
+                  <option value="science-project">Science Project (High School - Team)</option>
+                  <option value="industrial-case">Industrial Case (Undergraduate - Team)</option>
               </select>
             </div>
 

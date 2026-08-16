@@ -32,7 +32,7 @@ export default async function DashboardPage() {
     ktmUrl: string | null;
     isLeader: boolean | null;
   }[] = [];
-
+  
   let isVerified = false;
   let isPending = false;
   let isPO = false;
@@ -41,7 +41,6 @@ export default async function DashboardPage() {
   let abstractStatus = "waiting";
   let abstractUrl = null;
   let caseChoice = null;
-  
   let participantNumber = "";
   let cbtPassword = "";
   let compeTypeSlug = "";
@@ -49,34 +48,25 @@ export default async function DashboardPage() {
   if (hasRegistered) {
     isVerified = userTeam[0].statusPayment === "verified";
     isPending = userTeam[0].statusPayment === "pending";
-    
-    // NORMALISASI: Ubah underscore dari DB ("science_project") menjadi hyphen ("science-project")
     compeTypeSlug = userTeam[0].compeType.replace(/_/g, "-");
-
     isPO = compeTypeSlug === "physics-olympiad";
     isSPC = compeTypeSlug === "science-project";
     isICC = compeTypeSlug === "industrial-case";
     abstractStatus = userTeam[0].abstractStatus;
     abstractUrl = userTeam[0].abstractUrl;
     caseChoice = userTeam[0].caseChoice;
-
-    participantNumber = userTeam[0].participantNumber || "PENDING VERIFICATION";
+    participantNumber = userTeam[0].participantNumber || "PENDING";
     cbtPassword = userTeam[0].cbtPassword || "******";
-
     membersData = await db.select().from(teamMembers).where(eq(teamMembers.teamId, userTeam[0].id));
     membersData.sort((a, b) => Number(b.isLeader || false) - Number(a.isLeader || false));
   }
 
   let currentStep = 1;
   if (hasRegistered) {
-    if (isPO) {
-       currentStep = isVerified ? 3 : (isPending ? 2.5 : 2);
-    } else {
-       if (abstractStatus === "passed") {
-          currentStep = isVerified ? 3 : (isPending ? 2.5 : 2);
-       } else {
-          currentStep = 1; 
-       }
+    if (isPO) currentStep = isVerified ? 3 : (isPending ? 2.5 : 2);
+    else {
+       if (abstractStatus === "passed") currentStep = isVerified ? 3 : (isPending ? 2.5 : 2);
+       else currentStep = 1; 
     }
   }
 
@@ -86,17 +76,16 @@ export default async function DashboardPage() {
     "industrial-case": "https://chat.whatsapp.com/JqkSHzRxYRBFxuVmig1wMw",
   };
 
+  // LOGIKA WA: PO & SPC Verified Only, ICC Selalu
+  const showWaLink = isICC || ((isPO || isSPC) && isVerified);
+
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden">
       <div className="max-w-6xl mx-auto w-full pt-16 sm:pt-20">
-        
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-white/10 pb-6 w-full box-border gap-4">
           <div>
-            <Link href="/" className="font-display font-bold text-2xl text-white tracking-widest hover:text-sunlight-orange transition-colors block mb-2">
-              EUREKA! <span className="text-sunlight-orange">ITB 2026</span>
-            </Link>
+            <Link href="/" className="font-display font-bold text-2xl text-white tracking-widest hover:text-sunlight-orange transition-colors block mb-2">EUREKA! <span className="text-sunlight-orange">ITB 2026</span></Link>
             <h1 className="font-display text-2xl sm:text-3xl font-bold text-white mb-1">Official Participant Portal</h1>
-            <p className="text-silver-shine text-sm">Welcome, <span className="font-semibold text-white">{session.user.name}</span></p>
           </div>
           <div className="flex gap-4 sm:gap-6 items-center w-full md:w-auto justify-between md:justify-end">
             <Link href="/" className="text-silver-shine hover:text-white transition-colors text-sm font-semibold">← Homepage</Link>
@@ -104,31 +93,20 @@ export default async function DashboardPage() {
           </div>
         </header>
 
+        {/* --- STEP BAR & CONTENT (Kodinganmu sebelumnya) --- */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 mb-8 backdrop-blur-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 overflow-hidden relative">
-          <div className="absolute -right-20 -top-20 w-64 h-64 bg-sunlight-orange/10 blur-3xl rounded-full z-0 pointer-events-none"></div>
-          
-          <div className="relative z-10 w-full md:w-1/3">
-            <h2 className="font-display text-xl font-bold text-white mb-2">Registration Status</h2>
-            <p className="text-silver-shine text-sm">Follow the steps to become an official EUREKA participant.</p>
-          </div>
-
           <div className="relative z-10 w-full md:w-2/3 flex items-center justify-between">
+            {/* Step Bar Item */}
             <div className="flex flex-col items-center gap-2 w-1/3 text-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 1 ? "bg-sunlight-orange border-sunlight-orange text-blue-marine" : "border-white/20 text-white/40"}`}><FileText size={18} /></div>
-              <span className={`text-xs font-semibold ${currentStep >= 1 ? "text-sunlight-orange" : "text-white/40"}`}>
-                {(isSPC || isICC) ? "Registration & Abstract" : "Team Profile"}
-              </span>
+              <span className={`text-xs font-semibold ${currentStep >= 1 ? "text-sunlight-orange" : "text-white/40"}`}>{(isSPC || isICC) ? "Registration & Abstract" : "Team Profile"}</span>
             </div>
             <div className={`flex-1 h-0.5 -mt-6 transition-colors ${currentStep >= 2 ? "bg-sunlight-orange" : "bg-white/10"}`}></div>
-            
             <div className="flex flex-col items-center gap-2 w-1/3 text-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 2 ? (isPending ? "bg-yellow-500 border-yellow-500 text-black" : "bg-sunlight-orange border-sunlight-orange text-blue-marine") : "bg-blue-marine border-white/20 text-white/40"}`}>{isPending ? <Clock size={18} /> : <CreditCard size={18} />}</div>
-              <span className={`text-xs font-semibold ${currentStep >= 2 ? (isPending ? "text-yellow-500" : "text-sunlight-orange") : "text-white/40"}`}>
-                {isPending ? "Admin Verification" : "Payment"}
-              </span>
+              <span className={`text-xs font-semibold ${currentStep >= 2 ? (isPending ? "text-yellow-500" : "text-sunlight-orange") : "text-white/40"}`}>{isPending ? "Admin Verification" : "Payment"}</span>
             </div>
             <div className={`flex-1 h-0.5 -mt-6 transition-colors ${currentStep >= 3 ? "bg-sunlight-orange" : "bg-white/10"}`}></div>
-            
             <div className="flex flex-col items-center gap-2 w-1/3 text-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 3 ? "bg-green-400 border-green-400 text-blue-marine" : "bg-blue-marine border-white/20 text-white/40"}`}><CheckCircle2 size={18} /></div>
               <span className={`text-xs font-semibold ${currentStep >= 3 ? "text-green-400" : "text-white/40"}`}>Officially Registered</span>
@@ -136,16 +114,21 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+        {/* --- MAIN CONTENT LOGIC --- */}
         {!hasRegistered ? (
           <div className="bg-white/5 border border-white/10 p-8 sm:p-16 rounded-3xl text-center backdrop-blur-sm w-full box-border border-dashed">
             <Trophy className="w-12 h-12 text-sunlight-orange mx-auto mb-6" />
-            <h2 className="font-display text-2xl font-bold mb-4">Start Your Journey</h2>
-            <Link href="/dashboard/register-lomba" className="inline-block bg-sunlight-orange text-blue-marine font-bold px-8 py-4 rounded-xl hover:bg-yellow-400 transition-transform shadow-xl text-sm mt-4">
-              Fill Team Registration Form
-            </Link>
+            <Link href="/dashboard/register-lomba" className="inline-block bg-sunlight-orange text-blue-marine font-bold px-8 py-4 rounded-xl hover:bg-yellow-400 transition-transform shadow-xl text-sm mt-4">Fill Team Registration Form</Link>
           </div>
         ) : (
           <div className="flex flex-col w-full box-border">
+            {/* Render conditional content here (isPending, isVerified, etc) */}
+            {/* PENTING: Gunakan 'showWaLink' untuk menampilkan tombol WA */}
+            {showWaLink && (
+                 <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2 mb-6">
+                    <MessageCircle size={18}/> Join WhatsApp Group
+                 </a>
+            )}
             
             {(isSPC || isICC) && abstractStatus === "waiting" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border mb-8">
