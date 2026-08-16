@@ -86,7 +86,7 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
         <section className="relative text-center flex flex-col items-center justify-center pt-8 pb-12">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-64 bg-sunlight-orange/15 blur-[100px] rounded-full z-0 pointer-events-none"></div>
           <div className="relative z-10 flex flex-col items-center">
-            <div className="w-96 h-48 flex items-center justify-center mb-1 overflow-hidden mx-auto">
+            <div className="w-80 h-48 flex items-center justify-center mb-1 overflow-hidden mx-auto">
              <Image
                src="/compe-icon/po-white.png" 
                alt="po-white.png" 
