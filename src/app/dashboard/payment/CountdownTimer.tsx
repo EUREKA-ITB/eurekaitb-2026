@@ -2,21 +2,29 @@
 
 import { useState, useEffect } from "react";
 import { Timer } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function CountdownTimer({ registeredAt }: { registeredAt: Date | string }) {
   const [timeLeft, setTimeLeft] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    // Batas waktu: 3 Jam after tanggal pendaftaran
+    // Batas waktu: 3 Jam setelah tanggal pendaftaran
     const targetTime = new Date(registeredAt).getTime() + 3 * 60 * 60 * 1000;
 
     const timer = setInterval(() => {
       const now = new Date().getTime();
       const distance = targetTime - now;
 
+      // JIKA WAKTU HABIS
       if (distance < 0) {
         setTimeLeft("00:00:00");
         clearInterval(timer);
+        
+        // Memaksa halaman untuk refresh otomatis. 
+        // Server (PaymentPage) akan membaca bahwa waktu sudah expired 
+        // dan langsung MENGHILANGKAN tombol Upload & QRIS!
+        router.refresh(); 
         return;
       }
 
@@ -28,7 +36,7 @@ export default function CountdownTimer({ registeredAt }: { registeredAt: Date | 
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [registeredAt]);
+  }, [registeredAt, router]);
 
   if (!timeLeft) return null;
 

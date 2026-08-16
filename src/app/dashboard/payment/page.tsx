@@ -31,15 +31,18 @@ export default async function PaymentPage() {
   const teamPhase = userTeam[0].registrationPhase as Phase;
   const phaseName = PHASE_NAMES[teamPhase];
   
-  // NORMALISASI: Ubah underscore dari DB menjadi hyphen agar terbaca oleh config
-  const normalizedCompeType = userTeam[0].compeType.replace(/_/g, "-") as CompeType;
-  const basePrice = getPrice(normalizedCompeType, teamPhase);
+  // SEKARANG DATABASE SUDAH SINKRON DENGAN FRONTEND
+  const compeTypeSlug = userTeam[0].compeType as CompeType;
+  const basePrice = getPrice(compeTypeSlug, teamPhase);
   
   const uniqueCode = parseInt((leader?.phoneNumber || "000").slice(-3)) || 0; 
   const totalPayment = basePrice + uniqueCode;
 
   const isPending = userTeam[0].statusPayment === "pending";
   const isVerified = userTeam[0].statusPayment === "verified";
+  
+  // Cek kalau waktu pendaftaran sudah melebihi 3 jam (untuk halaman server)
+  const isExpired = new Date().getTime() > new Date(userTeam[0].createdAt).getTime() + (3 * 60 * 60 * 1000);
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden">
@@ -82,7 +85,7 @@ export default async function PaymentPage() {
               <div className="bg-gray-50 rounded-xl p-6 border border-gray-100 mb-8">
                 <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-4">
                   <span className="font-semibold text-gray-700">Competition Category</span>
-                  <span className="font-bold uppercase">{normalizedCompeType.replace(/-/g, " ")}</span>
+                  <span className="font-bold uppercase">{compeTypeSlug.replace(/-/g, " ")}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-gray-700">Total Payment</span>
@@ -123,6 +126,18 @@ export default async function PaymentPage() {
                   </p>
                 </div>
               </div>
+            ) : isExpired ? (
+              // TAMPILAN LOCK JIKA LEWAT 3 JAM
+              <div className="bg-red-500/10 border border-red-500/30 rounded-3xl p-8 sm:p-12 backdrop-blur-sm text-center max-w-2xl mx-auto shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+                 <AlertCircle size={64} className="text-red-400 mx-auto mb-6" />
+                 <h2 className="font-display text-2xl font-bold text-red-400 mb-2">Waktu Pembayaran Habis</h2>
+                 <p className="text-silver-shine text-sm leading-relaxed mb-6">
+                   Batas waktu 3 jam untuk menyelesaikan administrasi pendaftaran telah berakhir. Sistem telah menonaktifkan portal pembayaran untuk tim Anda.
+                 </p>
+                 <a href="https://wa.me/628123456789" target="_blank" rel="noreferrer" className="inline-block bg-white/10 border border-white/20 text-white font-bold py-3 px-6 rounded-xl hover:bg-white/20 transition-colors text-sm">
+                   Hubungi Admin via WhatsApp
+                 </a>
+              </div>
             ) : (
               <>
                 <CountdownTimer registeredAt={userTeam[0].createdAt || new Date()} />
@@ -135,7 +150,7 @@ export default async function PaymentPage() {
                     <h2 className="font-display text-xl font-bold mb-6 border-b border-white/10 pb-4">Invoice Details</h2>
                     
                     <div className="space-y-4 mb-8 text-sm">
-                      <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{normalizedCompeType.replace(/-/g, " ")}</span></div>
+                      <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{compeTypeSlug.replace(/-/g, " ")}</span></div>
                       <div className="flex justify-between"><span className="text-silver-shine">Base Ticket Price</span><span className="font-semibold">{formatIDR(basePrice)}</span></div>
                       <div className="flex justify-between items-center"><span className="text-silver-shine">System Unique Code</span><span className="font-semibold text-sunlight-orange font-mono bg-sunlight-orange/10 px-2 py-0.5 rounded">+{uniqueCode}</span></div>
                     </div>

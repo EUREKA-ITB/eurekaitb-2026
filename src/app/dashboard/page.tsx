@@ -81,9 +81,9 @@ export default async function DashboardPage() {
   }
 
   const waGroupLinks = {
-    "physics-olympiad": "https://chat.whatsapp.com/po_link",
-    "science-project": "https://chat.whatsapp.com/spc_link",
-    "industrial-case": "https://chat.whatsapp.com/icc_link",
+    "physics-olympiad": "https://chat.whatsapp.com/D5abGwkP7qyBzYRMA8s0aU",
+    "science-project": "https://chat.whatsapp.com/B60UKcQMg2bGUBI3vzTOqH",
+    "industrial-case": "https://chat.whatsapp.com/JqkSHzRxYRBFxuVmig1wMw",
   };
 
   return (

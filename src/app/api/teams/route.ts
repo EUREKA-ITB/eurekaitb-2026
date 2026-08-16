@@ -87,7 +87,6 @@ export async function POST(req: Request) {
     const activePhase = getCurrentPhase();
 
     if (existingTeam.length > 0) {
-      // PROTEKSI PERMANEN UNTUK SPC DAN ICC
       if (existingTeam[0].compeType === "science-project" || existingTeam[0].compeType === "industrial-case") {
          return NextResponse.json({ error: "Data SPC dan ICC telah dikunci permanen setelah registrasi." }, { status: 403 });
       }
