@@ -10,6 +10,7 @@ import CountdownTimer from "./CountdownTimer";
 import PaymentUploader from "./PaymentUploader";
 import { getPrice, formatIDR, PHASE_NAMES } from "@/lib/competition-config";
 import type { CompeType, Phase } from "@/lib/competition-config";
+import Image from "next/image";
 
 export default async function PaymentPage() {
   const session = await getServerSession(authOptions);
@@ -179,13 +180,20 @@ export default async function PaymentPage() {
 
                       <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/30 transition-colors text-center sm:text-left">
                         <div className="bg-white p-3 rounded-xl shadow-lg w-full max-w-[220px] sm:w-[150px] sm:max-w-none flex flex-col items-center shrink-0">
-                           <div className="w-full aspect-square border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 rounded-lg mb-3"></div>
-                           <a href="/QRIS-EUREKA2026.jpg" download="QRIS-EUREKA2026.jpg" className="w-full flex items-center justify-center gap-2 bg-blue-marine text-white text-xs font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-colors border border-blue-800">
-                              <Download size={14} /> Download
-                           </a>
+                          <div className="w-full aspect-square border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 rounded-lg mb-3 overflow-hidden relative">
+                            <Image 
+                              src="/QRIS-EUREKA2026.jpg" 
+                              alt="QRIS EUREKA 2026" 
+                              width={200} 
+                              height={200} 
+                              className="w-full h-full object-contain" 
+                            />
+                          </div>
+                          <a href="/QRIS-EUREKA2026.jpg" download="QRIS-EUREKA2026.jpg" className="w-full flex items-center justify-center gap-2 bg-blue-marine text-white text-xs font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-colors border border-blue-800">
+                            <Download size={10} /> Download
+                          </a>
                         </div>
                         <div className="flex-1 w-full">
-                          <p className="font-bold text-white text-xl sm:text-lg mb-1">QRIS</p>
                           <p className="text-sm text-silver-shine mb-2">Scan to Pay</p>
                           <p className="text-sm text-silver-shine">a.n. <span className="text-white font-semibold">EUREKA ITB 2026</span></p>
                         </div>
