@@ -107,7 +107,25 @@ export default function SiteFooter() {
 
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-silver-shine sm:flex-row sm:items-center sm:justify-between">
+        {/* ORGANIZED & SUPPORTED BY (LOGOS) */}
+        <div className="mt-14 flex flex-col items-center gap-8 border-t border-white/10 pt-10 pb-4">
+          <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine text-center">
+            Collaboration Partner & Sponsor
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/brin-c.png" alt="BRIN" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/iasssf-c.png" alt="IASSSF" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+          </div>
+        </div>
+
+        {/* COPYRIGHT */}
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-silver-shine sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <MapPin size={14} className="text-sunlight-orange" />
             <span>Built for EUREKA! ITB 2026</span>
