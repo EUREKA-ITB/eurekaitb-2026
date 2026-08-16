@@ -32,7 +32,7 @@ export default async function DashboardPage() {
     ktmUrl: string | null;
     isLeader: boolean | null;
   }[] = [];
-  
+
   let isVerified = false;
   let isPending = false;
   let isPO = false;
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
   };
 
   // LOGIKA WA: PO & SPC Verified Only, ICC Selalu
-  const showWaLink = isICC || ((isPO || isSPC) && isVerified);
+  const showWaLink = isICC || (isVerified && (isPO || isSPC));
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden">
@@ -125,9 +125,9 @@ export default async function DashboardPage() {
             {/* Render conditional content here (isPending, isVerified, etc) */}
             {/* PENTING: Gunakan 'showWaLink' untuk menampilkan tombol WA */}
             {showWaLink && (
-                 <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2 mb-6">
-                    <MessageCircle size={18}/> Join WhatsApp Group
-                 </a>
+              <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2 mb-6">
+                <MessageCircle size={18}/> Join WhatsApp Group
+              </a>
             )}
             
             {(isSPC || isICC) && abstractStatus === "waiting" && (
