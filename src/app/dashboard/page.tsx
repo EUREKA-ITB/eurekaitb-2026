@@ -76,9 +76,6 @@ export default async function DashboardPage() {
     "industrial-case": "https://chat.whatsapp.com/JqkSHzRxYRBFxuVmig1wMw",
   };
 
-  // LOGIKA WA: PO & SPC Verified Only, ICC Selalu
-  const showWaLink = isICC || (isVerified && (isPO || isSPC));
-
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden">
       <div className="max-w-6xl mx-auto w-full pt-16 sm:pt-20">
@@ -93,10 +90,8 @@ export default async function DashboardPage() {
           </div>
         </header>
 
-        {/* --- STEP BAR & CONTENT (Kodinganmu sebelumnya) --- */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 mb-8 backdrop-blur-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 overflow-hidden relative">
           <div className="relative z-10 w-full md:w-2/3 flex items-center justify-between">
-            {/* Step Bar Item */}
             <div className="flex flex-col items-center gap-2 w-1/3 text-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${currentStep >= 1 ? "bg-sunlight-orange border-sunlight-orange text-blue-marine" : "border-white/20 text-white/40"}`}><FileText size={18} /></div>
               <span className={`text-xs font-semibold ${currentStep >= 1 ? "text-sunlight-orange" : "text-white/40"}`}>{(isSPC || isICC) ? "Registration & Abstract" : "Team Profile"}</span>
@@ -114,7 +109,6 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* --- MAIN CONTENT LOGIC --- */}
         {!hasRegistered ? (
           <div className="bg-white/5 border border-white/10 p-8 sm:p-16 rounded-3xl text-center backdrop-blur-sm w-full box-border border-dashed">
             <Trophy className="w-12 h-12 text-sunlight-orange mx-auto mb-6" />
@@ -122,13 +116,6 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="flex flex-col w-full box-border">
-            {/* Render conditional content here (isPending, isVerified, etc) */}
-            {/* PENTING: Gunakan 'showWaLink' untuk menampilkan tombol WA */}
-            {showWaLink && (
-              <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2 mb-6">
-                <MessageCircle size={18}/> Join WhatsApp Group
-              </a>
-            )}
             
             {(isSPC || isICC) && abstractStatus === "waiting" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border mb-8">
@@ -165,9 +152,12 @@ export default async function DashboardPage() {
                     <Lock size={16}/> Data Registrasi Terkunci
                   </div>
                   
-                  <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
-                    <MessageCircle size={18}/> Join WhatsApp Group
-                  </a>
+                  {/* FIX: HANYA ICC YANG DAPAT AKSES GRUP WA DI TAHAP INI */}
+                  {isICC && (
+                    <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
+                      <MessageCircle size={18}/> Join WhatsApp Group
+                    </a>
+                  )}
                 </div>
 
                 <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl flex flex-col justify-center items-center">
@@ -230,7 +220,8 @@ export default async function DashboardPage() {
                     </div>
                   )}
 
-                  {(isSPC || isICC) && (
+                  {/* FIX: HANYA ICC YANG DAPAT AKSES GRUP WA DI TAHAP BELUM VERIFIED INI */}
+                  {isICC && (
                     <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3 rounded-xl hover:bg-green-500/30 transition-colors text-sm mt-4 flex items-center justify-center gap-2">
                       <MessageCircle size={16}/> Join WhatsApp Group
                     </a>
@@ -316,7 +307,8 @@ export default async function DashboardPage() {
                       )}
                     </div>
                   </div>
-
+                  
+                  {/* FIX: PO, SPC, & ICC SEMUANYA MENDAPATKAN LINK WA DI TAHAP VERIFIED INI */}
                   <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                     <MessageCircle size={18}/> Join WhatsApp Group
                   </a>

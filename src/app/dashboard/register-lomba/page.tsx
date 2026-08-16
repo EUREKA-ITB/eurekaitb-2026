@@ -157,9 +157,15 @@ export default function RegisterLombaPage() {
     });
   };
 
+  // FIX: PROTEKSI PENGHAPUSAN ANGGOTA MINIMAL 2 UNTUK TIM
   const removeMemberSlot = (index: number) => {
     if (index === 0) return; 
     setFormData((prev) => {
+      const isTeam = prev.compeType === "science-project" || prev.compeType === "industrial-case";
+      if (isTeam && prev.members.length <= 2) {
+        alert("Tim kategori SPC dan ICC wajib memiliki minimal 2 anggota!");
+        return prev;
+      }
       const updatedMembers = prev.members.filter((_, i) => i !== index);
       return { ...prev, members: updatedMembers };
     });
@@ -170,6 +176,13 @@ export default function RegisterLombaPage() {
     setIsSaving(true);
 
     try {
+      // FIX: PROTEKSI SUBMIT MINIMAL 2 ANGGOTA UNTUK TIM
+      if ((formData.compeType === "science-project" || formData.compeType === "industrial-case") && formData.members.length < 2) {
+        alert("IMPORTANT: Science Project and Industrial Case teams must have at least 2 members!");
+        setIsSaving(false);
+        return;
+      }
+
       const hasMissingPhotos = formData.members.some((m) => m.photoUrl === "");
       const hasMissingKTM = formData.members.some((m) => m.ktmUrl === "");
       const hasMissingIgLink = formData.members.some((m) => m.igAccountLink.trim() === "");
@@ -293,7 +306,10 @@ export default function RegisterLombaPage() {
                   <span className="text-xs font-bold text-sunlight-orange bg-sunlight-orange/10 px-3 py-1.5 rounded-md uppercase tracking-widest">
                     {member.isLeader ? "★ Leader / Individual" : `Additional Member ${index}`}
                   </span>
-                  {!member.isLeader && <button type="button" onClick={() => removeMemberSlot(index)} className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors">Remove Member</button>}
+                  {/* FIX: SEMBUNYIKAN TOMBOL REMOVE JIKA ANGGOTA TERSISA 2 UNTUK TIM */}
+                  {!member.isLeader && !(isTeamCompetition && formData.members.length <= 2) && (
+                    <button type="button" onClick={() => removeMemberSlot(index)} className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors">Remove Member</button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
