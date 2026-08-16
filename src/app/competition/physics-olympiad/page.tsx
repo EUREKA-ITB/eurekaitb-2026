@@ -36,7 +36,7 @@ export default function PhysicsOlympiadPage() {
   };
 
   const documents = [
-    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/po-baru.pdf" },
+    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/rev-physics-olympiad.pdf" },
     { id: "silabus", title: "Syllabus & Guidelines", url: "/guidebooks/silabus-physics-olympiad.pdf" },
   ];
   
