@@ -82,10 +82,7 @@ export default function LandingPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-sunlight-orange/5 rounded-full blur-3xl group-hover:bg-sunlight-orange/10 transition-colors"></div>
                 <div className="relative z-10 flex flex-col h-full">
                   <div className="mb-6 flex items-center justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sunlight-orange/10 text-sunlight-orange">
-                      <Trophy size={24} />
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-sunlight-orange border border-sunlight-orange/20 px-3 py-1 rounded-full bg-sunlight-orange/5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-sunlight-orange px-1 py-1 rounded-full">
                       {card.tagline}
                     </span>
                   </div>

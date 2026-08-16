@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCircle, ChevronRight, Wallet, Banknote, BanknoteIcon, LucideMedal } from "lucide-react";
 import { COMPETITION_PRICING, PHASE_NAMES, formatIDR, getCurrentPhase } from "@/lib/competition-config";
 import type { CompeType, Phase } from "@/lib/competition-config";
+import Image from "next/image";
 
 type DocItem = { id: string; title: string; url: string; };
 type TimelineItem = { date: string; title: string; desc: string; };
@@ -75,7 +76,7 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans overflow-x-hidden pt-24 pb-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full flex flex-col gap-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full flex flex-col gap-6">
         
         <Link href="/#lomba" className="inline-flex items-center text-silver-shine hover:text-white transition-colors w-max text-sm font-semibold relative z-20">
           <ArrowLeft size={16} className="mr-2" /> Back to Competitions
@@ -84,10 +85,16 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
         {/* HERO SECTION */}
         <section className="relative text-center flex flex-col items-center justify-center pt-8 pb-12">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-64 bg-sunlight-orange/15 blur-[100px] rounded-full z-0 pointer-events-none"></div>
-          
           <div className="relative z-10 flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-s font-bold uppercase tracking-widest text-sunlight-orange mb-6">
-              EUREKA! ITB 2026 COMPETITION
+            <div className="w-96 h-48 flex items-center justify-center mb-1 overflow-hidden mx-auto">
+             <Image
+               src="/compe-icon/po-white.png" 
+               alt="po-white.png" 
+               width={400} 
+               height={200}
+               quality={100}
+               className="w-full h-full object-contain scale-100"
+             />
             </div>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">{formatName}</h1>
             <p className="text-silver-shine text-base md:text-lg leading-relaxed max-w-3xl mx-auto mb-10">{info.desc}</p>
