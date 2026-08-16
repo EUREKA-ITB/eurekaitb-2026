@@ -43,7 +43,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   }, [initialData]);
 
   const filteredTeams = teams.filter(t => {
-    // FIX: Normalize database underscore (_) to hyphen (-) for comparison
     const dbType = t.compeType.replace(/_/g, "-");
     const matchTab = activeTab === "ALL" || dbType === activeTab;
     const matchSearch = t.teamName.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -252,7 +251,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                   
                   {activeTab !== "physics-olympiad" && (
                     <td className="p-5 text-center">
-                      {team.compeType === "physics_olympiad" ? (
+                      {team.compeType === "physics-olympiad" ? (
                         <span className="text-silver-shine text-xs">-</span>
                       ) : (
                         <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${team.abstractStatus === "passed" ? "bg-green-500/20 text-green-400" : team.abstractStatus === "failed" ? "bg-red-500/20 text-red-400" : "bg-white/10 text-white"}`}>
@@ -276,7 +275,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                         View Details
                       </button>
                       
-                      {(team.compeType === "science_project" || team.compeType === "industrial_case") && (
+                      {(team.compeType === "science-project" || team.compeType === "industrial-case") && (
                         <div className="flex items-center gap-2 border border-white/10 p-1.5 rounded-lg bg-black/20">
                           <span className="text-[9px] text-silver-shine font-bold uppercase mr-1">Abstract:</span>
                           {team.abstractStatus === "waiting" ? (
@@ -290,7 +289,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                         </div>
                       )}
 
-                      {(team.compeType === "physics_olympiad" || team.abstractStatus === "passed") && (
+                      {(team.compeType === "physics-olympiad" || team.abstractStatus === "passed") && (
                          <div className="flex items-center gap-2 border border-white/10 p-1.5 rounded-lg bg-black/20">
                             <span className="text-[9px] text-silver-shine font-bold uppercase mr-1">Payment:</span>
                             <button disabled={isProcessing === team.id} onClick={() => handleVerify(team.id, "payment", team.statusPayment === "verified" ? "unpaid" : "verified")} className={`px-3 py-1 rounded-md text-[10px] font-bold transition-colors ${team.statusPayment === "verified" ? "bg-red-500/20 text-red-400 hover:bg-red-500/30" : "bg-green-500/20 text-green-400 hover:bg-green-500/30"}`}>
@@ -348,7 +347,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
               <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText size={18} className="text-sunlight-orange"/> Files & Administration</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {(selectedTeam.compeType === "science_project" || selectedTeam.compeType === "industrial_case") && (
+                  {(selectedTeam.compeType === "science-project" || selectedTeam.compeType === "industrial-case") && (
                     <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                       <p className="text-xs text-silver-shine mb-1">Abstract Document</p>
                       {selectedTeam.abstractUrl ? <a href={selectedTeam.abstractUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline font-bold text-sm">Open Abstract PDF ↗</a> : <span className="text-red-400 text-sm">Not Uploaded</span>}

@@ -362,7 +362,7 @@ export default function RegisterLombaPage() {
                     <div className="sm:col-span-2 bg-blue-900/30 border border-blue-500/20 p-4 rounded-xl mt-2">
                       <div className="flex justify-between items-center mb-4">
                         <p className="text-xs font-bold text-silver-shine">Requirements (JPG/PNG)</p>
-                        <a href="https://drive.google.com/drive/folders/1OoO-RJDn-RfwbcuVlYg3MpycWjYIeVVa?usp=sharing" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-[10px] font-bold bg-sunlight-orange text-blue-marine px-3 py-1.5 rounded-md hover:bg-yellow-400 transition-colors shadow-sm">
+                        <a href="https://drive.google.com/drive/folders/1sUovV9PenobUOmBtcKKHa6pUWPUJ0MV3?usp=drive_link" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-[10px] font-bold bg-sunlight-orange text-blue-marine px-3 py-1.5 rounded-md hover:bg-yellow-400 transition-colors shadow-sm">
                           <Link2 size={12}/> Twibbon
                         </a>
                       </div>
