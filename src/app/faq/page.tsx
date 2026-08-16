@@ -35,13 +35,13 @@ const faqs: { question: string; answer: string; category: Category }[] = [
     category: "akun",
     question: "Bagaimana cara mendaftar sebagai peserta?",
     answer:
-      "Buat akun terlebih dahulu, lalu masuk ke dashboard dan pilih menu pendaftaran lomba. Isi data tim, unggah dokumen yang diminta, dan lanjutkan ke pembayaran.",
+      "Buat akun terlebih dahulu, lalu masuk ke dashboard dan pilih menu pendaftaran lomba. Isi data tim, unggah dokumen yang diminta, dan lanjutkan ke langkah berikutnya sesuai kompetisi yang diikuti.",
   },
   {
     category: "akun",
     question: "Apakah saya bisa mengubah data tim setelah submit?",
     answer:
-      "Bisa, selama status pembayaran masih unpaid. Setelah bukti pembayaran dikirim dan status berubah menjadi pending atau verified, data akan dikunci untuk menjaga integritas pendaftaran.",
+      "Untuk kompetisi berupa tim seperti SPC dan ICC, setelah selesai melakukan registrasi, formulir akan otomatis terkunci.",
   },
   {
     category: "akun",
@@ -75,15 +75,9 @@ const faqs: { question: string; answer: string; category: Category }[] = [
   },
   {
     category: "dokumen",
-    question: "Dokumen apa saja yang harus diunggah?",
-    answer:
-      "Setiap anggota diwajibkan mengunggah pas foto, KTM atau kartu pelajar, link Instagram, serta bukti follow dan share poster/BC sesuai instruksi pada formulir.",
-  },
-  {
-    category: "dokumen",
     question: "Dokumen apa saja yang harus saya unggah untuk setiap anggota tim?",
     answer:
-      "Setiap anggota harus melampirkan pas foto, KTM atau kartu pelajar, link Instagram, bukti follow akun resmi EUREKA, dan bukti share poster/BC sesuai instruksi formulir.",
+      "Setiap anggota harus melampirkan pas foto ukuran 3x4, KTM atau kartu pelajar, link Instagram, bukti follow akun resmi EUREKA, bukti upload twibbon, dan bukti share poster/BC sesuai instruksi formulir.",
   },
   {
     category: "teknis",
@@ -266,21 +260,7 @@ export default function FaqPageV2() {
                   </div>
                 </div>
 
-                <div className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-black/20 p-3">
-                  <div className="flex gap-3">
-                    <Download className="mt-0.5 text-sunlight-orange shrink-0" size={18} />
-                    <div className="flex-1">
-                      <p className="font-semibold text-white">Guidebook</p>
-                      <p className="text-silver-shine text-xs mt-1">Unduh panduan pendaftaran</p>
-                    </div>
-                  </div>
-                  <Button
-                    asChild
-                    className="rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine hover:bg-yellow-400 shrink-0 self-center"
-                  >
-                    <Link href="/links">Unduh</Link>
-                  </Button>
-                </div>
+                {/* BUAT GUIDEBOOK UMUM */}
 
                 <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3">
                   <Clock3 className="mt-0.5 text-sunlight-orange shrink-0" size={18} />
