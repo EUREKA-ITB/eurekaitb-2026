@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy } from "lucide-react";
 import InteractiveTimeline from "@/components/InteractiveTimeline";
+import Image from "next/image";
 
 const competitionCards = [
   { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang ingin mengukur penguasaan dan problem solving konsep fisika secara mendalam.", href: "/competition/physics-olympiad" },
@@ -22,6 +23,16 @@ export default function LandingPage() {
       <section className="relative isolate pt-32 pb-24 px-4 sm:px-6 flex flex-col items-center text-center">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(255,184,0,0.15),_transparent_40%),linear-gradient(180deg,_rgba(5,10,31,0.1),_rgba(5,10,31,0.8))]"></div>
         <div className="max-w-4xl mx-auto">
+          <div className="w-36 h-36 rounded-full flex items-center justify-center mb-6 overflow-hidden mx-auto">
+           <Image
+             src="/side-event/PP-SE-2.png" 
+             alt="PP-SE-2.png" 
+             width={200} 
+             height={200}
+             quality={100}
+             className="w-full h-full object-cover"
+           />
+        </div>
           <h1 className="mt-8 font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
             Exploring Physics, <span className="text-sunlight-orange relative whitespace-nowrap">From Curiousity<svg className="absolute -bottom-2 left-0 w-full text-sunlight-orange/40" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="transparent"/></svg></span>,<br className="hidden sm:block" /> to Impact.
           </h1>
