@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Search, X, Users, FileText, CheckCircle2, Clock, MessageCircle, DownloadCloud, ShieldCheck, Key } from "lucide-react";
+import { Search, X, Users, FileText, CheckCircle2, Clock, MessageCircle, DownloadCloud, ShieldCheck, Key, AlertTriangle } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -16,6 +16,7 @@ interface TeamMember {
 interface AdminTeamData {
   id: string; teamName: string; institutionName: string; compeType: string;
   statusPayment: string; abstractStatus: string; abstractUrl: string | null; caseChoice: string | null;
+  documentStatus: string; adminNotes: string | null;
   document: { urlPayment: string | null };
   leaderContact: { name: string; email: string; phone: string };
   members: TeamMember[];
@@ -27,20 +28,27 @@ interface AdminTeamData {
 export default function AdminTable({ initialData }: { initialData: AdminTeamData[] }) {
   const router = useRouter();
   const [teams, setTeams] = useState<AdminTeamData[]>(initialData);
+  const [prevInitialData, setPrevInitialData] = useState<AdminTeamData[]>(initialData);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const [isZipping, setIsZipping] = useState(false);
   
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedTeam, setSelectedTeam] = useState<AdminTeamData | null>(null);
+  const [tempNotes, setTempNotes] = useState<string>("");
 
-  useEffect(() => {
+  // Render-time state sync pattern (Menghilangkan error useEffect setState cascading renders)
+  if (initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
     setTeams(initialData);
     if (selectedTeam) {
       const updatedSelected = initialData.find(t => t.id === selectedTeam.id);
-      if (updatedSelected) setSelectedTeam(updatedSelected);
+      if (updatedSelected) {
+        setSelectedTeam(updatedSelected);
+        setTempNotes(updatedSelected.adminNotes || "");
+      }
     }
-  }, [initialData]);
+  }
 
   const filteredTeams = teams.filter(t => {
     const dbType = t.compeType.replace(/_/g, "-");
@@ -60,7 +68,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   const handleExportCSV = () => {
     const headers = [
       "Team Name", "Institution", "Category", "Team Leader", "WhatsApp", "Email", 
-      "Abstract Status", "Payment Status", "Admin Verifier", 
+      "Doc Status", "Abstract Status", "Payment Status", "Admin Verifier", 
       "CBT Username (Reg Num)", "CBT Password",
       "Abstract Link", "Payment Link"
     ];
@@ -68,7 +76,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     const rows = filteredTeams.map(t => [
       `"${t.teamName}"`, `"${t.institutionName}"`, t.compeType.replace(/_/g, "-"), 
       `"${t.leaderContact.name}"`, `"${t.leaderContact.phone}"`, `"${t.leaderContact.email}"`,
-      t.abstractStatus, t.statusPayment, t.verifiedBy || "-", 
+      t.documentStatus, t.abstractStatus, t.statusPayment, t.verifiedBy || "-", 
       `"${t.participantNumber || "-"}"`, `"${t.cbtPassword || "-"}"`, 
       t.abstractUrl || "Empty", t.document.urlPayment || "Empty"
     ]);
@@ -120,27 +128,31 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     }
   };
 
-  const sendWhatsApp = (team: AdminTeamData, type: "tagih" | "revisi") => {
+  const sendWhatsApp = (team: AdminTeamData, type: "tagih" | "revisi" | "berkas") => {
     let phone = team.leaderContact.phone.replace(/[^0-9]/g, '');
     if (phone.startsWith('0')) phone = '62' + phone.slice(1);
 
-    const txtTagih = `Hello Team Leader of *${team.teamName}*!\n\nWe are from the EUREKA ITB 2026 Committee. We noticed that your team has not completed the registration administration/payment. Please secure your team's slot before the phase closes!\n\nYou can check the portal at: https://eurekaitb.com/dashboard/payment \n\nWarm regards,\nEUREKA ITB Committee`;
-    const txtRevisi = `Hello Team Leader of *${team.teamName}*!\n\nWe are from the EUREKA ITB 2026 Committee. We apologize, but after our Admin reviewed your submission, we found that your *Payment Receipt* is unclear or invalid.\n\nPlease RE-UPLOAD a clearer payment receipt via the portal immediately: https://eurekaitb.com/dashboard/payment\n\nThank you for your cooperation!`;
+    const txtTagih = `Halo Ketua Tim *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Kami perhatikan tim kamu belum menyelesaikan administrasi/pembayaran. Yuk amankan slot tim kamu sebelum fase ditutup!\n\nCek portal: https://eurekaitb.com/dashboard/payment`;
+    const txtRevisi = `Halo Ketua Tim *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Mohon maaf, setelah Admin mengecek, *Bukti Pembayaran* tim kamu kurang jelas/tidak valid.\n\nHarap RE-UPLOAD bukti bayar yang benar melalui portal: https://eurekaitb.com/dashboard/payment`;
+    const txtBerkas = `Halo Ketua Tim *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Berdasarkan pengecekan, terdapat *berkas pendaftaran anggota* yang kurang sesuai. Cek catatan Admin dan segera lakukan perbaikan data di: https://eurekaitb.com/dashboard`;
     
-    const message = encodeURIComponent(type === "tagih" ? txtTagih : txtRevisi);
+    const msg = type === "tagih" ? txtTagih : type === "berkas" ? txtBerkas : txtRevisi;
+    const message = encodeURIComponent(msg);
     window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
   };
 
-  const handleVerify = async (teamId: string, target: "abstract" | "payment", newStatus: string) => {
+  const handleVerify = async (teamId: string, target: "abstract" | "payment" | "document", newStatus: string, notes?: string) => {
     setIsProcessing(teamId);
     
     setTeams(prevTeams => prevTeams.map(t => {
       if (t.id === teamId) {
+        if (target === "document") {
+          return { ...t, documentStatus: newStatus, adminNotes: notes || null };
+        }
         if (target === "abstract") {
           const isCanceled = newStatus === "waiting" || newStatus === "failed";
           return {
-            ...t,
-            abstractStatus: newStatus,
+            ...t, abstractStatus: newStatus,
             statusPayment: isCanceled ? "unpaid" : t.statusPayment, 
             verifiedBy: isCanceled ? null : t.verifiedBy
           };
@@ -155,7 +167,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     try {
       const res = await fetch("/api/verify", {
         method: "PATCH", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamId, updateTarget: target, newStatus }),
+        body: JSON.stringify({ teamId, updateTarget: target, newStatus, adminNotes: notes }),
       });
       if (!res.ok) throw new Error("Failed to update status");
       toast.success(`Success! Data updated.`);
@@ -225,17 +237,18 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
             <tr className="border-b border-white/10 text-silver-shine text-xs uppercase tracking-wider bg-black/20">
               <th className="p-5 font-semibold">Team Profile</th>
               <th className="p-5 font-semibold">Leader Contact</th>
+              <th className="p-5 font-semibold text-center">Doc Status</th>
               {activeTab !== "physics-olympiad" && (
-                <th className="p-5 font-semibold text-center">Abstract Status</th>
+                <th className="p-5 font-semibold text-center">Abstract</th>
               )}
-              <th className="p-5 font-semibold text-center">Payment Status</th>
-              <th className="p-5 font-semibold text-right">Actions & Verification</th>
+              <th className="p-5 font-semibold text-center">Payment</th>
+              <th className="p-5 font-semibold text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredTeams.length === 0 ? (
               <tr>
-                <td colSpan={activeTab !== "physics-olympiad" ? 5 : 4} className="p-10 text-center text-silver-shine">No data found.</td>
+                <td colSpan={activeTab !== "physics-olympiad" ? 6 : 5} className="p-10 text-center text-silver-shine">No data found.</td>
               </tr>
             ) : (
               filteredTeams.map((team) => (
@@ -249,6 +262,12 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                     <p className="text-xs text-silver-shine">{team.leaderContact.phone}</p>
                   </td>
                   
+                  <td className="p-5 text-center">
+                     <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${team.documentStatus === "passed" ? "bg-green-500/20 text-green-400" : team.documentStatus === "revision" ? "bg-yellow-500/20 text-yellow-500" : "bg-white/10 text-white"}`}>
+                       {team.documentStatus}
+                     </span>
+                  </td>
+
                   {activeTab !== "physics-olympiad" && (
                     <td className="p-5 text-center">
                       {team.compeType === "physics-olympiad" ? (
@@ -270,34 +289,9 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                     )}
                   </td>
                   <td className="p-5 text-right whitespace-nowrap">
-                    <div className="flex flex-col items-end gap-3">
-                      <button onClick={() => setSelectedTeam(team)} className="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/30">
-                        View Details
-                      </button>
-                      
-                      {(team.compeType === "science-project" || team.compeType === "industrial-case") && (
-                        <div className="flex items-center gap-2 border border-white/10 p-1.5 rounded-lg bg-black/20">
-                          <span className="text-[9px] text-silver-shine font-bold uppercase mr-1">Abstract:</span>
-                          {team.abstractStatus === "waiting" ? (
-                            <>
-                              <button disabled={isProcessing === team.id} onClick={() => handleVerify(team.id, "abstract", "passed")} className="bg-green-500/20 text-green-400 px-3 py-1 rounded-md text-[10px] font-bold hover:bg-green-500/30">Pass</button>
-                              <button disabled={isProcessing === team.id} onClick={() => handleVerify(team.id, "abstract", "failed")} className="bg-red-500/20 text-red-400 px-3 py-1 rounded-md text-[10px] font-bold hover:bg-red-500/30">Reject</button>
-                            </>
-                          ) : (
-                            <button disabled={isProcessing === team.id} onClick={() => handleVerify(team.id, "abstract", "waiting")} className="bg-gray-500/20 text-gray-400 px-3 py-1 rounded-md text-[10px] font-bold hover:bg-gray-500/30">Cancel {team.abstractStatus === "passed" ? "Pass" : "Reject"}</button>
-                          )}
-                        </div>
-                      )}
-
-                      {(team.compeType === "physics-olympiad" || team.abstractStatus === "passed") && (
-                         <div className="flex items-center gap-2 border border-white/10 p-1.5 rounded-lg bg-black/20">
-                            <span className="text-[9px] text-silver-shine font-bold uppercase mr-1">Payment:</span>
-                            <button disabled={isProcessing === team.id} onClick={() => handleVerify(team.id, "payment", team.statusPayment === "verified" ? "unpaid" : "verified")} className={`px-3 py-1 rounded-md text-[10px] font-bold transition-colors ${team.statusPayment === "verified" ? "bg-red-500/20 text-red-400 hover:bg-red-500/30" : "bg-green-500/20 text-green-400 hover:bg-green-500/30"}`}>
-                              {isProcessing === team.id ? "..." : team.statusPayment === "verified" ? "Cancel Verify" : "Verify Payment"}
-                            </button>
-                         </div>
-                      )}
-                    </div>
+                    <button onClick={() => { setSelectedTeam(team); setTempNotes(team.adminNotes || ""); }} className="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/30">
+                      View Details
+                    </button>
                   </td>
                 </tr>
               ))
@@ -307,9 +301,9 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
       </div>
 
       {selectedTeam && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 sm:pt-24 p-4 sm:p-6 overflow-y-auto">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedTeam(null)}></div>
-          <div className="relative w-full max-w-4xl max-h-[90vh] bg-blue-marine border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+          <div className="relative w-full max-w-4xl max-h-[85vh] bg-blue-marine border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col mb-10">
             
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
               <div>
@@ -317,7 +311,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                 <p className="text-sm text-silver-shine capitalize">{selectedTeam.institutionName} • {selectedTeam.compeType.replace(/_/g, "-")}</p>
               </div>
               <div className="flex gap-3 items-center">
-                <button onClick={() => sendWhatsApp(selectedTeam, "tagih")} className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors" title="Send Payment Reminder (WA)">
+                <button onClick={() => sendWhatsApp(selectedTeam, "tagih")} className="bg-green-500/20 text-green-400 border border-green-500/40 p-2 rounded-full hover:bg-green-500/30 transition-colors" title="WA: Tagih Pembayaran">
                   <MessageCircle size={20} />
                 </button>
                 <button onClick={() => setSelectedTeam(null)} className="p-2 bg-white/5 rounded-full hover:bg-red-500/20 hover:text-red-400 transition-colors">
@@ -346,28 +340,68 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
 
               <div className="bg-black/20 p-5 rounded-2xl border border-white/5">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><FileText size={18} className="text-sunlight-orange"/> Files & Administration</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="col-span-1 md:col-span-2 bg-blue-900/20 p-4 rounded-xl border border-blue-500/30 flex flex-col gap-3">
+                     <div className="flex justify-between items-center">
+                        <h4 className="text-sm font-bold text-blue-400 flex items-center gap-2"><AlertTriangle size={16}/> Tahap 1: Verifikasi Dokumen Tim</h4>
+                        <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${selectedTeam.documentStatus === "passed" ? "bg-green-500/20 text-green-400" : selectedTeam.documentStatus === "revision" ? "bg-yellow-500/20 text-yellow-500" : "bg-white/10 text-white"}`}>
+                          STATUS: {selectedTeam.documentStatus}
+                        </span>
+                     </div>
+                     <textarea
+                        value={tempNotes}
+                        onChange={(e) => setTempNotes(e.target.value)}
+                        placeholder="Tulis catatan (contoh: Foto KTM anggota 2 buram, mohon upload ulang)..."
+                        className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 resize-none h-20"
+                     />
+                     <div className="flex gap-2 items-center flex-wrap">
+                        <button disabled={isProcessing === selectedTeam.id} onClick={() => handleVerify(selectedTeam.id, "document", "passed", tempNotes)} className="bg-green-600/30 text-green-400 border border-green-500/40 px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-600/50 transition-colors">Pass Dokumen</button>
+                        <button disabled={isProcessing === selectedTeam.id} onClick={() => handleVerify(selectedTeam.id, "document", "revision", tempNotes)} className="bg-yellow-600/30 text-yellow-500 border border-yellow-500/40 px-4 py-2 rounded-lg text-xs font-bold hover:bg-yellow-600/50 transition-colors">Request Revisi (Buka Form)</button>
+                        <button onClick={() => sendWhatsApp(selectedTeam, "berkas")} className="ml-auto text-[10px] bg-white/5 text-silver-shine px-3 py-2 rounded-lg hover:bg-white/10 transition-colors border border-white/10 flex items-center gap-1"><MessageCircle size={12}/> Info WA Revisi</button>
+                     </div>
+                  </div>
+
                   {(selectedTeam.compeType === "science-project" || selectedTeam.compeType === "industrial-case") && (
-                    <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                      <p className="text-xs text-silver-shine mb-1">Abstract Document</p>
-                      {selectedTeam.abstractUrl ? <a href={selectedTeam.abstractUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline font-bold text-sm">Open Abstract PDF ↗</a> : <span className="text-red-400 text-sm">Not Uploaded</span>}
+                    <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex flex-col justify-between">
+                      <div>
+                        <p className="text-xs text-silver-shine mb-1">Abstract Document</p>
+                        {selectedTeam.abstractUrl ? <a href={selectedTeam.abstractUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline font-bold text-sm">Open Abstract PDF ↗</a> : <span className="text-red-400 text-sm">Not Uploaded</span>}
+                      </div>
+                      <div className="flex gap-2 mt-4">
+                         {selectedTeam.abstractStatus === "waiting" ? (
+                           <>
+                             <button disabled={isProcessing === selectedTeam.id} onClick={() => handleVerify(selectedTeam.id, "abstract", "passed")} className="bg-green-500/20 text-green-400 px-3 py-1.5 rounded-md text-[10px] font-bold hover:bg-green-500/30 flex-1">Pass Abstract</button>
+                             <button disabled={isProcessing === selectedTeam.id} onClick={() => handleVerify(selectedTeam.id, "abstract", "failed")} className="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-md text-[10px] font-bold hover:bg-red-500/30 flex-1">Reject</button>
+                           </>
+                         ) : (
+                           <button disabled={isProcessing === selectedTeam.id} onClick={() => handleVerify(selectedTeam.id, "abstract", "waiting")} className="bg-gray-500/20 text-gray-400 px-3 py-1.5 rounded-md text-[10px] font-bold hover:bg-gray-500/30 w-full">Cancel {selectedTeam.abstractStatus}</button>
+                         )}
+                      </div>
                     </div>
                   )}
+
+                  <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex flex-col justify-between">
+                    <div>
+                      <p className="text-xs text-silver-shine mb-1">Payment Proof</p>
+                      {selectedTeam.document.urlPayment ? <a href={selectedTeam.document.urlPayment} target="_blank" rel="noreferrer" className="text-green-400 hover:underline font-bold text-sm mb-2 inline-block">View Receipt ↗</a> : <span className="text-red-400 text-sm mb-2 block">None</span>}
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                       <button disabled={isProcessing === selectedTeam.id} onClick={() => handleVerify(selectedTeam.id, "payment", selectedTeam.statusPayment === "verified" ? "unpaid" : "verified")} className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold transition-colors ${selectedTeam.statusPayment === "verified" ? "bg-red-500/20 text-red-400 hover:bg-red-500/30" : "bg-green-500/20 text-green-400 hover:bg-green-500/30"}`}>
+                         {selectedTeam.statusPayment === "verified" ? "Cancel Verify" : "Verify Payment"}
+                       </button>
+                       {selectedTeam.document.urlPayment && selectedTeam.statusPayment !== "verified" && (
+                         <button onClick={() => sendWhatsApp(selectedTeam, "revisi")} className="flex-1 text-[10px] bg-yellow-500/20 text-yellow-500 px-3 py-1.5 rounded-lg hover:bg-yellow-500/30 font-bold">WA: Bukti Buram</button>
+                       )}
+                    </div>
+                  </div>
+                  
                   {selectedTeam.caseChoice && (
-                    <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div className="p-4 bg-white/5 rounded-xl border border-white/10 md:col-span-2">
                       <p className="text-xs text-silver-shine mb-1">Case Choice (ICC)</p>
                       <p className="font-bold text-sunlight-orange text-sm">{selectedTeam.caseChoice}</p>
                     </div>
                   )}
-                  <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex justify-between items-start gap-4">
-                    <div>
-                      <p className="text-xs text-silver-shine mb-1">Payment Proof</p>
-                      {selectedTeam.document.urlPayment ? <a href={selectedTeam.document.urlPayment} target="_blank" rel="noreferrer" className="text-green-400 hover:underline font-bold text-sm">View Receipt ↗</a> : <span className="text-red-400 text-sm">None</span>}
-                    </div>
-                    {selectedTeam.document.urlPayment && selectedTeam.statusPayment !== "verified" && (
-                       <button onClick={() => sendWhatsApp(selectedTeam, "revisi")} className="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg hover:bg-red-500/30">Request Revision (WA)</button>
-                    )}
-                  </div>
                 </div>
               </div>
 
@@ -387,9 +421,9 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                       <div className="grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-white/10 text-[10px] font-bold">
                         {member.photoUrl ? <a href={member.photoUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">Photo</a> : <span className="text-red-400 text-center py-1.5 bg-red-500/10">No Photo</span>}
                         {member.ktmUrl ? <a href={member.ktmUrl} target="_blank" className="bg-blue-500/20 text-blue-400 py-1.5 rounded-lg text-center hover:bg-blue-500/30">ID Card</a> : <span className="text-red-400 text-center py-1.5 bg-red-500/10">No ID</span>}
-                        {member.proofFollowUrl ? <a href={member.proofFollowUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Follow IG</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Follow IG</span>}
-                        {member.proofShareUrl ? <a href={member.proofShareUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Main Story</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Main Story</span>}
-                        {member.proofStoryCompeUrl ? <a href={member.proofStoryCompeUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Compe Story</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Compe Story</span>}
+                        {member.proofFollowUrl ? <a href={member.proofFollowUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Follow IG</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Follow</span>}
+                        {member.proofShareUrl ? <a href={member.proofShareUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Main Story</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Main Sty</span>}
+                        {member.proofStoryCompeUrl ? <a href={member.proofStoryCompeUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Compe Story</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Cmp Sty</span>}
                         {member.proofTwibbonUrl ? <a href={member.proofTwibbonUrl} target="_blank" className="bg-green-500/20 text-green-400 py-1.5 rounded-lg text-center hover:bg-green-500/30 mt-1">Twibbon</a> : <span className="text-red-400 text-center py-1.5 mt-1 bg-red-500/10">No Twibbon</span>}
                       </div>
                     </div>

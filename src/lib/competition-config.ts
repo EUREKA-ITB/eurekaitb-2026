@@ -25,8 +25,8 @@ export const PHASE_NAMES: Record<Phase, string> = {
 
 export const COMPETITION_PRICING: Record<CompeType, Record<Phase, number>> = {
   "physics-olympiad": { early_bird: 75000, normal: 100000, late: 125000 },
-  "science-project": { early_bird: 100000, normal: 125000, late: 150000 },
-  "industrial-case": { early_bird: 100000, normal: 125000, late: 150000 },
+  "science-project": { early_bird: 90000, normal: 120000, late: 150000 },
+  "industrial-case": { early_bird: 90000, normal: 120000, late: 150000 },
 };
 
 export function getCurrentPhase(): Phase {

@@ -79,8 +79,8 @@ export default function RegisterLombaPage() {
           if (data && data.team) {
             const fetchedCompeType = data.team.compeType.replace(/_/g, "-");
 
-            // LOCK SPC DAN ICC LANGSUNG SECARA PERMANEN
-            if (fetchedCompeType === "science-project" || fetchedCompeType === "industrial-case") {
+            // LOCK SPC DAN ICC LANGSUNG (KECUALI JIKA SEDANG REVISI)
+            if ((fetchedCompeType === "science-project" || fetchedCompeType === "industrial-case") && data.team.documentStatus !== "revision") {
               setIsLocked(true);
               setLockedCompeName(fetchedCompeType.replace(/-/g, " "));
               setIsFetching(false);

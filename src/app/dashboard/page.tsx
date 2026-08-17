@@ -44,6 +44,8 @@ export default async function DashboardPage() {
   let participantNumber = "";
   let cbtPassword = "";
   let compeTypeSlug = "";
+  let documentStatus = "waiting";
+  let adminNotes = null;
 
   if (hasRegistered) {
     isVerified = userTeam[0].statusPayment === "verified";
@@ -55,6 +57,8 @@ export default async function DashboardPage() {
     abstractStatus = userTeam[0].abstractStatus;
     abstractUrl = userTeam[0].abstractUrl;
     caseChoice = userTeam[0].caseChoice;
+    documentStatus = userTeam[0].documentStatus; // NEW
+    adminNotes = userTeam[0].adminNotes; // NEW
     participantNumber = userTeam[0].participantNumber || "PENDING";
     cbtPassword = userTeam[0].cbtPassword || "******";
     membersData = await db.select().from(teamMembers).where(eq(teamMembers.teamId, userTeam[0].id));
@@ -117,6 +121,23 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex flex-col w-full box-border">
             
+            {/* NEW: BANNER CATATAN REVISI BERKAS DARI ADMIN */}
+            {documentStatus === "revision" && (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 p-5 sm:p-6 rounded-3xl w-full mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 shadow-[0_0_20px_rgba(234,179,8,0.1)]">
+                   <AlertCircle className="text-yellow-500 shrink-0 mt-1 sm:mt-0" size={36} />
+                   <div className="flex-1">
+                      <h3 className="font-display text-xl font-bold text-yellow-500 mb-2">Revisi Berkas Diperlukan!</h3>
+                      <p className="text-sm text-silver-shine mb-3">Admin menemukan ketidaksesuaian pada berkas pendaftaran tim kamu. Silakan perbaiki dan lengkapi data sesuai catatan berikut:</p>
+                      <div className="bg-black/30 p-4 rounded-xl border border-white/10 text-sm text-white italic border-l-4 border-l-yellow-500">
+                        {adminNotes || "Tidak ada catatan."}
+                      </div>
+                   </div>
+                   <Link href="/dashboard/register-lomba" className="mt-2 sm:mt-0 bg-yellow-500 text-black font-bold px-6 py-3.5 rounded-xl text-sm hover:bg-yellow-400 transition-colors shrink-0 whitespace-nowrap shadow-lg">
+                      Buka Form Edit Data
+                   </Link>
+                </div>
+            )}
+
             {(isSPC || isICC) && abstractStatus === "waiting" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full box-border mb-8">
                 <div className="flex flex-col gap-4">
@@ -152,7 +173,6 @@ export default async function DashboardPage() {
                     <Lock size={16}/> Data Registrasi Terkunci
                   </div>
                   
-                  {/* FIX: HANYA ICC YANG DAPAT AKSES GRUP WA DI TAHAP INI */}
                   {isICC && (
                     <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                       <MessageCircle size={18}/> Join WhatsApp Group
@@ -210,7 +230,7 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   
-                  {isPO && userTeam[0].statusPayment === "unpaid" ? (
+                  {userTeam[0].statusPayment === "unpaid" ? (
                     <Link href="/dashboard/register-lomba" className="w-full text-center border-2 border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/10 transition-colors text-sm mt-6 block">
                       Edit Registration Data
                     </Link>
@@ -220,7 +240,6 @@ export default async function DashboardPage() {
                     </div>
                   )}
 
-                  {/* FIX: HANYA ICC YANG DAPAT AKSES GRUP WA DI TAHAP BELUM VERIFIED INI */}
                   {isICC && (
                     <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3 rounded-xl hover:bg-green-500/30 transition-colors text-sm mt-4 flex items-center justify-center gap-2">
                       <MessageCircle size={16}/> Join WhatsApp Group
@@ -308,7 +327,6 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   
-                  {/* FIX: PO, SPC, & ICC SEMUANYA MENDAPATKAN LINK WA DI TAHAP VERIFIED INI */}
                   <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                     <MessageCircle size={18}/> Join WhatsApp Group
                   </a>

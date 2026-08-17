@@ -35,8 +35,8 @@ export default async function AdminDashboardPage() {
       ktmUrl: m.ktmUrl,
       proofFollowUrl: m.proofFollowUrl,
       proofShareUrl: m.proofShareUrl,
-      proofStoryCompeUrl: m.proofStoryCompeUrl, // URL BARU
-      proofTwibbonUrl: m.proofTwibbonUrl, // URL BARU
+      proofStoryCompeUrl: m.proofStoryCompeUrl,
+      proofTwibbonUrl: m.proofTwibbonUrl,
       igAccountLink: m.igAccountLink
     }));
 
@@ -49,6 +49,11 @@ export default async function AdminDashboardPage() {
       compeType: team.compeType,
       statusPayment: team.statusPayment,
       abstractStatus: team.abstractStatus,
+      
+      // NEW: Pass status berkas & catatan
+      documentStatus: team.documentStatus,
+      adminNotes: team.adminNotes,
+
       abstractUrl: team.abstractUrl,
       caseChoice: team.caseChoice,
       document: { 
@@ -69,7 +74,6 @@ export default async function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden pt-28">
       <div className="max-w-7xl mx-auto w-full">
-        
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 border-b border-red-500/30 pb-6">
           <div>
             <div className="inline-block bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 tracking-widest uppercase shadow-[0_0_15px_rgba(239,68,68,0.5)]">

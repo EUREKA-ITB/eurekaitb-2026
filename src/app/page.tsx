@@ -78,16 +78,16 @@ export default function LandingPage() {
 
           <div className="grid gap-6 lg:grid-cols-3">
             {competitionCards.map((card) => (
-              <Link key={card.title} href={card.href} className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 transition-all hover:bg-white/10 hover:border-sunlight-orange/30">
+              <Link key={card.title} href={card.href} className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 transition-all hover:bg-white/10 hover:border-sunlight-orange/30 flex flex-col h-full">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-sunlight-orange/5 rounded-full blur-3xl group-hover:bg-sunlight-orange/10 transition-colors"></div>
-                <div className="relative z-10 flex flex-col h-full">
+                <div className="relative z-10 flex flex-col flex-1 h-full">
                   <div className="mb-6 flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-sunlight-orange px-1 py-1 rounded-full">
                       {card.tagline}
                     </span>
                   </div>
                   <h3 className="font-display text-2xl font-bold text-white">{card.title}</h3>
-                  <p className="mt-4 text-sm leading-relaxed text-silver-shine flex-grow">
+                  <p className="mt-4 text-sm leading-relaxed text-silver-shine flex-1">
                     {card.description}
                   </p>
                   <div className="mt-8 flex items-center text-sm font-bold text-white group-hover:text-sunlight-orange transition-colors">
@@ -119,9 +119,9 @@ export default function LandingPage() {
       </section>
 
       {/* 5. PREVIEW FAQ SECTION */}
-      <section className="px-4 sm:px-6 py-16 mb-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6 mb-8">
+      <section className="px-4 sm:px-6 py-16 mb-10 w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6 mb-8 w-full">
             <div>
               <h2 className="font-display text-3xl font-bold">Pertanyaan Umum</h2>
               <p className="mt-2 text-sm text-silver-shine">FAQ yang paling sering ditanyakan oleh peserta.</p>
@@ -130,14 +130,14 @@ export default function LandingPage() {
               Lihat semua FAQ <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-3 w-full">
             {faqPreview.map((item) => (
-              <details key={item.q} className="group rounded-2xl border border-white/10 bg-black/20 p-5 transition-colors hover:bg-white/5 open:bg-white/5 cursor-pointer">
-                <summary className="list-none font-bold text-white flex justify-between items-center outline-none">
-                  <span className="pr-4">{item.q}</span>
+              <details key={item.q} className="group rounded-2xl border border-white/10 bg-black/20 p-5 transition-colors hover:bg-white/5 open:bg-white/5 cursor-pointer w-full box-border">
+                <summary className="list-none font-bold text-white flex justify-between items-center outline-none w-full">
+                  <span className="pr-2 break-words flex-1 text-left leading-tight">{item.q}</span>
                   <ChevronRight size={16} className="text-sunlight-orange transition-transform group-open:rotate-90 flex-shrink-0" />
                 </summary>
-                <p className="mt-4 text-sm leading-relaxed text-silver-shine border-t border-white/10 pt-4">
+                <p className="mt-4 text-sm leading-relaxed text-silver-shine border-t border-white/10 pt-4 w-full break-words">
                   {item.a}
                 </p>
               </details>

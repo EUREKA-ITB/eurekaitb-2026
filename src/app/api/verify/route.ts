@@ -7,11 +7,13 @@ import { eq } from "drizzle-orm";
 
 type AbstractStatus = "waiting" | "passed" | "failed";
 type PaymentStatus = "unpaid" | "pending" | "verified" | "rejected";
+type DocumentStatus = "waiting" | "passed" | "revision";
 
 interface VerifyPayload {
   teamId: string;
-  updateTarget: "abstract" | "payment";
+  updateTarget: "abstract" | "payment" | "document";
   newStatus: string;
+  adminNotes?: string;
 }
 
 export async function PATCH(req: Request) {
@@ -24,7 +26,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { teamId, updateTarget, newStatus } = (await req.json()) as VerifyPayload;
+    const { teamId, updateTarget, newStatus, adminNotes } = (await req.json()) as VerifyPayload;
 
     if (!teamId || !updateTarget || !newStatus) {
       return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 });
@@ -34,18 +36,27 @@ export async function PATCH(req: Request) {
     if (currentTeam.length === 0) return NextResponse.json({ error: "Tim tidak ditemukan" }, { status: 404 });
 
     // ==========================================
+    // LOGIKA VERIFIKASI BERKAS AWAL
+    // ==========================================
+    if (updateTarget === "document") {
+      await db.update(teams).set({
+        documentStatus: newStatus as DocumentStatus,
+        adminNotes: adminNotes || null,
+      }).where(eq(teams.id, teamId));
+      return NextResponse.json({ message: `Status dokumen diubah menjadi ${newStatus}` }, { status: 200 });
+    }
+
+    // ==========================================
     // LOGIKA ABSTRAK (TERMASUK AUTO-CANCEL PAYMENT)
     // ==========================================
     if (updateTarget === "abstract") {
       if (newStatus === "waiting" || newStatus === "failed") {
-        // JIKA DIBATALKAN ATAU DITOLAK -> KEMBALIKAN PAYMENT JADI UNPAID!
         await db.update(teams).set({ 
           abstractStatus: newStatus as AbstractStatus,
           statusPayment: "unpaid", 
           verifiedBy: null
         }).where(eq(teams.id, teamId));
       } else {
-        // JIKA DILULUSKAN (PASSED)
         await db.update(teams).set({ 
           abstractStatus: newStatus as AbstractStatus 
         }).where(eq(teams.id, teamId));
