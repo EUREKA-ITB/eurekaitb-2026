@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { Timer } from "lucide-react";
 
-export default function CountdownTimer({ registeredAt }: { registeredAt: Date | string }) {
+function CountdownTimer({ registeredAt }: { registeredAt: Date | string }) {
   const [timeLeft, setTimeLeft] = useState("");
 
   useEffect(() => {
@@ -39,3 +39,5 @@ export default function CountdownTimer({ registeredAt }: { registeredAt: Date | 
     </div>
   );
 }
+
+export default memo(CountdownTimer);

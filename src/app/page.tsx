@@ -35,6 +35,9 @@ export default function LandingPage() {
             <Link href="/faq" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/10">
               FAQ Umum
             </Link>
+            <Link href="/merch" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/10">
+              Merch & Souvenir
+            </Link>
           </div>
         </div>
       </section>

@@ -1,9 +1,10 @@
 "use client";
 
+import React, { memo } from "react";
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
 
-export default function LogoutButton() {
+function LogoutButton() {
   return (
     <button
       onClick={() => signOut({ callbackUrl: "/login" })}
@@ -13,3 +14,5 @@ export default function LogoutButton() {
     </button>
   );
 }
+
+export default memo(LogoutButton);

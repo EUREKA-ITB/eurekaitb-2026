@@ -199,7 +199,7 @@ export default function InteractiveTimeline() {
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveFilter(tab.id as any)}
+            onClick={() => setActiveFilter(tab.id as "all" | "active" | "upcoming" | "past")}
             className={`px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 border ${
               activeFilter === tab.id
                 ? "bg-sunlight-orange text-blue-marine border-sunlight-orange shadow-[0_0_12px_rgba(245,158,11,0.4)]"

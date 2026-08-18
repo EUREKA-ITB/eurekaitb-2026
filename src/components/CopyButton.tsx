@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, memo } from "react";
 import { Copy, Check } from "lucide-react";
 
-export default function CopyButton({
+function CopyButton({
   text,
   ariaLabel,
   className,
@@ -36,3 +36,5 @@ export default function CopyButton({
     </button>
   );
 }
+
+export default memo(CopyButton);

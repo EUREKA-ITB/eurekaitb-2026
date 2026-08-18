@@ -4,6 +4,7 @@ import { ArrowUpRight, Mail, MapPin } from "lucide-react";
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
+  { label: "Merch", href: "/merch" },
   { label: "Competitions", href: "/#lomba" },
   { label: "FAQ", href: "/faq" },
   { label: "Mini Competition", href: "/mini-competition" },
@@ -88,16 +89,16 @@ export default function SiteFooter() {
                   <a href="https://instagram.com/eurekaitb" target="_blank" rel="noreferrer" aria-label="Instagram EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <InstagramIcon />
                   </a>
-                  <a href="mailto:officialeurekaitb@gmail.com" aria-label="Email EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
+                  <a href="mailto:officialeurekaitb@gmail.com" target="_blank" rel="noreferrer" aria-label="Email EUREKA ITB" className="relative z-20 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange"> 
                     <Mail size={16} />
                   </a>
-                  <a href="#" aria-label="X EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
+                  <a href="https://x.com/eureka_itb" target="_blank" rel="noreferrer" aria-label="X EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <XIcon />
                   </a>
-                  <a href="https://www.linkedin.com/in/eureka-itb-a6aa262ab" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
+                  <a href="https://www.linkedin.com/in/eureka-itb-a6aa262ab" target="_blank" rel="noreferrer" aria-label="LinkedIn EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <LinkedinIcon />
                   </a>
-                  <a href="#" aria-label="TikTok EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
+                  <a href="https://www.tiktok.com/@eurekaitb" target="_blank" rel="noreferrer" aria-label="TikTok EUREKA ITB" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white transition-colors hover:border-sunlight-orange/50 hover:bg-sunlight-orange/10 hover:text-sunlight-orange">
                     <TikTokIcon />
                   </a>
                 </div>

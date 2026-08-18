@@ -176,3 +176,9 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* When cart is open, hide the fixed navbar to avoid overlap */
+body.cart-open nav.fixed.top-0 {
+  transform: translateY(-100%) !important;
+  display: none !important;
+}

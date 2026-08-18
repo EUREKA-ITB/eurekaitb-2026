@@ -2,15 +2,38 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import React, { useEffect, useRef, useState, memo } from "react";
 import { ChevronDown, LogOut, Menu, X, LayoutDashboard, Settings } from "lucide-react";
 import type { Session } from "next-auth";
 import LogoutModal from "./LogoutModal";
 
-export default function Navbar({ session }: { session: Session | null }) {
+function Navbar({ session }: { session: Session | null }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isMobileCompeOpen, setIsMobileCompeOpen] = useState<boolean>(false);
+  const [showNav, setShowNav] = useState(true);
+  const lastY = useRef(0);
+  const ticking = useRef(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      if (ticking.current) return;
+      ticking.current = true;
+      requestAnimationFrame(() => {
+        // hide when scrolling down beyond small threshold, show when scrolling up
+        if (y > lastY.current + 10 && y > 60) {
+          setShowNav(false);
+        } else if (y < lastY.current - 10 || y <= 60) {
+          setShowNav(true);
+        }
+        lastY.current = y;
+        ticking.current = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const competitionLinks = [
     { label: "Physics Olympiad", href: "/competition/physics_olympiad" },
@@ -20,7 +43,7 @@ export default function Navbar({ session }: { session: Session | null }) {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-blue-marine/85 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)]">
+      <nav className={`fixed top-0 left-0 w-full z-50 border-b border-white/10 bg-blue-marine/85 backdrop-blur-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] transform transition-transform duration-300 ${showNav ? "translate-y-0" : "-translate-y-full"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
           
           <div className="flex items-center gap-3 sm:gap-5 min-w-0">
@@ -72,6 +95,7 @@ export default function Navbar({ session }: { session: Session | null }) {
             </div>
 
             <Link href="/mini-competition" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Mini Competition</Link>
+            <Link href="/merch" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Merch</Link>
             <Link href="/faq" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
             <Link href="/about" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">About</Link>
 
@@ -194,6 +218,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 </div>
 
                 <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Mini Competition</Link>
+                <Link href="/merch" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Merch</Link>
                 <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>General FAQ</Link>
                 <Link href="/about" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>About</Link>
               </div>
@@ -206,3 +231,5 @@ export default function Navbar({ session }: { session: Session | null }) {
     </>
   );
 }
+
+export default memo(Navbar);
