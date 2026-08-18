@@ -7,7 +7,6 @@ export const paymentStatusEnum = pgEnum("payment_status", ["unpaid", "pending", 
 export const registrationPhaseEnum = pgEnum("registration_phase", ["early_bird", "normal", "late"]);
 export const abstractStatusEnum = pgEnum("abstract_status", ["waiting", "passed", "failed"]); 
 
-// NEW: Status verifikasi berkas awal
 export const documentStatusEnum = pgEnum("document_status", ["waiting", "passed", "revision"]);
 
 export const users = pgTable("user", {
@@ -33,7 +32,6 @@ export const teams = pgTable("teams", {
   registrationPhase: registrationPhaseEnum("registration_phase").notNull(),
   statusPayment: paymentStatusEnum("payment_status").default("unpaid").notNull(),
   
-  // NEW: Kolom untuk tahap verifikasi berkas dan catatan admin
   documentStatus: documentStatusEnum("document_status").default("waiting").notNull(),
   adminNotes: text("admin_notes"),
 
@@ -42,6 +40,10 @@ export const teams = pgTable("teams", {
   caseChoice: varchar("case_choice", { length: 100 }), 
   fullPaperUrl: text("full_paper_url"), 
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  
+  // NEW: Kolom untuk mencatat kapan waktu 3 jam mulai dihitung
+  paymentStartedAt: timestamp("payment_started_at"),
+
   participantNumber: varchar("participant_number", { length: 50 }),
   cbtPassword: varchar("cbt_password", { length: 50 }),
   verifiedBy: varchar("verified_by", { length: 255 }), 

@@ -57,8 +57,8 @@ export default async function DashboardPage() {
     abstractStatus = userTeam[0].abstractStatus;
     abstractUrl = userTeam[0].abstractUrl;
     caseChoice = userTeam[0].caseChoice;
-    documentStatus = userTeam[0].documentStatus; // NEW
-    adminNotes = userTeam[0].adminNotes; // NEW
+    documentStatus = userTeam[0].documentStatus; 
+    adminNotes = userTeam[0].adminNotes; 
     participantNumber = userTeam[0].participantNumber || "PENDING";
     cbtPassword = userTeam[0].cbtPassword || "******";
     membersData = await db.select().from(teamMembers).where(eq(teamMembers.teamId, userTeam[0].id));
@@ -121,7 +121,6 @@ export default async function DashboardPage() {
         ) : (
           <div className="flex flex-col w-full box-border">
             
-            {/* NEW: BANNER CATATAN REVISI BERKAS DARI ADMIN */}
             {documentStatus === "revision" && (
                 <div className="bg-yellow-500/10 border border-yellow-500/30 p-5 sm:p-6 rounded-3xl w-full mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 shadow-[0_0_20px_rgba(234,179,8,0.1)]">
                    <AlertCircle className="text-yellow-500 shrink-0 mt-1 sm:mt-0" size={36} />
@@ -281,12 +280,19 @@ export default async function DashboardPage() {
                   </div>
                   
                   {abstractStatus !== "failed" && (
-                    <Link 
-                      href="/dashboard/payment" 
-                      className={`w-full block text-center font-bold py-4 rounded-xl transition-all shadow-lg text-sm relative z-10 mt-6 ${isPending ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "bg-sunlight-orange text-blue-marine hover:bg-yellow-400"}`}
-                    >
-                      {isPending ? "View Invoice Ticket" : "Open Payment Portal"}
-                    </Link>
+                    <div className="mt-6 text-center">
+                      {!isPending && (
+                        <p className="text-[10px] text-silver-shine mb-2 font-semibold">
+                          *(Batas waktu pembayaran 3 jam akan dimulai setelah Anda klik tombol di bawah ini)*
+                        </p>
+                      )}
+                      <Link 
+                        href="/dashboard/payment" 
+                        className={`w-full block text-center font-bold py-4 rounded-xl transition-all shadow-lg text-sm relative z-10 ${isPending ? "bg-white/10 text-white border border-white/20 hover:bg-white/20" : "bg-sunlight-orange text-blue-marine hover:bg-yellow-400"}`}
+                      >
+                        {isPending ? "View Invoice Ticket" : "Open Payment Portal"}
+                      </Link>
+                    </div>
                   )}
                 </div>
               </div>

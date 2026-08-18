@@ -132,9 +132,9 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     let phone = team.leaderContact.phone.replace(/[^0-9]/g, '');
     if (phone.startsWith('0')) phone = '62' + phone.slice(1);
 
-    const txtTagih = `Halo Ketua Tim *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Kami perhatikan tim kamu belum menyelesaikan administrasi/pembayaran. Yuk amankan slot tim kamu sebelum fase ditutup!\n\nCek portal: https://eurekaitb.com/dashboard/payment`;
-    const txtRevisi = `Halo Ketua Tim *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Mohon maaf, setelah Admin mengecek, *Bukti Pembayaran* tim kamu kurang jelas/tidak valid.\n\nHarap RE-UPLOAD bukti bayar yang benar melalui portal: https://eurekaitb.com/dashboard/payment`;
-    const txtBerkas = `Halo Ketua Tim *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Berdasarkan pengecekan, terdapat *berkas pendaftaran anggota* yang kurang sesuai. Cek catatan Admin dan segera lakukan perbaikan data di: https://eurekaitb.com/dashboard`;
+    const txtTagih = `Halo *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Kami perhatikan tim kamu belum menyelesaikan administrasi/pembayaran. Yuk amankan slot tim kamu sebelum fase ditutup!\n\nCek portal: https://eurekaitb.com/dashboard/payment`;
+    const txtRevisi = `Halo *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Mohon maaf, setelah Admin mengecek, *Bukti Pembayaran* tim kamu kurang jelas/tidak valid.\n\nHarap RE-UPLOAD bukti bayar yang benar melalui portal: https://eurekaitb.com/dashboard/payment`;
+    const txtBerkas = `Halo *${team.teamName}*!\n\nKami dari Panitia EUREKA ITB 2026. Berdasarkan pengecekan, terdapat *berkas pendaftaran anggota* yang kurang sesuai. Cek catatan Admin dan segera lakukan perbaikan data di: https://eurekaitb.com/dashboard`;
     
     const msg = type === "tagih" ? txtTagih : type === "berkas" ? txtBerkas : txtRevisi;
     const message = encodeURIComponent(msg);
@@ -391,7 +391,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                          {selectedTeam.statusPayment === "verified" ? "Cancel Verify" : "Verify Payment"}
                        </button>
                        {selectedTeam.document.urlPayment && selectedTeam.statusPayment !== "verified" && (
-                         <button onClick={() => sendWhatsApp(selectedTeam, "revisi")} className="flex-1 text-[10px] bg-yellow-500/20 text-yellow-500 px-3 py-1.5 rounded-lg hover:bg-yellow-500/30 font-bold">WA: Bukti Buram</button>
+                         <button onClick={() => sendWhatsApp(selectedTeam, "revisi")} className="flex-1 text-[10px] bg-yellow-500/20 text-yellow-500 px-3 py-1.5 rounded-lg hover:bg-yellow-500/30 font-bold">WA: Confirm</button>
                        )}
                     </div>
                   </div>

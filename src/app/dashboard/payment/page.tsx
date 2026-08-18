@@ -8,6 +8,7 @@ import Link from "next/link";
 import { AlertCircle, CheckCircle2, Clock, Lock, ShieldCheck, Wallet, Building, Download } from "lucide-react";
 import CountdownTimer from "./CountdownTimer";
 import PaymentUploader from "./PaymentUploader";
+import RetryPaymentButton from "./RetryPaymentButton"; 
 import { getPrice, formatIDR, PHASE_NAMES } from "@/lib/competition-config";
 import type { CompeType, Phase } from "@/lib/competition-config";
 import Image from "next/image";
@@ -31,7 +32,6 @@ export default async function PaymentPage() {
   const teamPhase = userTeam[0].registrationPhase as Phase;
   const phaseName = PHASE_NAMES[teamPhase];
   
-  // SEKARANG DATABASE SUDAH SINKRON DENGAN FRONTEND
   const compeTypeSlug = userTeam[0].compeType as CompeType;
   const basePrice = getPrice(compeTypeSlug, teamPhase);
   
@@ -41,8 +41,9 @@ export default async function PaymentPage() {
   const isPending = userTeam[0].statusPayment === "pending";
   const isVerified = userTeam[0].statusPayment === "verified";
   
-  // Cek kalau waktu pendaftaran sudah melebihi 3 jam (untuk halaman server)
-  const isExpired = new Date().getTime() > new Date(userTeam[0].createdAt).getTime() + (3 * 60 * 60 * 1000);
+  // LOGIKA BARU: Cek waktu kadaluarsa HANYA JIKA paymentStartedAt sudah ada (tidak null)
+  const startedAt = userTeam[0].paymentStartedAt;
+  const isExpired = startedAt ? (new Date().getTime() > new Date(startedAt).getTime() + (3 * 60 * 60 * 1000)) : false;
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden">
@@ -127,20 +128,18 @@ export default async function PaymentPage() {
                 </div>
               </div>
             ) : isExpired ? (
-              // TAMPILAN LOCK JIKA LEWAT 3 JAM
-              <div className="bg-red-500/10 border border-red-500/30 rounded-3xl p-8 sm:p-12 backdrop-blur-sm text-center max-w-2xl mx-auto shadow-[0_0_30px_rgba(239,68,68,0.15)]">
+              // TAMPILAN LOCK JIKA LEWAT 3 JAM (DENGAN TOMBOL COBA LAGI)
+              <div className="bg-red-500/10 border border-red-500/30 rounded-3xl p-8 sm:p-12 backdrop-blur-sm text-center max-w-2xl mx-auto shadow-[0_0_30px_rgba(239,68,68,0.15)] flex flex-col items-center">
                  <AlertCircle size={64} className="text-red-400 mx-auto mb-6" />
                  <h2 className="font-display text-2xl font-bold text-red-400 mb-2">Waktu Pembayaran Habis</h2>
-                 <p className="text-silver-shine text-sm leading-relaxed mb-6">
-                   Batas waktu 3 jam untuk menyelesaikan administrasi pendaftaran telah berakhir. Sistem telah menonaktifkan portal pembayaran untuk tim Anda.
+                 <p className="text-silver-shine text-sm leading-relaxed mb-8">
+                   Batas waktu 3 jam untuk menyelesaikan administrasi pendaftaran telah berakhir. Namun, kamu masih bisa mencoba ulang pembayaran untuk membuka kembali portal ini.
                  </p>
-                 <a href="https://wa.me/628123456789" target="_blank" rel="noreferrer" className="inline-block bg-white/10 border border-white/20 text-white font-bold py-3 px-6 rounded-xl hover:bg-white/20 transition-colors text-sm">
-                   Hubungi Admin via WhatsApp
-                 </a>
+                 <RetryPaymentButton teamId={userTeam[0].id} />
               </div>
             ) : (
               <>
-                <CountdownTimer registeredAt={userTeam[0].createdAt || new Date()} />
+                <CountdownTimer startedAt={startedAt} teamId={userTeam[0].id} />
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   
                   <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-sm relative overflow-hidden h-max shadow-2xl">
