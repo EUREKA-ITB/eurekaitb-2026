@@ -1,24 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  Sparkles,
-  Search,
-  Clock3,
-  Mail,
-  ShieldCheck,
-  Headphones,
-  Download,
-  ListFilter,
-  UserRound,
-  Wallet,
-  FileText,
-  Wrench,
-} from "lucide-react";
-import CopyButton from "@/components/CopyButton";
-import EmailHelpButton from "@/components/EmailHelpButton";
-import FaqRating from "@/components/FaqRating";
+import { Search, ListFilter, UserRound, Wallet, FileText, Wrench, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Category = "akun" | "pembayaran" | "dokumen" | "teknis";
@@ -88,21 +71,6 @@ const faqs: { question: string; answer: string; category: Category }[] = [
 ];
 
 export default function FaqPageV2() {
-  const whatsappNumberGen = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "6283148657849";
-  const whatsappTemplateGen = encodeURIComponent(
-    "Halo tim helpdesk EUREKA 2026, ada yang ingin saya tanyakan terkait Eureka! ITB 2026 ini. [Jelaskan keperluan Anda]"
-  );
-
-  const whatsappNumberCompe = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "62895324405010";
-  const whatsappTemplateCompe = encodeURIComponent(
-    "Halo tim helpdesk EUREKA 2026, ada yang ingin saya tanyakan terkait [sebutkan jenis kompetisi yang ingin ditanyakan]."
-  );
-
-  const whatsappNumberTech = process.env.NEXT_PUBLIC_HELPDESK_WHATSAPP ?? "6285139556416";
-  const whatsappTemplateTech = encodeURIComponent(
-    "Halo tim helpdesk EUREKA 2026, saya mengalami kendala teknis [sebutkan kendala teknis yang dialami]. Mohon bantuannya."
-  );
-
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category | "semua">("semua");
 
@@ -119,20 +87,20 @@ export default function FaqPageV2() {
 
   return (
     <div className="min-h-screen px-4 sm:px-6 pt-28 pb-20 text-white selection:bg-sunlight-orange selection:text-blue-marine overflow-x-hidden">
-      <div className="mx-auto max-w-6xl w-full">
+      <div className="mx-auto max-w-4xl w-full">
         {/* HERO + SEARCH */}
-        <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 sm:p-8 md:p-10 backdrop-blur-sm shadow-2xl">
+        <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 sm:p-8 md:p-10 backdrop-blur-sm shadow-2xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full px-1 py-1.5 text-s font-bold uppercase tracking-[0.35em] text-sunlight-orange mb-5">
-            FAQ & Helpdesk
+            General FAQ
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl font-bold max-w-2xl">
-            Cari jawaban lebih cepat lewat pencarian & kategori
+          <h1 className="font-display text-4xl sm:text-5xl font-bold mx-auto max-w-2xl">
+            Cari jawaban lebih cepat lewat pencarian
           </h1>
-          <p className="mt-5 max-w-3xl text-sm sm:text-base leading-relaxed text-silver-shine">
+          <p className="mt-5 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed text-silver-shine">
             Ketik kata kunci atau pilih kategori pertanyaan di bawah untuk langsung menemukan jawaban yang kamu butuhkan.
           </p>
 
-          <div className="mt-8 flex flex-col gap-4">
+          <div className="mt-8 flex flex-col items-center gap-4 max-w-3xl mx-auto">
             <div className="relative w-full">
               <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-silver-shine" size={18} />
               <input
@@ -144,7 +112,7 @@ export default function FaqPageV2() {
               />
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-center gap-2">
               <Button
                 type="button"
                 onClick={() => setActiveCategory("semua")}
@@ -177,14 +145,13 @@ export default function FaqPageV2() {
         </section>
 
         {/* CONTENT */}
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] w-full">
-          {/* FAQ list */}
+        <section className="mt-8 w-full">
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8 shadow-xl backdrop-blur-md w-full box-border">
             {filtered.length === 0 ? (
               <div className="py-16 text-center">
                 <p className="font-display text-lg font-semibold text-white">Tidak ada hasil ditemukan</p>
                 <p className="mt-2 text-sm text-silver-shine">
-                  Coba kata kunci lain atau hubungi helpdesk kami di samping.
+                  Coba kata kunci lain atau hubungi helpdesk melalui icon CS di atas.
                 </p>
               </div>
             ) : (
@@ -194,15 +161,15 @@ export default function FaqPageV2() {
                   return (
                     <details
                       key={faq.question}
-                      className="group rounded-2xl border border-white/10 bg-black/20 p-4 transition-colors hover:bg-white/5 w-full"
+                      className="group rounded-2xl border border-white/10 bg-black/20 p-5 transition-colors hover:bg-white/5 w-full cursor-pointer"
                     >
-                      <summary className="cursor-pointer list-none text-sm font-semibold text-white flex gap-3 outline-none w-full">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sunlight-orange/10 text-sunlight-orange">
-                          <CategoryIcon size={16} />
+                      <summary className="list-none text-sm sm:text-base font-semibold text-white flex gap-4 outline-none w-full items-center">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sunlight-orange/10 text-sunlight-orange">
+                          <CategoryIcon size={18} />
                         </span>
                         <span className="pt-1 break-words flex-1 leading-tight">{faq.question}</span>
                       </summary>
-                      <p className="mt-3 ml-11 text-sm leading-relaxed text-silver-shine border-t border-white/10 pt-3 break-words">
+                      <p className="mt-4 ml-14 text-sm leading-relaxed text-silver-shine border-t border-white/10 pt-4 break-words">
                         {faq.answer}
                       </p>
                     </details>
@@ -210,113 +177,6 @@ export default function FaqPageV2() {
                 })}
               </div>
             )}
-          </div>
-
-          {/* Sidebar Helpdesk */}
-          <div className="space-y-6 w-full box-border">
-            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-sunlight-orange/15 to-white/5 p-6 shadow-xl backdrop-blur-md w-full">
-              <div className="mb-4 flex items-center gap-3">
-                <Headphones className="text-sunlight-orange" size={22} />
-                <h2 className="font-display text-2xl font-semibold text-white">Helpdesk EUREKA</h2>
-              </div>
-              <p className="text-sm leading-relaxed text-silver-shine">
-                Tim support kami siap membantu Anda di hari kerja selama masa pendaftaran.
-              </p>
-
-              <div className="mt-6 space-y-3 text-sm w-full">
-                <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3 w-full">
-                  <Mail className="mt-0.5 text-sunlight-orange shrink-0" size={18} />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-white">Email</p>
-                    <div className="flex items-center justify-between gap-2 mt-0.5">
-                      <a
-                        href="mailto:officialeurekaitb@gmail.com"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-silver-shine hover:text-white break-all text-xs sm:text-sm"
-                      >
-                        officialeurekaitb@gmail.com
-                      </a>
-                      <CopyButton text="officialeurekaitb@gmail.com" ariaLabel="Copy email" className="shrink-0" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3 w-full">
-                  <ShieldCheck className="mt-0.5 text-sunlight-orange shrink-0" size={18} />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-white">Instagram resmi</p>
-                    <div className="flex items-center justify-between gap-2 mt-0.5">
-                      <a
-                        href="https://instagram.com/eurekaitb"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-silver-shine hover:text-white break-all text-xs sm:text-sm"
-                      >
-                        @eurekaitb
-                      </a>
-                      <CopyButton text="@eurekaitb" ariaLabel="Copy instagram handle" className="shrink-0" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3 w-full">
-                  <Clock3 className="mt-0.5 text-sunlight-orange shrink-0" size={18} />
-                  <div>
-                    <p className="font-semibold text-white">Jam respon</p>
-                    <p className="text-silver-shine text-xs sm:text-sm mt-0.5">Senin–Jumat, 08.00–17.00 WIB</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-xl backdrop-blur-md w-full">
-              <h3 className="font-display text-xl font-semibold text-white">Butuh bantuan cepat?</h3>
-              <p className="mt-2 text-sm leading-relaxed text-silver-shine mb-5">
-                Jika Anda mengalami masalah saat upload bukti pembayaran, mengubah data tim, atau mengakses dashboard, hubungi support kami langsung.
-              </p>
-              <div className="flex flex-col gap-3">
-                <EmailHelpButton />
-                <Button
-                  asChild
-                  className="w-full rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine hover:bg-yellow-400"
-                >
-                  <a
-                    href={`https://wa.me/${whatsappNumberGen}?text=${whatsappTemplateGen}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    General (WhatsApp)
-                  </a>
-                </Button>
-                <Button
-                  asChild
-                  className="w-full rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine hover:bg-yellow-400"
-                >
-                  <a
-                    href={`https://wa.me/${whatsappNumberCompe}?text=${whatsappTemplateCompe}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Kompetisi (WhatsApp)
-                  </a>
-                </Button>
-                <Button
-                  asChild
-                  className="w-full rounded-full border border-sunlight-orange/40 bg-sunlight-orange px-4 py-2 text-sm font-semibold text-blue-marine hover:bg-yellow-400"
-                >
-                  <a
-                    href={`https://wa.me/${whatsappNumberTech}?text=${whatsappTemplateTech}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Teknis (WhatsApp)
-                  </a>
-                </Button>
-              </div>
-            </div>
-
-            <FaqRating />
           </div>
         </section>
       </div>

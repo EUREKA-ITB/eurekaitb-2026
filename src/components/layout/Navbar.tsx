@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { ChevronDown, LogOut, Menu, X, LayoutDashboard, Settings } from "lucide-react";
+import { ChevronDown, LogOut, Menu, X, LayoutDashboard, Settings, Headphones } from "lucide-react";
 import type { Session } from "next-auth";
 import LogoutModal from "./LogoutModal";
 
@@ -40,78 +40,95 @@ export default function Navbar({ session }: { session: Session | null }) {
             </Link>
           </div>
 
-          <div className="hidden lg:flex items-center gap-2 xl:gap-3">
-            <Link 
-              href="/" 
-              onClick={(e) => {
-                if (typeof window !== 'undefined' && window.location.hostname.includes('mini-competition')) {
-                  e.preventDefault();
-                  window.location.href = 'https://eurekaitb2026.vercel.app'; 
-                }
-              }}
-              className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors"
-            >
-              Home
-            </Link>
+          {/* BAGIAN KANAN NAVBAR */}
+          <div className="flex items-center gap-2 xl:gap-3">
             
-            <div className="relative group">
-              <button className="flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">
-                Competitions <ChevronDown size={16} />
-              </button>
-              <div className="absolute top-full right-0 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="w-[320px] rounded-2xl border border-white/10 bg-[#0a102b]/95 backdrop-blur-2xl p-3 shadow-2xl">
-                  <div className="flex flex-col gap-1">
-                    {competitionLinks.map((item) => (
-                      <Link key={item.href} href={item.href} className="px-3 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition-colors">
-                        {item.label}
-                      </Link>
-                    ))}
+            {/* MENU LINKS (HANYA DESKTOP) */}
+            <div className="hidden lg:flex items-center gap-1 xl:gap-2 mr-2">
+              <Link 
+                href="/" 
+                onClick={(e) => {
+                  if (typeof window !== 'undefined' && window.location.hostname.includes('mini-competition')) {
+                    e.preventDefault();
+                    window.location.href = 'https://eurekaitb2026.vercel.app'; 
+                  }
+                }}
+                className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors"
+              >
+                Home
+              </Link>
+              
+              <div className="relative group">
+                <button className="flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">
+                  Competitions <ChevronDown size={16} />
+                </button>
+                <div className="absolute top-full right-0 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="w-[320px] rounded-2xl border border-white/10 bg-[#0a102b]/95 backdrop-blur-2xl p-3 shadow-2xl">
+                    <div className="flex flex-col gap-1">
+                      {competitionLinks.map((item) => (
+                        <Link key={item.href} href={item.href} className="px-3 py-3 rounded-xl text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <Link href="/mini-competition" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Mini Competition</Link>
+              <Link href="/faq" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
+              <Link href="/about" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">About</Link>
             </div>
 
-            <Link href="/mini-competition" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">Mini Competition</Link>
-            <Link href="/faq" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">FAQ</Link>
-            <Link href="/about" className="px-3 py-2 rounded-full text-sm font-bold text-white hover:text-sunlight-orange hover:bg-white/5 transition-colors">About</Link>
+            {/* TOMBOL HELPDESK / CS (TAMPIL DI MOBILE & DESKTOP) */}
+            <Link 
+              href="/helpdesk" 
+              className="inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/10 bg-white/5 text-white hover:text-sunlight-orange hover:bg-white/10 transition-colors shrink-0" 
+              title="Helpdesk & Support Center"
+            >
+              <Headphones size={20} />
+            </Link>
 
-            {session ? (
-              <div className="flex items-center gap-2 ml-2">
-                {/* --- EKSPLISIT TOMBOL DASHBOARD DI DESKTOP --- */}
-                <Link href="/dashboard" className="hidden xl:flex px-4 py-2 rounded-full text-sm font-bold bg-sunlight-orange/10 text-sunlight-orange border border-sunlight-orange/30 hover:bg-sunlight-orange hover:text-blue-marine transition-colors">
-                  Dashboard
-                </Link>
-                
-                <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1.5 pr-4 gap-3 ml-1 hover:bg-white/10 transition-colors">
-                  <Link href="/dashboard" className="flex items-center gap-3 group" title="Open Dashboard">
-                    {session.user?.image ? (
-                      <Image src={session.user.image} alt="User" width={32} height={32} unoptimized className="w-8 h-8 rounded-full border border-sunlight-orange object-cover group-hover:scale-105 transition-transform" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-sunlight-orange text-blue-marine flex items-center justify-center font-bold text-sm group-hover:scale-105 transition-transform">
-                        {session.user?.name?.charAt(0)}
-                      </div>
-                    )}
-                    <div className="flex flex-col text-left mr-2">
-                      <span className="text-[10px] text-silver-shine uppercase tracking-wider group-hover:text-white transition-colors">Logged in as</span>
-                      <span className="text-sm font-bold text-sunlight-orange leading-tight">{session.user?.name}</span>
-                    </div>
+            {/* AUTH & PROFILE (HANYA DESKTOP) */}
+            <div className="hidden lg:flex items-center ml-1">
+              {session ? (
+                <div className="flex items-center gap-2">
+                  <Link href="/dashboard" className="hidden xl:flex px-4 py-2 rounded-full text-sm font-bold bg-sunlight-orange/10 text-sunlight-orange border border-sunlight-orange/30 hover:bg-sunlight-orange hover:text-blue-marine transition-colors">
+                    Dashboard
                   </Link>
-                  <div className="w-px h-6 bg-white/20"></div>
-                  <Link href="/settings" className="text-silver-shine hover:text-white transition-colors" title="Account Settings"><Settings size={18} /></Link>
-                  <button 
-                    onClick={() => setIsLogoutModalOpen(true)}
-                    className="flex items-center gap-2 text-sm font-bold text-maroon-flash hover:text-red-400 transition-colors ml-1"
-                    title="Logout"
-                  >
-                    <LogOut size={18} />
-                  </button>
+                  
+                  <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-1.5 pr-4 gap-3 ml-1 hover:bg-white/10 transition-colors">
+                    <Link href="/dashboard" className="flex items-center gap-3 group" title="Open Dashboard">
+                      {session.user?.image ? (
+                        <Image src={session.user.image} alt="User" width={32} height={32} unoptimized className="w-8 h-8 rounded-full border border-sunlight-orange object-cover group-hover:scale-105 transition-transform" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-sunlight-orange text-blue-marine flex items-center justify-center font-bold text-sm group-hover:scale-105 transition-transform">
+                          {session.user?.name?.charAt(0)}
+                        </div>
+                      )}
+                      <div className="flex flex-col text-left mr-2">
+                        <span className="text-[10px] text-silver-shine uppercase tracking-wider group-hover:text-white transition-colors">Logged in as</span>
+                        <span className="text-sm font-bold text-sunlight-orange leading-tight">{session.user?.name}</span>
+                      </div>
+                    </Link>
+                    <div className="w-px h-6 bg-white/20"></div>
+                    <Link href="/settings" className="text-silver-shine hover:text-white transition-colors" title="Account Settings"><Settings size={18} /></Link>
+                    <button 
+                      onClick={() => setIsLogoutModalOpen(true)}
+                      className="flex items-center gap-2 text-sm font-bold text-maroon-flash hover:text-red-400 transition-colors ml-1"
+                      title="Logout"
+                    >
+                      <LogOut size={18} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <Link href="/login" className="hidden lg:flex px-5 py-2.5 rounded-full bg-sunlight-orange text-blue-marine hover:bg-yellow-400 transition-all text-sm font-bold ml-1">
-                Sign In / Sign Up
-              </Link>
-            )}
+              ) : (
+                <Link href="/login" className="px-5 py-2.5 rounded-full bg-sunlight-orange text-blue-marine hover:bg-yellow-400 transition-all text-sm font-bold ml-1">
+                  Sign In / Sign Up
+                </Link>
+              )}
+            </div>
+
           </div>
         </div>
 
@@ -196,6 +213,11 @@ export default function Navbar({ session }: { session: Session | null }) {
                 <Link href="/mini-competition" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>Mini Competition</Link>
                 <Link href="/faq" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>General FAQ</Link>
                 <Link href="/about" className="w-full text-left p-4 rounded-xl font-semibold text-silver-shine hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10" onClick={() => setIsOpen(false)}>About</Link>
+                
+                {/* MENU HELPDESK UNTUK MOBILE */}
+                <Link href="/helpdesk" className="w-full text-left p-4 rounded-xl font-bold text-sunlight-orange bg-sunlight-orange/10 hover:bg-sunlight-orange/20 transition-colors border border-sunlight-orange/20 mt-2 flex items-center gap-3" onClick={() => setIsOpen(false)}>
+                  <Headphones size={20} /> Support Center
+                </Link>
               </div>
               <div className="hidden md:block mt-8 pt-6 border-t border-white/10 text-xs text-silver-shine text-center">© 2026 EUREKA ITB. All rights reserved.</div>
             </div>

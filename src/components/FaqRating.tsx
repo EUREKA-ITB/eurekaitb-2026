@@ -14,8 +14,8 @@ export default function FaqRating() {
 
   return (
     <div className="rounded-3xl border border-white/10 bg-black/20 p-6 text-sm">
-      <h3 className="font-display text-lg font-semibold text-white">Bagaimana kepuasan FAQ?</h3>
-      <p className="text-silver-shine mt-2">Nilai jawaban FAQ kami agar kami bisa meningkatkan helpdesk.</p>
+      <h3 className="font-display text-lg font-semibold text-white">Apakah Anda terbantu oleh Support Center?</h3>
+      <p className="text-silver-shine mt-2">Beri nilai pada pelayanan kami agar kami bisa meningkatkan helpdesk.</p>
       <div className="mt-4 flex items-center gap-2">
         {[1, 2, 3, 4, 5].map((score) => (
           <button
