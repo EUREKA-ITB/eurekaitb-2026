@@ -79,7 +79,6 @@ export default function RegisterLombaPage() {
           if (data && data.team) {
             const fetchedCompeType = data.team.compeType.replace(/_/g, "-");
 
-            // LOCK SPC DAN ICC LANGSUNG (KECUALI JIKA SEDANG REVISI)
             if ((fetchedCompeType === "science-project" || fetchedCompeType === "industrial-case") && data.team.documentStatus !== "revision") {
               setIsLocked(true);
               setLockedCompeName(fetchedCompeType.replace(/-/g, " "));
@@ -157,7 +156,6 @@ export default function RegisterLombaPage() {
     });
   };
 
-  // FIX: PROTEKSI PENGHAPUSAN ANGGOTA MINIMAL 2 UNTUK TIM
   const removeMemberSlot = (index: number) => {
     if (index === 0) return; 
     setFormData((prev) => {
@@ -176,7 +174,6 @@ export default function RegisterLombaPage() {
     setIsSaving(true);
 
     try {
-      // FIX: PROTEKSI SUBMIT MINIMAL 2 ANGGOTA UNTUK TIM
       if ((formData.compeType === "science-project" || formData.compeType === "industrial-case") && formData.members.length < 2) {
         alert("IMPORTANT: Science Project and Industrial Case teams must have at least 2 members!");
         setIsSaving(false);
@@ -306,7 +303,6 @@ export default function RegisterLombaPage() {
                   <span className="text-xs font-bold text-sunlight-orange bg-sunlight-orange/10 px-3 py-1.5 rounded-md uppercase tracking-widest">
                     {member.isLeader ? "★ Leader / Individual" : `Additional Member ${index}`}
                   </span>
-                  {/* FIX: SEMBUNYIKAN TOMBOL REMOVE JIKA ANGGOTA TERSISA 2 UNTUK TIM */}
                   {!member.isLeader && !(isTeamCompetition && formData.members.length <= 2) && (
                     <button type="button" onClick={() => removeMemberSlot(index)} className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors">Remove Member</button>
                   )}
@@ -357,6 +353,9 @@ export default function RegisterLombaPage() {
                         <option value="" disabled>-- Select grade / semester --</option>
                         {!isMahasiswa ? (
                           <>
+                            <option value="Grade 7">Grade 7</option>
+                            <option value="Grade 8">Grade 8</option>
+                            <option value="Grade 9">Grade 9</option>
                             <option value="Grade 10">Grade 10</option>
                             <option value="Grade 11">Grade 11</option>
                             <option value="Grade 12">Grade 12</option>

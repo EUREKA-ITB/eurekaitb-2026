@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCircle, ChevronRight, Wallet, Banknote, BanknoteIcon, LucideMedal } from "lucide-react";
+import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCircle, ChevronRight, Wallet, Banknote, BanknoteIcon, LucideMedal, Link2 } from "lucide-react";
 import { COMPETITION_PRICING, PHASE_NAMES, formatIDR, getCurrentPhase } from "@/lib/competition-config";
 import type { CompeType, Phase } from "@/lib/competition-config";
 import Image from "next/image";
@@ -36,8 +36,8 @@ export default function ScienceProjectPage() {
   };
 
   const documents = [
-    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/science-project.pdf" },
-    { id: "format_laporan", title: "Report Format", url: "/guidebooks/format-laporan-sp.pdf" },
+    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/gb-spc-new.pdf" },
+    { id: "format_laporan", title: "Report Format", url: "https://drive.google.com/drive/folders/1qCLomko2HcE_j5gImmNITH4_BP3MRKae?usp=drive_link" },
   ];
   
   const [activePdfIndex, setActivePdfIndex] = useState(0);
@@ -70,6 +70,9 @@ export default function ScienceProjectPage() {
 function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, activePdfIndex, setActivePdfIndex, timelineData, faqData, hadiah }: TemplateProps) {
   const pricing = COMPETITION_PRICING[lombaId as CompeType];
   const currentPhase = getCurrentPhase();
+
+  // Deteksi link eksternal (GDrive)
+  const isExternalLink = activeDoc.url.startsWith("http");
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans overflow-x-hidden pt-24 pb-20">
@@ -126,7 +129,7 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
             
             <div className="relative z-10 flex flex-col items-center">
               <div className="inline-block px-5 py-2 rounded-full text-sunlight-orange text-s font-bold uppercase tracking-[0.25em] mb-4 backdrop-blur-sm shadow-sm">
-                Total Prize Pool
+                Total Prize Pool of Main Competitions
               </div>
               <h3 className="text-5xl sm:text-7xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-100 via-sunlight-orange to-yellow-400 drop-shadow-sm mb-4 tracking-tight pb-2">
                 Rp 30.000.000+
@@ -249,27 +252,40 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               <div className="flex flex-wrap gap-2">
                 {documents.map((doc, index) => (
                   <button key={doc.id} onClick={() => setActivePdfIndex(index)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activePdfIndex === index ? "bg-sunlight-orange text-blue-marine shadow-lg" : "bg-black/30 border border-white/10 text-silver-shine hover:bg-white/10 hover:text-white"}`}>
-                    <FileText size={16} /> {doc.title}
+                    {doc.url.startsWith("http") ? <Link2 size={16} /> : <FileText size={16} />} {doc.title}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="w-full bg-[#0a0f24] border border-white/10 rounded-2xl overflow-hidden relative h-[400px] md:h-[700px] flex flex-col items-center justify-center group">
-              <object data={`${activeDoc.url}#toolbar=0`} type="application/pdf" className="hidden md:block w-full h-full absolute inset-0 z-10">
-                <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-black/40">
-                  <FileText size={48} className="text-white/20 mb-4" />
-                  <p className="text-white font-bold mb-2">Document Not Available</p>
-                  <p className="text-sm text-silver-shine">Please ensure the file <b>{activeDoc.url}</b> is uploaded in the public folder.</p>
+              {isExternalLink ? (
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center relative z-20">
+                  <Link2 size={48} className="text-sunlight-orange mb-4 opacity-80" />
+                  <h3 className="font-bold text-xl mb-2 text-white">External Document</h3>
+                  <p className="text-silver-shine text-sm mb-6 max-w-sm">Dokumen ini berada di Google Drive. Klik tombol di bawah untuk melihat atau mengunduh dokumen secara aman.</p>
+                  <a href={activeDoc.url} target="_blank" rel="noreferrer" className="bg-sunlight-orange text-blue-marine font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-yellow-400 transition-colors flex items-center gap-2">
+                    Buka di Google Drive <ChevronRight size={16}/>
+                  </a>
                 </div>
-              </object>
-              <div className="md:hidden flex flex-col items-center justify-center p-8 text-center h-full relative z-20">
-                <FileText size={48} className="text-sunlight-orange mb-4 opacity-50" />
-                <h3 className="font-bold text-lg mb-2">Document Preview</h3>
-                <p className="text-silver-shine text-sm mb-6">Mobile devices do not support direct PDF previews.</p>
-                <a href={activeDoc.url} target="_blank" rel="noreferrer" className="bg-sunlight-orange text-blue-marine font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-yellow-400 transition-colors">Open / Download {activeDoc.title}</a>
-              </div>
-              <a href={activeDoc.url} download className="hidden md:flex absolute top-4 right-6 z-20 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 px-4 py-2 rounded-lg text-white text-xs font-bold items-center gap-2 transition-colors">Download PDF</a>
+              ) : (
+                <>
+                  <object data={`${activeDoc.url}#toolbar=0`} type="application/pdf" className="hidden md:block w-full h-full absolute inset-0 z-10">
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-black/40">
+                      <FileText size={48} className="text-white/20 mb-4" />
+                      <p className="text-white font-bold mb-2">Document Not Available</p>
+                      <p className="text-sm text-silver-shine">Please ensure the file <b>{activeDoc.url}</b> is uploaded in the public folder.</p>
+                    </div>
+                  </object>
+                  <div className="md:hidden flex flex-col items-center justify-center p-8 text-center h-full relative z-20">
+                    <FileText size={48} className="text-sunlight-orange mb-4 opacity-50" />
+                    <h3 className="font-bold text-lg mb-2">Document Preview</h3>
+                    <p className="text-silver-shine text-sm mb-6">Mobile devices do not support direct PDF previews.</p>
+                    <a href={activeDoc.url} target="_blank" rel="noreferrer" className="bg-sunlight-orange text-blue-marine font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-yellow-400 transition-colors">Open / Download {activeDoc.title}</a>
+                  </div>
+                  <a href={activeDoc.url} download className="hidden md:flex absolute top-4 right-6 z-20 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 px-4 py-2 rounded-lg text-white text-xs font-bold items-center gap-2 transition-colors">Download PDF</a>
+                </>
+              )}
             </div>
           </div>
         </section>

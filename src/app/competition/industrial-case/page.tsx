@@ -128,7 +128,7 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
             
             <div className="relative z-10 flex flex-col items-center">
               <div className="inline-block px-5 py-2 rounded-full text-sunlight-orange text-s font-bold uppercase tracking-[0.25em] mb-4 backdrop-blur-sm shadow-sm">
-                Total Prize Pool
+                Total Prize Pool of Main Competitions
               </div>
               <h3 className="text-5xl sm:text-7xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-100 via-sunlight-orange to-yellow-400 drop-shadow-sm mb-4 tracking-tight pb-2">
                 Rp 30.000.000+

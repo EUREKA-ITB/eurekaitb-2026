@@ -13,12 +13,28 @@ export async function POST(req: Request) {
     const { teamId, paymentUrl } = await req.json();
     if (!teamId || !paymentUrl) return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 });
 
-    // 1. Save bukti payment
-    const existingDoc = await db.select().from(documents).where(eq(documents.teamId, teamId)).limit(1);
-    if (existingDoc.length > 0) {
-      await db.update(documents).set({ urlPayment: paymentUrl }).where(eq(documents.teamId, teamId));
+    // 1. Ambil semua dokumen dengan teamId tersebut (untuk antisipasi ada data ganda sebelumnya)
+    const existingDocs = await db.select().from(documents).where(eq(documents.teamId, teamId));
+
+    if (existingDocs.length > 0) {
+      // Jika sudah ada, update dokumen yang PERTAMA ditemukan
+      await db.update(documents)
+        .set({ urlPayment: paymentUrl })
+        .where(eq(documents.id, existingDocs[0].id));
+
+      // [SOLUSI BUG] Hapus otomatis sisanya jika ternyata terjadi "Race Condition" / data double di tabel
+      if (existingDocs.length > 1) {
+        for (let i = 1; i < existingDocs.length; i++) {
+          await db.delete(documents).where(eq(documents.id, existingDocs[i].id));
+        }
+      }
     } else {
-      await db.insert(documents).values({ teamId: teamId, urlIdentitas: null, urlPayment: paymentUrl });
+      // Jika benar-benar baru, lakukan insert
+      await db.insert(documents).values({ 
+        teamId: teamId, 
+        urlIdentitas: null, 
+        urlPayment: paymentUrl 
+      });
     }
 
     // 2. STATUS 'PENDING'
