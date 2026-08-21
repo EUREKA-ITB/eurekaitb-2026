@@ -27,7 +27,10 @@ export const teams = pgTable("teams", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id).notNull(), 
   teamName: varchar("team_name", { length: 255 }).notNull(), 
-  institutionName: varchar("institution_name", { length: 255 }).notNull(), 
+  
+  // DIUBAH: Dibuat opsional (tanpa .notNull()) karena ICC tidak pakai instansi utama
+  institutionName: varchar("institution_name", { length: 255 }), 
+  
   compeType: compeTypeEnum("compe_type").notNull(),
   registrationPhase: registrationPhaseEnum("registration_phase").notNull(),
   statusPayment: paymentStatusEnum("payment_status").default("unpaid").notNull(),
@@ -41,7 +44,6 @@ export const teams = pgTable("teams", {
   fullPaperUrl: text("full_paper_url"), 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   
-  // NEW: Kolom untuk mencatat kapan waktu 3 jam mulai dihitung
   paymentStartedAt: timestamp("payment_started_at"),
 
   participantNumber: varchar("participant_number", { length: 50 }),
@@ -55,6 +57,10 @@ export const teamMembers = pgTable("team_members", {
   fullName: varchar("full_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(), 
   phoneNumber: varchar("phone_number", { length: 50 }).notNull(),
+  
+  // NEW: Tambahan kolom instansi per orang khusus ICC
+  institution: varchar("institution", { length: 255 }),
+  
   grade: varchar("grade", { length: 50 }).notNull(),
   photoUrl: text("photo_url").notNull(),
   ktmUrl: text("ktm_url"), 

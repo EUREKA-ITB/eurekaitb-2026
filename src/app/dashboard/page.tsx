@@ -218,7 +218,12 @@ export default async function DashboardPage() {
                 <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm flex flex-col justify-between">
                   <div>
                     <p className="text-silver-shine text-xs uppercase tracking-wider mb-2 flex items-center gap-2"><Users size={16}/> Registration Data</p>
-                    <h3 className="font-display text-2xl font-bold text-white mb-6">{userTeam[0].teamName}</h3>
+                    
+                    {/* BUG NAMA TERBALIK DIPERBAIKI DI SINI */}
+                    <h3 className="font-display text-2xl font-bold text-white mb-6">
+                      {isPO && membersData.length > 0 ? membersData[0].fullName : userTeam[0].teamName}
+                    </h3>
+                    
                     <div className="space-y-4 text-sm bg-black/20 p-5 rounded-xl border border-white/5">
                       <div className="flex justify-between items-center border-b border-white/10 pb-3 gap-2">
                         <span className="text-silver-shine">Category</span><span className="font-semibold capitalize text-sunlight-orange text-right">{compeTypeSlug.replace(/-/g, " ")}</span>
@@ -312,7 +317,12 @@ export default async function DashboardPage() {
                           Official Participant
                           <span className="bg-green-500 text-white px-2 py-0.5 rounded-md text-[8px] tracking-normal">VERIFIED</span>
                         </p>
-                        <h3 className="font-display text-2xl font-bold text-white mb-6 break-words mt-2">{userTeam[0].teamName}</h3>
+                        
+                        {/* BUG NAMA TERBALIK DIPERBAIKI DI SINI JUGA */}
+                        <h3 className="font-display text-2xl font-bold text-white mb-6 break-words mt-2">
+                          {isPO && membersData.length > 0 ? membersData[0].fullName : userTeam[0].teamName}
+                        </h3>
+                        
                         <div className="space-y-3 text-xs mb-8">
                           <div>
                             <p className="text-silver-shine">Category</p>

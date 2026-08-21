@@ -13,6 +13,7 @@ interface MemberInput {
   fullName: string;
   email: string;
   phoneNumber: string;
+  institution: string; // NEW: Tambahan untuk ICC
   grade: string;       
   photoUrl: string;    
   ktmUrl: string;      
@@ -33,7 +34,7 @@ interface FormData {
 }
 
 const createEmptyMember = (isLeader: boolean): MemberInput => ({
-  fullName: "", email: "", phoneNumber: "", grade: "", photoUrl: "", ktmUrl: "", 
+  fullName: "", email: "", phoneNumber: "", institution: "", grade: "", photoUrl: "", ktmUrl: "", 
   igAccountLink: "", proofFollowUrl: "", proofShareUrl: "", proofStoryCompeUrl: "", proofTwibbonUrl: "", isLeader: isLeader,
 });
 
@@ -48,11 +49,10 @@ const getSecureUrlFromUpload = (result: unknown): string | null => {
   return null;
 };
 
-// Pengaturan khusus untuk mengunci format ke Image (JPG/PNG)
 const imageUploadOptions = {
   maxFiles: 1,
   clientAllowedFormats: ["png", "jpg", "jpeg"],
-  maxFileSize: 5242880 // 5MB
+  maxFileSize: 5242880 
 };
 
 export default function RegisterLombaPage() {
@@ -86,7 +86,6 @@ export default function RegisterLombaPage() {
               return;
             }
 
-            // LOCK PO HANYA JIKA SUDAH BAYAR
             if (data.team.statusPayment !== "unpaid") {
               setIsLocked(true);
               setLockedCompeName(data.team.compeType.replace("-", " "));
@@ -99,8 +98,9 @@ export default function RegisterLombaPage() {
             validMembers = validMembers.sort((a: Partial<MemberInput>, b: Partial<MemberInput>) => Number(b.isLeader || false) - Number(a.isLeader || false));
 
             const processedMembers: MemberInput[] = validMembers.map((m: Partial<MemberInput>) => ({
-              fullName: m.fullName || "", email: m.email || "", phoneNumber: m.phoneNumber || "", grade: m.grade || "",       
-              photoUrl: m.photoUrl || "", ktmUrl: m.ktmUrl || "", igAccountLink: m.igAccountLink || "",
+              fullName: m.fullName || "", email: m.email || "", phoneNumber: m.phoneNumber || "", 
+              institution: m.institution || "", // NEW mapping
+              grade: m.grade || "", photoUrl: m.photoUrl || "", ktmUrl: m.ktmUrl || "", igAccountLink: m.igAccountLink || "",
               proofFollowUrl: m.proofFollowUrl || "", proofShareUrl: m.proofShareUrl || "", 
               proofStoryCompeUrl: m.proofStoryCompeUrl || "", proofTwibbonUrl: m.proofTwibbonUrl || "",
               isLeader: m.isLeader ?? false,
@@ -130,14 +130,15 @@ export default function RegisterLombaPage() {
     setFormData((prev) => {
       const currentLeader = prev.members[0] || createEmptyMember(true);
       currentLeader.grade = ""; 
+      currentLeader.institution = ""; // Reset instansi saat ganti lomba
       let newMembers: MemberInput[] = [currentLeader];
       
       if (selectedType === "science-project" || selectedType === "industrial-case") {
         if (prev.members.length < 2) newMembers.push(createEmptyMember(false));
-        else newMembers = prev.members.map(m => ({...m, grade: ""}));
+        else newMembers = prev.members.map(m => ({...m, grade: "", institution: ""}));
       }
 
-      return { ...prev, compeType: selectedType, members: newMembers };
+      return { ...prev, compeType: selectedType, institutionName: selectedType === "industrial-case" ? "" : prev.institutionName, members: newMembers };
     });
   };
 
@@ -174,10 +175,25 @@ export default function RegisterLombaPage() {
     setIsSaving(true);
 
     try {
+      // Validasi Institusi Utama
+      if (formData.compeType !== "industrial-case" && formData.institutionName.trim() === "") {
+        alert("IMPORTANT: Please fill in the Institution / School field!");
+        setIsSaving(false); return;
+      }
+
+      // Validasi Tim
       if ((formData.compeType === "science-project" || formData.compeType === "industrial-case") && formData.members.length < 2) {
         alert("IMPORTANT: Science Project and Industrial Case teams must have at least 2 members!");
-        setIsSaving(false);
-        return;
+        setIsSaving(false); return;
+      }
+
+      // Validasi Institusi per Anggota (Khusus ICC)
+      if (formData.compeType === "industrial-case") {
+        const hasMissingInst = formData.members.some((m) => m.institution.trim() === "");
+        if (hasMissingInst) {
+          alert("IMPORTANT: Each member must specify their Campus / Institution for ICC!");
+          setIsSaving(false); return;
+        }
       }
 
       const hasMissingPhotos = formData.members.some((m) => m.photoUrl === "");
@@ -189,7 +205,7 @@ export default function RegisterLombaPage() {
       const hasMissingTwibbon = formData.members.some((m) => m.proofTwibbonUrl === "");
       
       if (hasMissingPhotos || hasMissingKTM || hasMissingIgLink || hasMissingFollow || hasMissingShare || hasMissingStoryCompe || hasMissingTwibbon) {
-        alert("IMPORTANT: Please complete ALL 4 document requirements (Follow, Main Story, Compe Story, and Twibbon) for EACH member!");
+        alert("IMPORTANT: Please complete ALL document requirements for EACH member!");
         setIsSaving(false);
         return;
       }
@@ -280,10 +296,13 @@ export default function RegisterLombaPage() {
               <input id="teamNameInput" name="teamName" required type="text" placeholder={formData.compeType === "physics-olympiad" ? "e.g. Albert Einstein" : "e.g. Tim Eureka! ITB"} className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.teamName} onChange={(e) => setFormData((prev) => ({...prev, teamName: e.target.value}))} />
             </div>
 
-            <div>
-              <label htmlFor="institutionNameInput" className="block text-sm font-semibold mb-2">Institution / School</label>
-              <input id="institutionNameInput" name="institutionName" required type="text" placeholder="e.g. Institut Teknologi Bandung" className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.institutionName} onChange={(e) => setFormData((prev) => ({...prev, institutionName: e.target.value}))} />
-            </div>
+            {/* HIDE INSTANSI UTAMA JIKA ICC */}
+            {formData.compeType !== "industrial-case" && (
+              <div>
+                <label htmlFor="institutionNameInput" className="block text-sm font-semibold mb-2">Institution / School</label>
+                <input id="institutionNameInput" name="institutionName" required type="text" placeholder="e.g. SMA Negeri 1 Bandung" className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.institutionName} onChange={(e) => setFormData((prev) => ({...prev, institutionName: e.target.value}))} />
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -338,6 +357,15 @@ export default function RegisterLombaPage() {
                       <label htmlFor={`fullNameInput-${index}`} className="block text-xs font-semibold text-silver-shine mb-2">Full Name (as per ID)</label>
                       <input id={`fullNameInput-${index}`} name={`fullName-${index}`} required type="text" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.fullName} onChange={(e) => handleMemberChange(index, "fullName", e.target.value)} />
                     </div>
+                    
+                    {/* TAMPILKAN INSTITUSI PER ORANG KHUSUS ICC */}
+                    {formData.compeType === "industrial-case" && (
+                      <div className="sm:col-span-2">
+                        <label htmlFor={`institutionInput-${index}`} className="block text-xs font-semibold text-silver-shine mb-2">Campus / Institution</label>
+                        <input id={`institutionInput-${index}`} name={`institution-${index}`} required type="text" placeholder="e.g. Institut Teknologi Bandung" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.institution} onChange={(e) => handleMemberChange(index, "institution", e.target.value)} />
+                      </div>
+                    )}
+
                     <div>
                       <label htmlFor={`emailInput-${index}`} className="block text-xs font-semibold text-silver-shine mb-2">Active Email</label>
                       <input id={`emailInput-${index}`} name={`email-${index}`} required type="email" placeholder="name@email.com" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.email} onChange={(e) => handleMemberChange(index, "email", e.target.value)} />

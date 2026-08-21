@@ -10,6 +10,7 @@ interface MemberPayload {
   fullName: string;
   email: string;
   phoneNumber: string;
+  institution: string; // NEW
   grade: string;
   photoUrl: string;
   ktmUrl: string;
@@ -46,6 +47,7 @@ export async function GET() {
       fullName: teamMembers.fullName,
       email: teamMembers.email,
       phoneNumber: teamMembers.phoneNumber,
+      institution: teamMembers.institution, // Ditarik ke frontend
       grade: teamMembers.grade,
       photoUrl: teamMembers.photoUrl,
       ktmUrl: teamMembers.ktmUrl,
@@ -74,8 +76,12 @@ export async function POST(req: Request) {
     const body = (await req.json()) as RequestBody;
     const { compeType, teamName, institutionName, abstractUrl, members } = body;
 
-    if (!compeType || !teamName || !institutionName || members.length === 0) {
+    // VALIDASI DIPERBARUI
+    if (!compeType || !teamName || members.length === 0) {
       return NextResponse.json({ error: "All essential fields are required!" }, { status: 400 });
+    }
+    if (compeType !== "industrial-case" && !institutionName) {
+      return NextResponse.json({ error: "Institution is required for PO and SPC!" }, { status: 400 });
     }
 
     const dbUser = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
@@ -85,6 +91,9 @@ export async function POST(req: Request) {
     
     let targetTeamId = "";
     const activePhase = getCurrentPhase();
+
+    // Data institusi utama dikosongkan jika ICC
+    const finalInstitutionName = compeType === "industrial-case" ? null : institutionName;
 
     if (existingTeam.length > 0) {
       if (existingTeam[0].compeType === "science-project" || existingTeam[0].compeType === "industrial-case") {
@@ -99,7 +108,7 @@ export async function POST(req: Request) {
       
       await db.update(teams).set({
         teamName,
-        institutionName,
+        institutionName: finalInstitutionName,
         compeType,
         abstractUrl: isSwitchingCompe ? null : (abstractUrl || existingTeam[0].abstractUrl),
         abstractStatus: isSwitchingCompe ? "waiting" : existingTeam[0].abstractStatus,
@@ -112,7 +121,7 @@ export async function POST(req: Request) {
       const newTeam = await db.insert(teams).values({
         userId, 
         teamName, 
-        institutionName, 
+        institutionName: finalInstitutionName, 
         compeType, 
         registrationPhase: activePhase, 
         abstractUrl: abstractUrl || null,
@@ -128,6 +137,7 @@ export async function POST(req: Request) {
           fullName: member.fullName,
           email: member.email,
           phoneNumber: member.phoneNumber,
+          institution: compeType === "industrial-case" ? member.institution : null, // Disimpan khusus ICC
           grade: member.grade,
           photoUrl: member.photoUrl,
           ktmUrl: member.ktmUrl, 
