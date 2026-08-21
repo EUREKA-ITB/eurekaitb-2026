@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { format } from "date-fns";
 
 type Question = {
   id: string;
@@ -11,7 +10,7 @@ type Question = {
   question: string;
   answer: string;
   status: "pending" | "answered";
-  createdAt: any;
+  createdAt?: unknown;
 };
 
 export default function AdminQnAPage() {
