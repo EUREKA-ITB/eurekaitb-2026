@@ -10,13 +10,21 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app;
-try {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-} catch (error) {
-  console.error("Firebase initialization failed:", error);
-}
+// Cek apakah config lengkap
+const isConfigured = !!firebaseConfig.apiKey;
 
-const db = app ? getFirestore(app) : ({} as any);
+let app;
+let db = {} as any;
+
+if (isConfigured) {
+  try {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    db = getFirestore(app);
+  } catch (e) {
+    console.error("Firebase init error:", e);
+  }
+} else {
+  console.warn("Firebase config missing!");
+}
 
 export { db };
