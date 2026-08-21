@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,21 +10,5 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Cek apakah config lengkap
-const isConfigured = !!firebaseConfig.apiKey;
-
-let app;
-let db = {} as any;
-
-if (isConfigured) {
-  try {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    db = getFirestore(app);
-  } catch (e) {
-    console.error("Firebase init error:", e);
-  }
-} else {
-  console.warn("Firebase config missing!");
-}
-
-export { db };
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+export const db: Firestore = getFirestore(app);
