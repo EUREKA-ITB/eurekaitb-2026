@@ -8,7 +8,6 @@ import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { compare } from "bcryptjs";
 
-// DEKLARASI TIPE TYPESCRIPT AGAR BEBAS ANY
 declare module "next-auth" {
   interface Session {
     user: {
@@ -29,11 +28,14 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: NextAuthOptions = {
+  // 1. WAJIB: Kunci rahasia untuk enkripsi JWT di App Router Next.js
+  secret: process.env.NEXTAUTH_SECRET,
   adapter: DrizzleAdapter(db) as Adapter,
   providers: [
     GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID as string,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET as string,
+      clientId: process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.AUTH_GOOGLE_SECRET || process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true, // Mencegah crash jika email sudah terdaftar
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -44,33 +46,49 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const userDb = await db.select().from(users).where(eq(users.email, credentials.email)).limit(1);
-        if (userDb.length === 0 || !userDb[0].password) return null; 
+        try {
+          const userDb = await db.select().from(users).where(eq(users.email, credentials.email)).limit(1);
+          if (userDb.length === 0 || !userDb[0].password) return null; 
 
-        const isPasswordValid = await compare(credentials.password, userDb[0].password);
-        if (!isPasswordValid) return null;
+          const isPasswordValid = await compare(credentials.password, userDb[0].password);
+          if (!isPasswordValid) return null;
 
-        return {
-          id: userDb[0].id,
-          email: userDb[0].email,
-          name: userDb[0].name,
-          role: userDb[0].role,
-        };
+          return {
+            id: userDb[0].id,
+            email: userDb[0].email,
+            name: userDb[0].name,
+            role: userDb[0].role ?? "participant",
+          };
+        } catch (error) {
+          console.error("Error in Credentials authorize:", error);
+          return null;
+        }
       }
     })
   ],
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   
-  // INI MESIN PENYUNTIK DATA KE DALAM SESSIONNYA
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // Tarik role dari DB saat pertama kali login jika dari Google (karena google ga ngasih role)
-        const dbUser = await db.select().from(users).where(eq(users.email, token.email as string)).limit(1);
-        token.role = dbUser.length > 0 ? dbUser[0].role : "participant";
+        token.role = user.role ?? "participant";
       }
+
+      // Ambil role dari DB secara aman dengan try-catch
+      if (token.email) {
+        try {
+          const dbUser = await db.select().from(users).where(eq(users.email, token.email)).limit(1);
+          if (dbUser.length > 0) {
+            token.id = dbUser[0].id;
+            token.role = dbUser[0].role ?? "participant";
+          }
+        } catch (error) {
+          console.error("Error fetching user role in jwt callback:", error);
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
