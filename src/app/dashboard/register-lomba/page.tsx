@@ -130,7 +130,7 @@ export default function RegisterLombaPage() {
     setFormData((prev) => {
       const currentLeader = prev.members[0] || createEmptyMember(true);
       currentLeader.grade = ""; 
-      currentLeader.institution = ""; // Reset instansi saat ganti lomba
+      currentLeader.institution = "";
       let newMembers: MemberInput[] = [currentLeader];
       
       if (selectedType === "science-project" || selectedType === "industrial-case") {
