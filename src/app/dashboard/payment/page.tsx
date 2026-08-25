@@ -2,13 +2,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { users, teams, teamMembers, documents } from "@/db/schema";
+import { users, teams, teamMembers, documents, referralCodes } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { AlertCircle, CheckCircle2, Clock, Lock, ShieldCheck, Wallet, Building, Download } from "lucide-react";
 import CountdownTimer from "./CountdownTimer";
 import PaymentUploader from "./PaymentUploader";
 import RetryPaymentButton from "./RetryPaymentButton"; 
+import ReferralInput from "./ReferralInput";
 import { getPrice, formatIDR, PHASE_NAMES } from "@/lib/competition-config";
 import type { CompeType, Phase } from "@/lib/competition-config";
 import Image from "next/image";
@@ -29,19 +30,21 @@ export default async function PaymentPage() {
   const userDocs = await db.select().from(documents).where(eq(documents.teamId, userTeam[0].id)).limit(1);
   const existingPaymentUrl = userDocs.length > 0 ? userDocs[0].urlPayment : null;
   
+  const appliedReferral = await db.select().from(referralCodes).where(eq(referralCodes.usedByTeam, userTeam[0].id)).limit(1);
+  const discountPercentage = appliedReferral.length > 0 ? appliedReferral[0].discountVal : 0;
+  
   const teamPhase = userTeam[0].registrationPhase as Phase;
   const phaseName = PHASE_NAMES[teamPhase];
-  
   const compeTypeSlug = userTeam[0].compeType as CompeType;
-  const basePrice = getPrice(compeTypeSlug, teamPhase);
   
+  const basePrice = getPrice(compeTypeSlug, teamPhase);
+  const nominalDiscount = (basePrice * discountPercentage) / 100;
   const uniqueCode = parseInt((leader?.phoneNumber || "000").slice(-3)) || 0; 
-  const totalPayment = basePrice + uniqueCode;
+  const totalPayment = basePrice - nominalDiscount + uniqueCode;
 
   const isPending = userTeam[0].statusPayment === "pending";
   const isVerified = userTeam[0].statusPayment === "verified";
   
-  // LOGIKA BARU: Cek waktu kadaluarsa HANYA JIKA paymentStartedAt sudah ada (tidak null)
   const startedAt = userTeam[0].paymentStartedAt;
   const isExpired = startedAt ? (new Date().getTime() > new Date(startedAt).getTime() + (3 * 60 * 60 * 1000)) : false;
 
@@ -88,6 +91,12 @@ export default async function PaymentPage() {
                   <span className="font-semibold text-gray-700">Competition Category</span>
                   <span className="font-bold uppercase">{compeTypeSlug.replace(/-/g, " ")}</span>
                 </div>
+                {discountPercentage > 0 && (
+                  <div className="flex justify-between items-center pb-2 mb-2">
+                    <span className="font-semibold text-green-600">Referral Discount ({discountPercentage}%)</span>
+                    <span className="font-bold text-green-600">- {formatIDR(nominalDiscount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-gray-700">Total Payment</span>
                   <span className="font-display font-bold text-2xl text-sunlight-orange">{formatIDR(totalPayment)}</span>
@@ -128,7 +137,6 @@ export default async function PaymentPage() {
                 </div>
               </div>
             ) : isExpired ? (
-              // TAMPILAN LOCK JIKA LEWAT 3 JAM (DENGAN TOMBOL COBA LAGI)
               <div className="bg-red-500/10 border border-red-500/30 rounded-3xl p-8 sm:p-12 backdrop-blur-sm text-center max-w-2xl mx-auto shadow-[0_0_30px_rgba(239,68,68,0.15)] flex flex-col items-center">
                  <AlertCircle size={64} className="text-red-400 mx-auto mb-6" />
                  <h2 className="font-display text-2xl font-bold text-red-400 mb-2">Waktu Pembayaran Habis</h2>
@@ -142,81 +150,92 @@ export default async function PaymentPage() {
                 <CountdownTimer startedAt={startedAt} teamId={userTeam[0].id} />
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-sm relative overflow-hidden h-max shadow-2xl">
-                    <div className="absolute top-0 right-0 bg-sunlight-orange text-blue-marine text-xs font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider">
-                      Phase {phaseName}
-                    </div>
-                    <h2 className="font-display text-xl font-bold mb-6 border-b border-white/10 pb-4">Invoice Details</h2>
+                  <div>
+                    {discountPercentage === 0 && <ReferralInput teamId={userTeam[0].id} />}
                     
-                    <div className="space-y-4 mb-8 text-sm">
-                      <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{compeTypeSlug.replace(/-/g, " ")}</span></div>
-                      <div className="flex justify-between"><span className="text-silver-shine">Base Ticket Price</span><span className="font-semibold">{formatIDR(basePrice)}</span></div>
-                      <div className="flex justify-between items-center"><span className="text-silver-shine">System Unique Code</span><span className="font-semibold text-sunlight-orange font-mono bg-sunlight-orange/10 px-2 py-0.5 rounded">+{uniqueCode}</span></div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-blue-marine to-black/40 p-5 rounded-xl border border-white/10 text-center mb-6 shadow-inner">
-                      <p className="text-xs text-silver-shine mb-1">Total Amount to Transfer:</p>
-                      <p className="text-4xl font-display font-bold text-sunlight-orange tracking-tight">{formatIDR(totalPayment)}</p>
-                    </div>
-
-                    <div className="bg-red-500/10 p-4 rounded-xl border border-red-500/30 mb-8 flex gap-3 items-start">
-                      <AlertCircle size={20} className="shrink-0 text-red-400 mt-0.5" />
-                      <div className="text-xs text-red-100/80 leading-relaxed">
-                        <span className="font-bold text-red-400 block mb-1">Automatic Mutation Check System!</span>
-                        Transfer the exact amount up to the <span className="font-bold underline text-white">last 3 digits</span> to ensure smooth verification.
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-sm relative overflow-hidden h-max shadow-2xl">
+                      <div className="absolute top-0 right-0 bg-sunlight-orange text-blue-marine text-xs font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-wider">
+                        Phase {phaseName}
                       </div>
-                    </div>
-                    
-                    <div>
-                      <p className="text-xs text-silver-shine mb-4 font-bold uppercase tracking-wider">Select Payment Method:</p>
+                      <h2 className="font-display text-xl font-bold mb-6 border-b border-white/10 pb-4">Invoice Details</h2>
                       
-                      <div className="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10 mb-4 hover:border-white/30 transition-colors">
-                        <div className="bg-blue-600/20 text-blue-400 p-3 rounded-lg"><Building size={24} /></div>
-                        <div>
-                          <p className="font-bold text-white text-sm mb-1">Bank Transfer</p>
-                          <p className="text-xs text-silver-shine mb-2">BRI / Blu BCA</p>
-                          <div className="text-sm font-mono text-sunlight-orange mb-1">3287 0103 8671 537 <span className="text-xs text-silver-shine font-sans">(BRI)</span></div>
-                          <p className="text-xs text-silver-shine mb-2">a.n. <span className="text-white font-semibold">Azizah Pribadi Istiqomah</span></p>
-                          <div className="text-sm font-mono text-sunlight-orange mb-1">0025 5263 9906 <span className="text-xs text-silver-shine font-sans">(Blu)</span></div>
-                          <p className="text-xs text-silver-shine mb-2">a.n. <span className="text-white font-semibold">Rizka Hasna Tiara</span></p>
-                        </div>
+                      <div className="space-y-4 mb-8 text-sm">
+                        <div className="flex justify-between"><span className="text-silver-shine">Category</span><span className="font-semibold capitalize">{compeTypeSlug.replace(/-/g, " ")}</span></div>
+                        <div className="flex justify-between"><span className="text-silver-shine">Base Ticket Price</span><span className="font-semibold">{formatIDR(basePrice)}</span></div>
+                        
+                        {discountPercentage > 0 && (
+                           <div className="flex justify-between items-center bg-green-500/10 p-3 rounded-lg border border-green-500/20">
+                              <span className="text-green-400 font-bold">Referral Applied ({discountPercentage}%)</span>
+                              <span className="font-bold text-green-400">- {formatIDR(nominalDiscount)}</span>
+                           </div>
+                        )}
+                        
+                        <div className="flex justify-between items-center"><span className="text-silver-shine">System Unique Code</span><span className="font-semibold text-sunlight-orange font-mono bg-sunlight-orange/10 px-2 py-0.5 rounded">+{uniqueCode}</span></div>
                       </div>
 
-                      <div className="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10 mb-4 hover:border-white/30 transition-colors">
-                        <div className="bg-green-500/20 text-green-400 p-3 rounded-lg"><Wallet size={24} /></div>
-                        <div className="flex-1">
-                          <p className="font-bold text-white text-sm mb-1">E-Wallet Transfer</p>
-                          <p className="text-xs text-silver-shine mb-2">GoPay / ShopeePay / DANA</p>
-                          <div className="text-sm font-mono text-sunlight-orange mb-2">0895632139070</div>
-                          <p className="text-xs text-silver-shine">a.n. <span className="text-white font-semibold">Azizah Pribadi Istiqomah</span></p>
-                        </div>
+                      <div className="bg-gradient-to-r from-blue-marine to-black/40 p-5 rounded-xl border border-white/10 text-center mb-6 shadow-inner">
+                        <p className="text-xs text-silver-shine mb-1">Total Amount to Transfer:</p>
+                        <p className="text-4xl font-display font-bold text-sunlight-orange tracking-tight">{formatIDR(totalPayment)}</p>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/30 transition-colors text-center sm:text-left">
-                        <div className="bg-white p-3 rounded-xl shadow-lg w-full max-w-[220px] sm:w-[150px] sm:max-w-none flex flex-col items-center shrink-0">
-                          <div className="w-full aspect-square border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 rounded-lg mb-3 overflow-hidden relative">
-                            <Image 
-                              src="/QRIS-EUREKA2026.jpg" 
-                              alt="QRIS EUREKA 2026" 
-                              width={200} 
-                              height={200} 
-                              className="w-full h-full object-contain" 
-                            />
+                      <div className="bg-red-500/10 p-4 rounded-xl border border-red-500/30 mb-8 flex gap-3 items-start">
+                        <AlertCircle size={20} className="shrink-0 text-red-400 mt-0.5" />
+                        <div className="text-xs text-red-100/80 leading-relaxed">
+                          <span className="font-bold text-red-400 block mb-1">Automatic Mutation Check System!</span>
+                          Transfer the exact amount up to the <span className="font-bold underline text-white">last 3 digits</span> to ensure smooth verification.
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <p className="text-xs text-silver-shine mb-4 font-bold uppercase tracking-wider">Select Payment Method:</p>
+                        
+                        <div className="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10 mb-4 hover:border-white/30 transition-colors">
+                          <div className="bg-blue-600/20 text-blue-400 p-3 rounded-lg"><Building size={24} /></div>
+                          <div>
+                            <p className="font-bold text-white text-sm mb-1">Bank Transfer</p>
+                            <p className="text-xs text-silver-shine mb-2">BRI / Blu BCA</p>
+                            <div className="text-sm font-mono text-sunlight-orange mb-1">3287 0103 8671 537 <span className="text-xs text-silver-shine font-sans">(BRI)</span></div>
+                            <p className="text-xs text-silver-shine mb-2">a.n. <span className="text-white font-semibold">Azizah Pribadi Istiqomah</span></p>
+                            <div className="text-sm font-mono text-sunlight-orange mb-1">0025 5263 9906 <span className="text-xs text-silver-shine font-sans">(Blu)</span></div>
+                            <p className="text-xs text-silver-shine mb-2">a.n. <span className="text-white font-semibold">Rizka Hasna Tiara</span></p>
                           </div>
-                          <a href="/QRIS-EUREKA2026.jpg" download="QRIS-EUREKA2026.jpg" className="w-full flex items-center justify-center gap-2 bg-blue-marine text-white text-xs font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-colors border border-blue-800">
-                            <Download size={10} /> Download
-                          </a>
                         </div>
-                        <div className="flex-1 w-full">
-                          <p className="text-sm text-silver-shine mb-2">Scan to Pay</p>
-                          <p className="text-sm text-silver-shine">a.n. <span className="text-white font-semibold">EUREKA ITB 2026</span></p>
+
+                        <div className="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10 mb-4 hover:border-white/30 transition-colors">
+                          <div className="bg-green-500/20 text-green-400 p-3 rounded-lg"><Wallet size={24} /></div>
+                          <div className="flex-1">
+                            <p className="font-bold text-white text-sm mb-1">E-Wallet Transfer</p>
+                            <p className="text-xs text-silver-shine mb-2">GoPay / ShopeePay / DANA</p>
+                            <div className="text-sm font-mono text-sunlight-orange mb-2">0895632139070</div>
+                            <p className="text-xs text-silver-shine">a.n. <span className="text-white font-semibold">Azizah Pribadi Istiqomah</span></p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center sm:items-center gap-6 bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/30 transition-colors text-center sm:text-left">
+                          <div className="bg-white p-3 rounded-xl shadow-lg w-full max-w-[220px] sm:w-[150px] sm:max-w-none flex flex-col items-center shrink-0">
+                            <div className="w-full aspect-square border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 rounded-lg mb-3 overflow-hidden relative">
+                              <Image 
+                                src="/QRIS-EUREKA2026.jpg" 
+                                alt="QRIS EUREKA 2026" 
+                                width={200} 
+                                height={200} 
+                                className="w-full h-full object-contain" 
+                              />
+                            </div>
+                            <a href="/QRIS-EUREKA2026.jpg" download="QRIS-EUREKA2026.jpg" className="w-full flex items-center justify-center gap-2 bg-blue-marine text-white text-xs font-bold py-2.5 rounded-lg hover:bg-blue-900 transition-colors border border-blue-800">
+                              <Download size={10} /> Download
+                            </a>
+                          </div>
+                          <div className="flex-1 w-full">
+                            <p className="text-sm text-silver-shine mb-2">Scan to Pay</p>
+                            <p className="text-sm text-silver-shine">a.n. <span className="text-white font-semibold">EUREKA ITB 2026</span></p>
+                          </div>
                         </div>
                       </div>
-
                     </div>
                   </div>
 
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-sm flex flex-col shadow-2xl">
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-sm flex flex-col shadow-2xl h-max">
                      <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
                         <h2 className="font-display text-xl font-bold">Payment Confirmation</h2>
                         <Lock size={18} className="text-green-400" />

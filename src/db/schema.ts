@@ -6,8 +6,8 @@ export const compeTypeEnum = pgEnum("compe_type", ["physics-olympiad", "science-
 export const paymentStatusEnum = pgEnum("payment_status", ["unpaid", "pending", "verified", "rejected"]);
 export const registrationPhaseEnum = pgEnum("registration_phase", ["early_bird", "normal", "late"]);
 export const abstractStatusEnum = pgEnum("abstract_status", ["waiting", "passed", "failed"]); 
-
 export const documentStatusEnum = pgEnum("document_status", ["waiting", "passed", "revision"]);
+export const referralTierEnum = pgEnum("referral_tier", ["Quantum", "Photon", "Electron"]);
 
 export const users = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -27,25 +27,18 @@ export const teams = pgTable("teams", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id).notNull(), 
   teamName: varchar("team_name", { length: 255 }).notNull(), 
-  
-  // DIUBAH: Dibuat opsional (tanpa .notNull()) karena ICC tidak pakai instansi utama
   institutionName: varchar("institution_name", { length: 255 }), 
-  
   compeType: compeTypeEnum("compe_type").notNull(),
   registrationPhase: registrationPhaseEnum("registration_phase").notNull(),
   statusPayment: paymentStatusEnum("payment_status").default("unpaid").notNull(),
-  
   documentStatus: documentStatusEnum("document_status").default("waiting").notNull(),
   adminNotes: text("admin_notes"),
-
   abstractUrl: text("abstract_url"), 
   abstractStatus: abstractStatusEnum("abstract_status").default("waiting").notNull(),
   caseChoice: varchar("case_choice", { length: 100 }), 
   fullPaperUrl: text("full_paper_url"), 
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  
   paymentStartedAt: timestamp("payment_started_at"),
-
   participantNumber: varchar("participant_number", { length: 50 }),
   cbtPassword: varchar("cbt_password", { length: 50 }),
   verifiedBy: varchar("verified_by", { length: 255 }), 
@@ -57,10 +50,7 @@ export const teamMembers = pgTable("team_members", {
   fullName: varchar("full_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(), 
   phoneNumber: varchar("phone_number", { length: 50 }).notNull(),
-  
-  // NEW: Tambahan kolom instansi per orang khusus ICC
   institution: varchar("institution", { length: 255 }),
-  
   grade: varchar("grade", { length: 50 }).notNull(),
   photoUrl: text("photo_url").notNull(),
   ktmUrl: text("ktm_url"), 
@@ -123,3 +113,16 @@ export const verificationTokens = pgTable("verificationToken", {
 }, (vt) => ({
   compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
 }));
+
+export const referralCodes = pgTable("referral_codes", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  code: varchar("code", { length: 100 }).notNull().unique(),
+  partnerName: varchar("partner_name", { length: 255 }).notNull(),
+  tier: referralTierEnum("tier").notNull(),
+  discountVal: integer("discount_val").notNull(),
+  isUsed: boolean("is_used").default(false).notNull(),
+  usedByTeam: uuid("used_by_team").references(() => teams.id),
+  usedAt: timestamp("used_at"),
+  createdBy: varchar("created_by", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
