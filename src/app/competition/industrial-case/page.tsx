@@ -97,7 +97,20 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
             </div>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight text-center">{formatName}</h1>
             <p className="text-silver-shine text-base md:text-lg leading-relaxed max-w-3xl mx-auto mb-10">{info.desc}</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            
+            <div className="mt-4 flex flex-col items-center gap-8 border-t border-white/10 pt-8 pb-4">
+              <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine text-center">
+                Collaborated with:
+              </p>
+              <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-cms/iasssf-white-c.png" alt="IASSSF" className="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+              </div>
+            </div>
+            
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <div className="bg-white/5 border border-white/10 px-6 py-3.5 rounded-full flex items-center gap-3 w-full sm:w-auto justify-center">
                 <Users size={18} className="text-sunlight-orange" />
                 <span className="text-sm font-bold">{info.type}</span>

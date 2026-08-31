@@ -98,10 +98,23 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
             </div>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">{formatName}</h1>
             <p className="text-silver-shine text-base md:text-lg leading-relaxed max-w-3xl mx-auto mb-10">{info.desc}</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            
+            <div className="mt-4 flex flex-col items-center gap-8 border-t border-white/10 pt-8 pb-4">
+              <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine text-center">
+                Curated by:
+              </p>
+              <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-16 sm:h-18 md:h-20 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+              </div>
+            </div>
+            
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <div className="bg-white/5 border border-white/10 px-6 py-3.5 rounded-full flex items-center gap-3 w-full sm:w-auto justify-center">
                 <Users size={18} className="text-sunlight-orange" />
-                <span className="text-sm font-bold">{info.type}</span>
+                <span className="stext-sm font-bold">{info.type}</span>
               </div>
               <Link href={`/dashboard/register-lomba?lomba=${lombaId}`} className="bg-sunlight-orange text-blue-marine px-8 py-3.5 rounded-full font-bold text-sm hover:scale-105 transition-transform flex items-center justify-center gap-2 w-full sm:w-auto shadow-[0_0_20px_rgba(255,184,0,0.3)]">
                 Register Now <ChevronRight size={16} />

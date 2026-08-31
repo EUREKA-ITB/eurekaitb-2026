@@ -114,13 +114,15 @@ export default function SiteFooter() {
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-cms/brin-c.png" alt="BRIN" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-cms/iasssf-c.png" alt="IASSSF" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/brin-c.png" alt="BRIN" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/iasssf-white-c.png" alt="IASSSF" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
           </div>
         </div>
 
