@@ -14,8 +14,9 @@ const sponsorTiers: { tier: string; sponsors: Sponsor[] }[] = [
     tier: "Collaborators",
     sponsors: [
       { name: "BRIN", logoUrl: "/logo-cms/brin-c.png" },
-      { name: "IASSSF", logoUrl: "/logo-cms/iasssf-c.png" },
+      { name: "IASSSF", logoUrl: "/logo-cms/iasssf-white-c.png" },
       { name: "PLN Nusantara Power", logoUrl: "/logo-cms/pln-c.png" },
+      { name: "Puspresnas", logoUrl: "/logo-cms/puspresnas-c.png" },
     ],
   },
   {
