@@ -107,7 +107,7 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/logo-cms/brin-c.png" alt="BRIN" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-cms/iasssf-white-c.png" alt="IASSSF" className="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                <img src="/logo-cms/iasssf-c.png" alt="IASSSF" className="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
               </div>
             </div>
             
