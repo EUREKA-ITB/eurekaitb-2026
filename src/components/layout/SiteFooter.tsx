@@ -118,7 +118,7 @@ export default function SiteFooter() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-cms/brin-c.png" alt="BRIN" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-cms/iasssf-white-c.png" alt="IASSSF" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/iasssf-white-c.png" alt="IASSSF White" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}

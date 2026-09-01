@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCircle, ChevronRight, Wallet, Banknote, BanknoteIcon, LucideMedal } from "lucide-react";
+import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCircle, ChevronRight, Wallet, LucideMedal, Link2 } from "lucide-react";
 import { COMPETITION_PRICING, PHASE_NAMES, formatIDR, getCurrentPhase } from "@/lib/competition-config";
-import type { CompeType, Phase } from "@/lib/competition-config";
+import type { CompeType } from "@/lib/competition-config";
 import Image from "next/image";
 
 type DocItem = { id: string; title: string; url: string; };
@@ -69,10 +69,10 @@ export default function PhysicsOlympiadPage() {
   return <CompetitionTemplate formatName={formatName} lombaId={lombaId} info={info} documents={documents} activeDoc={activeDoc} activePdfIndex={activePdfIndex} setActivePdfIndex={setActivePdfIndex} timelineData={timelineData} faqData={faqData} hadiah={hadiah} />;
 }
 
-/* --- VISUAL TEMPLATE --- */
 function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, activePdfIndex, setActivePdfIndex, timelineData, faqData, hadiah }: TemplateProps) {
   const pricing = COMPETITION_PRICING[lombaId as CompeType];
   const currentPhase = getCurrentPhase();
+  const isExternalLink = activeDoc.url.startsWith("http");
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans overflow-x-hidden pt-24 pb-20">
@@ -85,7 +85,7 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
         {/* HERO SECTION */}
         <section className="relative text-center flex flex-col items-center justify-center pt-8 pb-12">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-64 bg-sunlight-orange/15 blur-[100px] rounded-full z-0 pointer-events-none"></div>
-          <div className="relative z-10 flex flex-col items-center">
+          <div className="relative z-10 flex flex-col items-center w-full">
             <div className="w-80 h-48 flex items-center justify-center mb-1 overflow-hidden mx-auto">
              <Image
                src="/compe-icon/po-white.png" 
@@ -99,22 +99,28 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">{formatName}</h1>
             <p className="text-silver-shine text-base md:text-lg leading-relaxed max-w-3xl mx-auto mb-10">{info.desc}</p>
             
-            <div className="mt-4 flex flex-col items-center gap-8 border-t border-white/10 pt-8 pb-4">
-              <p className="text-xs font-bold uppercase tracking-[0.35em] text-silver-shine text-center">
-                Curated by:
-              </p>
-              <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-16 sm:h-18 md:h-20 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* SEjAJAR CURATED BY & OFFICIAL PARTNER */}
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-20 border-t border-white/10 pt-8 pb-4 w-full">
+              <div className="flex flex-col items-center justify-between h-24">
+                <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-silver-shine text-center">Curated By</p>
+                <div className="flex items-center h-16">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-14 sm:h-16 md:h-18 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                </div>
+              </div>
+              <div className="flex flex-col items-center justify-between h-24">
+                <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-silver-shine text-center">Official Platform Partner</p>
+                <div className="flex items-center h-16">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-9 sm:h-11 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                </div>
               </div>
             </div>
             
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <div className="bg-white/5 border border-white/10 px-6 py-3.5 rounded-full flex items-center gap-3 w-full sm:w-auto justify-center">
                 <Users size={18} className="text-sunlight-orange" />
-                <span className="stext-sm font-bold">{info.type}</span>
+                <span className="text-sm font-bold">{info.type}</span>
               </div>
               <Link href={`/dashboard/register-lomba?lomba=${lombaId}`} className="bg-sunlight-orange text-blue-marine px-8 py-3.5 rounded-full font-bold text-sm hover:scale-105 transition-transform flex items-center justify-center gap-2 w-full sm:w-auto shadow-[0_0_20px_rgba(255,184,0,0.3)]">
                 Register Now <ChevronRight size={16} />
@@ -123,11 +129,9 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
           </div>
         </section>
 
-        {/* PRIZE POOL (ELEGANT CONFETTI BACKGROUND) */}
+        {/* PRIZE POOL */}
         <section id="prize-pool" className="px-4 py-8 relative z-20">
           <div className="max-w-4xl mx-auto rounded-3xl border border-sunlight-orange/40 p-10 sm:p-14 relative overflow-hidden text-center shadow-[0_0_50px_rgba(255,184,0,0.15)] group">
-            
-            {/* Animated Confetti & Sparkles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <div className="absolute top-10 left-12 w-2 h-2 bg-yellow-300 rounded-full animate-ping opacity-60"></div>
               <div className="absolute top-24 right-16 w-3 h-3 bg-sunlight-orange rounded-full animate-pulse opacity-80 shadow-[0_0_12px_#ffb800]"></div>
@@ -135,7 +139,6 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-yellow-200 rounded-full animate-pulse opacity-70"></div>
               <div className="absolute bottom-20 right-12 text-sunlight-orange animate-spin opacity-40" style={{ animationDuration: '4s' }}>✦</div>
               <div className="absolute top-1/4 left-1/3 text-yellow-400 animate-pulse opacity-30 text-xl">✧</div>
-              {/* Soft glows */}
               <div className="absolute -top-24 -left-24 w-72 h-72 bg-sunlight-orange/20 rounded-full blur-[90px] group-hover:bg-sunlight-orange/30 transition-colors duration-700"></div>
               <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-yellow-500/10 rounded-full blur-[90px] group-hover:bg-yellow-500/20 transition-colors duration-700"></div>
             </div>
@@ -159,7 +162,6 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
           <div className="text-center mb-12"><h2 className="font-display text-3xl font-bold flex items-center justify-center gap-3"><Medal className="text-sunlight-orange" /> Winners & Awards</h2></div>
           
           <div className="flex flex-col md:flex-row items-stretch justify-center gap-6 max-w-5xl mx-auto">
-            {/* 2nd Winner */}
             <div className="order-2 md:order-1 bg-white/3 border border-silver-600 shadow-inner p-6 rounded-3xl text-center w-full md:w-1/3 flex flex-col hover:-translate-y-2 transition-transform h-full">
               <div className="w-16 h-16 mx-auto bg-gray-300/20 rounded-full flex items-center justify-center text-2xl mb-4 border border-gray-400 shadow-inner"><Trophy size={30}/></div>
               <p className="text-xs uppercase tracking-widest text-silver-shine mb-2">2nd Winner</p>
@@ -170,7 +172,6 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               </div>
             </div>
 
-            {/* 1st Winner */}
             <div className="order-1 md:order-2 bg-white/3 border border-sunlight-orange/50 p-8 rounded-[2.5rem] text-center w-full md:w-1/3 flex flex-col shadow-[0_0_30px_rgba(255,184,0,0.15)] transform md:-translate-y-4 h-full relative z-10">
               <div className="w-20 h-20 mx-auto bg-sunlight-orange/20 rounded-full flex items-center justify-center text-4xl mb-4 border border-sunlight-orange shadow-[0_0_15px_rgba(255,184,0,0.5)]"><Trophy size={30}/></div>
               <p className="text-xs uppercase tracking-widest text-sunlight-orange font-bold mb-2">1st Winner</p>
@@ -181,7 +182,6 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               </div>
             </div>
 
-            {/* 3rd Winner */}
             <div className="order-3 md:order-3 bg-white/3 border border-amber-500 shadow-inner p-6 rounded-3xl text-center w-full md:w-1/3 flex flex-col hover:-translate-y-2 transition-transform h-full">
               <div className="w-16 h-16 mx-auto bg-amber-700/30 rounded-full flex items-center justify-center text-2xl mb-4 border border-amber-800 shadow-inner"><Trophy size={30}/></div>
               <p className="text-xs uppercase tracking-widest text-silver-shine mb-2">3rd Winner</p>
@@ -193,7 +193,6 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
             </div>
           </div>
 
-          {/* SPECIAL AWARDS CARD */}
           <div className="mt-8 max-w-3xl mx-auto bg-gradient-to-r from-transparent via-white/5 to-transparent border border-white-200 p-6 rounded-[2rem] text-center shadow-lg hover:border-sunlight-orange/40 hover:bg-white/5 transition-all duration-300">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-10 h-10 bg-white/2 rounded-full flex items-center justify-center text-xl border border-white-200"><LucideMedal size={18}/></div>
@@ -264,27 +263,40 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               <div className="flex flex-wrap gap-2">
                 {documents.map((doc, index) => (
                   <button key={doc.id} onClick={() => setActivePdfIndex(index)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activePdfIndex === index ? "bg-sunlight-orange text-blue-marine shadow-lg" : "bg-black/30 border border-white/10 text-silver-shine hover:bg-white/10 hover:text-white"}`}>
-                    <FileText size={16} /> {doc.title}
+                    {doc.url.startsWith("http") ? <Link2 size={16} /> : <FileText size={16} />} {doc.title}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="w-full bg-[#0a0f24] border border-white/10 rounded-2xl overflow-hidden relative h-[400px] md:h-[700px] flex flex-col items-center justify-center group">
-              <object data={`${activeDoc.url}#toolbar=0`} type="application/pdf" className="hidden md:block w-full h-full absolute inset-0 z-10">
-                <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-black/40">
-                  <FileText size={48} className="text-white/20 mb-4" />
-                  <p className="text-white font-bold mb-2">Document Not Available</p>
-                  <p className="text-sm text-silver-shine">Please ensure the file <b>{activeDoc.url}</b> is uploaded in the public folder.</p>
+              {isExternalLink ? (
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center relative z-20">
+                  <Link2 size={48} className="text-sunlight-orange mb-4 opacity-80" />
+                  <h3 className="font-bold text-xl mb-2 text-white">External Document</h3>
+                  <p className="text-silver-shine text-sm mb-6 max-w-sm">Dokumen ini berada di situs eksternal (Google Drive). Klik tombol di bawah untuk melihat dokumen.</p>
+                  <a href={activeDoc.url} target="_blank" rel="noreferrer" className="bg-sunlight-orange text-blue-marine font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-yellow-400 transition-colors flex items-center gap-2">
+                    Buka Dokumen <ChevronRight size={16}/>
+                  </a>
                 </div>
-              </object>
-              <div className="md:hidden flex flex-col items-center justify-center p-8 text-center h-full relative z-20">
-                <FileText size={48} className="text-sunlight-orange mb-4 opacity-50" />
-                <h3 className="font-bold text-lg mb-2">Document Preview</h3>
-                <p className="text-silver-shine text-sm mb-6">Mobile devices do not support direct PDF previews.</p>
-                <a href={activeDoc.url} target="_blank" rel="noreferrer" className="bg-sunlight-orange text-blue-marine font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-yellow-400 transition-colors">Open / Download {activeDoc.title}</a>
-              </div>
-              <a href={activeDoc.url} download className="hidden md:flex absolute top-4 right-6 z-20 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 px-4 py-2 rounded-lg text-white text-xs font-bold items-center gap-2 transition-colors">Download PDF</a>
+              ) : (
+                <>
+                  <object data={`${activeDoc.url}#toolbar=0`} type="application/pdf" className="hidden md:block w-full h-full absolute inset-0 z-10">
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-black/40">
+                      <FileText size={48} className="text-white/20 mb-4" />
+                      <p className="text-white font-bold mb-2">Document Not Available</p>
+                      <p className="text-sm text-silver-shine">Please ensure the file <b>{activeDoc.url}</b> is uploaded in the public folder.</p>
+                    </div>
+                  </object>
+                  <div className="md:hidden flex flex-col items-center justify-center p-8 text-center h-full relative z-20">
+                    <FileText size={48} className="text-sunlight-orange mb-4 opacity-50" />
+                    <h3 className="font-bold text-lg mb-2">Document Preview</h3>
+                    <p className="text-silver-shine text-sm mb-6">Mobile devices do not support direct PDF previews.</p>
+                    <a href={activeDoc.url} target="_blank" rel="noreferrer" className="bg-sunlight-orange text-blue-marine font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-yellow-400 transition-colors">Open / Download {activeDoc.title}</a>
+                  </div>
+                  <a href={activeDoc.url} download className="hidden md:flex absolute top-4 right-6 z-20 bg-black/50 hover:bg-black/80 backdrop-blur-md border border-white/20 px-4 py-2 rounded-lg text-white text-xs font-bold items-center gap-2 transition-colors">Download PDF</a>
+                </>
+              )}
             </div>
           </div>
         </section>

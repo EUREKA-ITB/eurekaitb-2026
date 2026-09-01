@@ -45,8 +45,10 @@ export default async function AdminDashboardPage() {
     return { 
       id: team.id,
       teamName: team.teamName,
-      institutionName: team.institutionName || "-", // FIX: Menghindari null pada tipe data AdminTable
+      institutionName: team.institutionName || "-", 
       compeType: team.compeType,
+      registrationPhase: team.registrationPhase,
+      createdAt: team.createdAt.toISOString(),
       statusPayment: team.statusPayment,
       abstractStatus: team.abstractStatus,
       

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Search, X, Users, FileText, CheckCircle2, Clock, MessageCircle, DownloadCloud, ShieldCheck, Key, AlertTriangle } from "lucide-react";
+import { Search, X, Users, FileText, CheckCircle2, Clock, MessageCircle, DownloadCloud, ShieldCheck, Key, AlertTriangle, ArrowUpDown } from "lucide-react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -15,6 +15,7 @@ interface TeamMember {
 
 interface AdminTeamData {
   id: string; teamName: string; institutionName: string; compeType: string;
+  registrationPhase: string; createdAt: string;
   statusPayment: string; abstractStatus: string; abstractUrl: string | null; caseChoice: string | null;
   documentStatus: string; adminNotes: string | null;
   document: { urlPayment: string | null };
@@ -34,10 +35,12 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
   
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [phaseFilter, setPhaseFilter] = useState<string>("ALL");
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({ key: "createdAt", direction: "desc" });
+  
   const [selectedTeam, setSelectedTeam] = useState<AdminTeamData | null>(null);
   const [tempNotes, setTempNotes] = useState<string>("");
 
-  // Render-time state sync pattern (Menghilangkan error useEffect setState cascading renders)
   if (initialData !== prevInitialData) {
     setPrevInitialData(initialData);
     setTeams(initialData);
@@ -50,12 +53,35 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     }
   }
 
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const [key, direction] = e.target.value.split("|");
+    setSortConfig({ key, direction: direction as "asc" | "desc" });
+  };
+
   const filteredTeams = teams.filter(t => {
     const dbType = t.compeType.replace(/_/g, "-");
     const matchTab = activeTab === "ALL" || dbType === activeTab;
+    const matchPhase = phaseFilter === "ALL" || t.registrationPhase === phaseFilter;
     const matchSearch = t.teamName.toLowerCase().includes(searchQuery.toLowerCase()) || 
                         t.institutionName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchTab && matchSearch;
+    return matchTab && matchPhase && matchSearch;
+  }).sort((a, b) => {
+    if (sortConfig.key === "createdAt") {
+      return sortConfig.direction === "asc"
+        ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    if (sortConfig.key === "teamName") {
+      return sortConfig.direction === "asc"
+        ? a.teamName.localeCompare(b.teamName)
+        : b.teamName.localeCompare(a.teamName);
+    }
+    if (sortConfig.key === "statusPayment") {
+      return sortConfig.direction === "asc"
+        ? a.statusPayment.localeCompare(b.statusPayment)
+        : b.statusPayment.localeCompare(a.statusPayment);
+    }
+    return 0;
   });
 
   const stats = {
@@ -67,14 +93,14 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
 
   const handleExportCSV = () => {
     const headers = [
-      "Team Name", "Institution", "Category", "Team Leader", "WhatsApp", "Email", 
+      "Team Name", "Institution", "Category", "Phase", "Registration Date", "Team Leader", "WhatsApp", "Email", 
       "Doc Status", "Abstract Status", "Payment Status", "Admin Verifier", 
       "CBT Username (Reg Num)", "CBT Password",
       "Abstract Link", "Payment Link"
     ];
     
     const rows = filteredTeams.map(t => [
-      `"${t.teamName}"`, `"${t.institutionName}"`, t.compeType.replace(/_/g, "-"), 
+      `"${t.teamName}"`, `"${t.institutionName}"`, t.compeType.replace(/_/g, "-"), t.registrationPhase, t.createdAt,
       `"${t.leaderContact.name}"`, `"${t.leaderContact.phone}"`, `"${t.leaderContact.email}"`,
       t.documentStatus, t.abstractStatus, t.statusPayment, t.verifiedBy || "-", 
       `"${t.participantNumber || "-"}"`, `"${t.cbtPassword || "-"}"`, 
@@ -201,8 +227,8 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-        <div className="flex bg-white/5 border border-white/10 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6">
+        <div className="flex bg-white/5 border border-white/10 p-1 rounded-xl w-full xl:w-auto overflow-x-auto">
           {["ALL", "physics-olympiad", "science-project", "industrial-case"].map(tab => (
             <button 
               key={tab} onClick={() => setActiveTab(tab)}
@@ -213,20 +239,44 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
           ))}
         </div>
         
-        <div className="flex w-full md:w-auto gap-3">
-          <div className="relative flex-1 md:w-64">
+        <div className="flex flex-wrap w-full xl:w-auto gap-3 items-center">
+          <select 
+            value={phaseFilter} 
+            onChange={(e) => setPhaseFilter(e.target.value)}
+            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sunlight-orange"
+          >
+            <option value="ALL" className="bg-blue-marine">All Waves</option>
+            <option value="early_bird" className="bg-blue-marine">Wave 1 (Early Bird)</option>
+            <option value="normal" className="bg-blue-marine">Wave 2 (Normal)</option>
+            <option value="late" className="bg-blue-marine">Wave 3 (Late)</option>
+          </select>
+
+          <select 
+            value={`${sortConfig.key}|${sortConfig.direction}`} 
+            onChange={handleSortChange}
+            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sunlight-orange"
+          >
+            <option value="createdAt|desc" className="bg-blue-marine">Newest First</option>
+            <option value="createdAt|asc" className="bg-blue-marine">Oldest First</option>
+            <option value="teamName|asc" className="bg-blue-marine">Name (A-Z)</option>
+            <option value="teamName|desc" className="bg-blue-marine">Name (Z-A)</option>
+            <option value="statusPayment|desc" className="bg-blue-marine">Payment (Paid First)</option>
+          </select>
+
+          <div className="relative flex-1 md:w-48">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-silver-shine" size={16} />
             <input 
-              type="text" placeholder="Search team or institution..." 
+              type="text" placeholder="Search team..." 
               value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-sunlight-orange"
             />
           </div>
+
           <button onClick={handleExportZIP} disabled={isZipping} className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-2.5 px-4 rounded-xl transition-colors shrink-0 flex items-center gap-2">
-            {isZipping ? "Processing ZIP..." : <><DownloadCloud size={16}/> ZIP Photos</>}
+            {isZipping ? "ZIP..." : <><DownloadCloud size={16}/> ZIP</>}
           </button>
           <button onClick={handleExportCSV} className="bg-green-600 hover:bg-green-500 text-white text-sm font-bold py-2.5 px-4 rounded-xl transition-colors shrink-0">
-            Export CSV
+            CSV
           </button>
         </div>
       </div>
@@ -256,6 +306,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                   <td className="p-5">
                     <p className="font-bold text-sunlight-orange text-base">{team.teamName}</p>
                     <p className="text-xs text-silver-shine capitalize">{team.institutionName} • {team.compeType.replace(/_/g, "-")}</p>
+                    <p className="text-[10px] bg-white/10 text-white inline-block px-2 py-0.5 rounded mt-1">{team.registrationPhase}</p>
                   </td>
                   <td className="p-5">
                     <p className="font-bold text-white">{team.leaderContact.name}</p>

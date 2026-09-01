@@ -9,7 +9,6 @@ interface CloudinaryResult {
   info?: string | { secure_url?: string; };
 }
 
-// FORMAT COUNTDOWN GLOBAL (Misal: 15 Agustus 2026 Jam 00:00 WIB)
 const REVEAL_DATE = new Date("2026-10-05T00:00:00+07:00").getTime();
 
 export default function AbstractPortalClient({ 
@@ -58,7 +57,7 @@ export default function AbstractPortalClient({
       setIsUpdating(true);
       try {
         const response = await fetch("/api/teams/abstract", {
-          method: "POST", // PASTIKAN INI POST AGAR MATCH DENGAN BACKEND
+          method: "POST", 
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
             abstractUrl: res.info.secure_url,
@@ -130,8 +129,7 @@ export default function AbstractPortalClient({
       ) : (
         <CldUploadWidget 
           uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-          // KUNCI CUMA BISA PDF / DOC / DOCX DI SINI
-          options={{ maxFiles: 1, clientAllowedFormats: ["pdf", "doc", "docx"], resourceType: "auto" }}
+          options={{ maxFiles: 1, clientAllowedFormats: ["pdf", "doc", "docx"], resourceType: "raw" }}
           onSuccess={handleUploadSuccess}
         >
           {({ open }) => (
