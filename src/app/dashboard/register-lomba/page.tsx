@@ -81,9 +81,10 @@ export default function RegisterLombaPage() {
             const paymentStatus = data.team.statusPayment;
             const docStatus = data.team.documentStatus;
 
-            // KUNCI UTAMA: Form hanya dikunci jika pembayaran sudah diproses (bukan unpaid) 
-            // KECUALI jika status dokumen sedang "revision" (maka form WAJIB DIBUKA agar peserta bisa edit)
-            if (paymentStatus !== "unpaid" && docStatus !== "revision") {
+            // LOGIKA SINKRON DENGAN BACKEND
+            const canEdit = paymentStatus === "unpaid" || (docStatus === "revision" && paymentStatus !== "verified");
+
+            if (!canEdit) {
               setIsLocked(true);
               setLockedCompeName(fetchedCompeType.replace(/-/g, " "));
               setIsFetching(false);

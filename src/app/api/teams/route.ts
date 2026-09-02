@@ -10,7 +10,7 @@ interface MemberPayload {
   fullName: string;
   email: string;
   phoneNumber: string;
-  institution: string; // NEW
+  institution: string; 
   grade: string;
   photoUrl: string;
   ktmUrl: string;
@@ -47,7 +47,7 @@ export async function GET() {
       fullName: teamMembers.fullName,
       email: teamMembers.email,
       phoneNumber: teamMembers.phoneNumber,
-      institution: teamMembers.institution, // Ditarik ke frontend
+      institution: teamMembers.institution, 
       grade: teamMembers.grade,
       photoUrl: teamMembers.photoUrl,
       ktmUrl: teamMembers.ktmUrl,
@@ -76,7 +76,6 @@ export async function POST(req: Request) {
     const body = (await req.json()) as RequestBody;
     const { compeType, teamName, institutionName, abstractUrl, members } = body;
 
-    // VALIDASI DIPERBARUI
     if (!compeType || !teamName || members.length === 0) {
       return NextResponse.json({ error: "All essential fields are required!" }, { status: 400 });
     }
@@ -91,17 +90,20 @@ export async function POST(req: Request) {
     
     let targetTeamId = "";
     const activePhase = getCurrentPhase();
-
-    // Data institusi utama dikosongkan jika ICC
     const finalInstitutionName = compeType === "industrial-case" ? null : institutionName;
 
     if (existingTeam.length > 0) {
-      if (existingTeam[0].compeType === "science-project" || existingTeam[0].compeType === "industrial-case") {
-         return NextResponse.json({ error: "Data SPC dan ICC telah dikunci permanen setelah registrasi." }, { status: 403 });
-      }
-      
-      if (existingTeam[0].statusPayment !== "unpaid") {
-        return NextResponse.json({ error: "Data cannot be edited because payment is processed!" }, { status: 403 });
+      const paymentStatus = existingTeam[0].statusPayment;
+      const docStatus = existingTeam[0].documentStatus;
+
+      // LOGIKA LOCK SESUAI KEBUTUHAN BARU:
+      // Peserta BISA edit JIKA:
+      // 1. Belum bayar (unpaid)
+      // 2. ATAU disuruh revisi berkas (revision) asalkan pembayarannya belum di-acc (verified)
+      const canEdit = paymentStatus === "unpaid" || (docStatus === "revision" && paymentStatus !== "verified");
+
+      if (!canEdit) {
+        return NextResponse.json({ error: "Data cannot be edited because payment is processed or locked!" }, { status: 403 });
       }
 
       const isSwitchingCompe = existingTeam[0].compeType !== compeType;
@@ -137,7 +139,7 @@ export async function POST(req: Request) {
           fullName: member.fullName,
           email: member.email,
           phoneNumber: member.phoneNumber,
-          institution: compeType === "industrial-case" ? member.institution : null, // Disimpan khusus ICC
+          institution: compeType === "industrial-case" ? member.institution : null,
           grade: member.grade,
           photoUrl: member.photoUrl,
           ktmUrl: member.ktmUrl, 
