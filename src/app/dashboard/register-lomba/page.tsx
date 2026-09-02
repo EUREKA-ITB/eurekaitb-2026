@@ -13,7 +13,7 @@ interface MemberInput {
   fullName: string;
   email: string;
   phoneNumber: string;
-  institution: string; // NEW: Tambahan untuk ICC
+  institution: string; 
   grade: string;       
   photoUrl: string;    
   ktmUrl: string;      
@@ -78,17 +78,14 @@ export default function RegisterLombaPage() {
           
           if (data && data.team) {
             const fetchedCompeType = data.team.compeType.replace(/_/g, "-");
+            const paymentStatus = data.team.statusPayment;
+            const docStatus = data.team.documentStatus;
 
-            if ((fetchedCompeType === "science-project" || fetchedCompeType === "industrial-case") && data.team.documentStatus !== "revision") {
+            // KUNCI UTAMA: Form hanya dikunci jika pembayaran sudah diproses (bukan unpaid) 
+            // KECUALI jika status dokumen sedang "revision" (maka form WAJIB DIBUKA agar peserta bisa edit)
+            if (paymentStatus !== "unpaid" && docStatus !== "revision") {
               setIsLocked(true);
               setLockedCompeName(fetchedCompeType.replace(/-/g, " "));
-              setIsFetching(false);
-              return;
-            }
-
-            if (data.team.statusPayment !== "unpaid") {
-              setIsLocked(true);
-              setLockedCompeName(data.team.compeType.replace("-", " "));
               setIsFetching(false);
               return; 
             }
@@ -99,7 +96,7 @@ export default function RegisterLombaPage() {
 
             const processedMembers: MemberInput[] = validMembers.map((m: Partial<MemberInput>) => ({
               fullName: m.fullName || "", email: m.email || "", phoneNumber: m.phoneNumber || "", 
-              institution: m.institution || "", // NEW mapping
+              institution: m.institution || "", 
               grade: m.grade || "", photoUrl: m.photoUrl || "", ktmUrl: m.ktmUrl || "", igAccountLink: m.igAccountLink || "",
               proofFollowUrl: m.proofFollowUrl || "", proofShareUrl: m.proofShareUrl || "", 
               proofStoryCompeUrl: m.proofStoryCompeUrl || "", proofTwibbonUrl: m.proofTwibbonUrl || "",
@@ -175,19 +172,16 @@ export default function RegisterLombaPage() {
     setIsSaving(true);
 
     try {
-      // Validasi Institusi Utama
       if (formData.compeType !== "industrial-case" && formData.institutionName.trim() === "") {
         alert("IMPORTANT: Please fill in the Institution / School field!");
         setIsSaving(false); return;
       }
 
-      // Validasi Tim
       if ((formData.compeType === "science-project" || formData.compeType === "industrial-case") && formData.members.length < 2) {
         alert("IMPORTANT: Science Project and Industrial Case teams must have at least 2 members!");
         setIsSaving(false); return;
       }
 
-      // Validasi Institusi per Anggota (Khusus ICC)
       if (formData.compeType === "industrial-case") {
         const hasMissingInst = formData.members.some((m) => m.institution.trim() === "");
         if (hasMissingInst) {
@@ -296,7 +290,6 @@ export default function RegisterLombaPage() {
               <input id="teamNameInput" name="teamName" required type="text" placeholder={formData.compeType === "physics-olympiad" ? "e.g. Albert Einstein" : "e.g. Tim Eureka! ITB"} className="w-full bg-blue-marine border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={formData.teamName} onChange={(e) => setFormData((prev) => ({...prev, teamName: e.target.value}))} />
             </div>
 
-            {/* HIDE INSTANSI UTAMA JIKA ICC */}
             {formData.compeType !== "industrial-case" && (
               <div>
                 <label htmlFor="institutionNameInput" className="block text-sm font-semibold mb-2">Institution / School</label>
@@ -358,7 +351,6 @@ export default function RegisterLombaPage() {
                       <input id={`fullNameInput-${index}`} name={`fullName-${index}`} required type="text" className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors" value={member.fullName} onChange={(e) => handleMemberChange(index, "fullName", e.target.value)} />
                     </div>
                     
-                    {/* TAMPILKAN INSTITUSI PER ORANG KHUSUS ICC */}
                     {formData.compeType === "industrial-case" && (
                       <div className="sm:col-span-2">
                         <label htmlFor={`institutionInput-${index}`} className="block text-xs font-semibold text-silver-shine mb-2">Campus / Institution</label>
