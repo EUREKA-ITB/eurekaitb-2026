@@ -47,13 +47,21 @@ const timelineEvents: EventItem[] = [
   {
     id: 5,
     startDate: "2026-10-01",
+    endDate: "2026-10-05",
+    dateLabel: "01 - 05 Oktober 2026",
+    title: "[REGISTRATION EXTENDED]",
+    description: "Pendaftaran kompetisi utama EUREKA! ITB 2026 DIPERPANJANG hingga 5 Oktober 2026!",
+  },
+  {
+    id: 6,
+    startDate: "2026-10-01",
     endDate: "2026-11-27",
     dateLabel: "Okt - Nov 2026",
     title: "Selection Phase of Main Competition",
     description: "Tahapan penyeleksian peserta menuju final",
   },
   {
-    id: 6,
+    id: 7,
     startDate: "2026-11-28",
     endDate: "2026-11-29",
     dateLabel: "28-29 Nov 2026",
@@ -89,6 +97,8 @@ function CountdownBadge({
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
         });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     };
 
@@ -169,7 +179,6 @@ function TiltCard({
   );
 }
 
-// Definisikan tipe untuk filter secara eksplisit agar bebas dari any error
 type FilterOptions = "all" | "active" | "upcoming" | "past";
 
 export default function InteractiveTimeline() {
@@ -177,9 +186,9 @@ export default function InteractiveTimeline() {
   const today = new Date();
 
   const filteredEvents = timelineEvents.filter((event) => {
-    const start = new Date(event.startDate);
-    const end = new Date(event.endDate);
-    end.setHours(23, 59, 59, 999);
+    // Format tanggal WIB (UTC+7) diparsing langsung 
+    const start = new Date(`${event.startDate}T00:00:00+07:00`);
+    const end = new Date(`${event.endDate}T23:59:59+07:00`);
 
     const isPast = today > end;
     const isActive = today >= start && today <= end;
@@ -203,7 +212,6 @@ export default function InteractiveTimeline() {
         ].map((tab) => (
           <button
             key={tab.id}
-            // Menggunakan casting ke tipe FilterOptions agar tidak any
             onClick={() => setActiveFilter(tab.id as FilterOptions)}
             className={`px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 border ${
               activeFilter === tab.id
@@ -219,9 +227,9 @@ export default function InteractiveTimeline() {
       {/* 2. TIMELINE ITEMS */}
       <div className="flex flex-row gap-0 overflow-x-auto pt-4 pb-8 px-4 hide-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {filteredEvents.map((event) => {
-          const start = new Date(event.startDate);
-          const end = new Date(event.endDate);
-          end.setHours(23, 59, 59, 999);
+          // Format tanggal WIB (UTC+7) diparsing langsung
+          const start = new Date(`${event.startDate}T00:00:00+07:00`);
+          const end = new Date(`${event.endDate}T23:59:59+07:00`);
 
           const isPast = today > end;
           const isActive = today >= start && today <= end;
