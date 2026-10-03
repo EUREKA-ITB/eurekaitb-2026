@@ -127,7 +127,7 @@ export default async function PaymentPage() {
                 <Clock size={64} className="text-sunlight-orange mx-auto mb-6 animate-pulse" />
                 <h2 className="font-display text-2xl font-bold text-white mb-2">Awaiting Treasurer Verification</h2>
                 <p className="text-silver-shine text-sm mb-8 leading-relaxed">
-                  Your transfer receipt has been received and is in the queue for bank mutation check. This process takes a maximum of 2x24 working hours.
+                  Your transfer receipt has been received and is in the queue for bank mutation check. Kindly check this page regularly for further updates.
                 </p>
                 <div className="bg-black/30 rounded-xl p-4 inline-block border border-white/10 mb-6 text-left">
                   <p className="text-xs text-silver-shine mb-1">Registration Reference Number:</p>

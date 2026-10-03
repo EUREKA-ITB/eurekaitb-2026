@@ -36,8 +36,8 @@ export default function PhysicsOlympiadPage() {
   };
 
   const documents = [
-    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/gb-po-rev9.pdf" },
-    { id: "silabus", title: "Syllabus & Guidelines", url: "/guidebooks/silabus-po-rev9.pdf" },
+    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/gb-po-rev10.pdf" },
+    { id: "silabus", title: "Syllabus & Guidelines", url: "/guidebooks/silabus-po-rev10.pdf" },
   ];
   
   const [activePdfIndex, setActivePdfIndex] = useState(0);
