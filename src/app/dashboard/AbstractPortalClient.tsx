@@ -14,11 +14,13 @@ const REVEAL_DATE = new Date("2026-10-05T00:00:00+07:00").getTime();
 export default function AbstractPortalClient({ 
   currentUrl, 
   compeType, 
-  currentCase 
+  currentCase,
+  abstractStatus
 }: { 
   currentUrl: string | null;
   compeType: string;
   currentCase: string | null;
+  abstractStatus: string;
 }) {
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -26,6 +28,8 @@ export default function AbstractPortalClient({
   
   const [timeLeft, setTimeLeft] = useState<{d: number, h: number, m: number, s: number} | null>(null);
   const [isRevealed, setIsRevealed] = useState<boolean>(compeType !== "industrial-case");
+
+  const isLocked = abstractStatus === "waiting" || abstractStatus === "passed";
 
   useEffect(() => {
     if (compeType !== "industrial-case") return;
@@ -114,7 +118,8 @@ export default function AbstractPortalClient({
           <select 
             value={selectedCase} 
             onChange={(e) => setSelectedCase(e.target.value)}
-            className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors"
+            disabled={isLocked}
+            className="w-full bg-blue-marine border border-white/20 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-sunlight-orange transition-colors disabled:opacity-50"
           >
             <option value="" disabled>-- Select Case --</option>
             <option value="Case A: Supply Chain">Case A: Supply Chain</option>
@@ -124,7 +129,11 @@ export default function AbstractPortalClient({
         </div>
       )}
 
-      {isUpdating ? (
+      {isLocked ? (
+        <div className="mt-4 p-4 bg-black/40 border border-white/10 rounded-xl flex items-center justify-center gap-2 text-silver-shine text-sm font-bold shadow-inner">
+          <Lock size={16} /> Data Dikunci ({abstractStatus === "passed" ? "Lolos Seleksi" : "Sedang Direview"})
+        </div>
+      ) : isUpdating ? (
         <div className="text-sm font-bold text-silver-shine animate-pulse">Saving document...</div>
       ) : (
         <CldUploadWidget 
@@ -154,7 +163,7 @@ export default function AbstractPortalClient({
         </CldUploadWidget>
       )}
       
-      {currentUrl && (
+      {currentUrl && !isLocked && (
         <div className="mt-4 text-[10px] text-silver-shine italic">
           *Re-uploading will overwrite the previous abstract file.
         </div>

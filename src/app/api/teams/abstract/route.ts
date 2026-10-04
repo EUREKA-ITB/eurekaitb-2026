@@ -16,13 +16,16 @@ export async function POST(req: Request) {
     const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
     if (userTeam.length === 0) return NextResponse.json({ error: "Team not found" }, { status: 404 });
 
-    // TANGKAP caseChoice JUGA DARI PAYLOAD (KHUSUS ICC)
+    const abstractStatus = userTeam[0].abstractStatus;
+    if (abstractStatus === "waiting" || abstractStatus === "passed") {
+       return NextResponse.json({ error: "File abstrak yang sedang direview atau sudah lolos tidak dapat diubah!" }, { status: 403 });
+    }
+
     const { abstractUrl, caseChoice } = await req.json();
     if (!abstractUrl) {
       return NextResponse.json({ error: "Abstract URL is required" }, { status: 400 });
     }
 
-    // UPDATE DATABASE (Sekalian simpan caseChoice jika ada isinya)
     if (caseChoice) {
       await db.update(teams).set({ abstractUrl, abstractStatus: "waiting", caseChoice }).where(eq(teams.id, userTeam[0].id));
     } else {

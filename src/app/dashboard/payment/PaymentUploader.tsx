@@ -16,6 +16,12 @@ export default function PaymentUploader({ teamId, initialUrl }: { teamId: string
 
   const handleSave = async () => {
     if (!paymentUrl) return alert("Harap unggah bukti transfer terlebih dahulu!");
+    
+    const PAYMENT_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
+    if (new Date() > PAYMENT_DEADLINE) {
+      return alert("Batas waktu pengiriman bukti pembayaran telah habis (5 Oktober 2026, 12:00 WIB)!");
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -80,7 +86,6 @@ export default function PaymentUploader({ teamId, initialUrl }: { teamId: string
         </CldUploadWidget>
       </div>
 
-      {/* Tombol Pintar: Baru bisa diklik kalau paymentUrl sudah terisi */}
       <button 
         onClick={handleSave}
         disabled={!paymentUrl || isSubmitting}

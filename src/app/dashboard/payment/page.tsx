@@ -24,6 +24,13 @@ export default async function PaymentPage() {
   const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
   if (userTeam.length === 0) redirect("/dashboard/register-lomba");
 
+  const compeTypeSlug = userTeam[0].compeType as CompeType;
+  
+  // VALIDASI ALUR: SPC & ICC tidak boleh masuk portal bayar kalau abstrak belum "passed"
+  if ((compeTypeSlug === "science-project" || compeTypeSlug === "industrial-case") && userTeam[0].abstractStatus !== "passed") {
+    redirect("/dashboard");
+  }
+
   const members = await db.select().from(teamMembers).where(eq(teamMembers.teamId, userTeam[0].id));
   const leader = members.find(m => m.isLeader);
   
@@ -35,7 +42,6 @@ export default async function PaymentPage() {
   
   const teamPhase = userTeam[0].registrationPhase as Phase;
   const phaseName = PHASE_NAMES[teamPhase];
-  const compeTypeSlug = userTeam[0].compeType as CompeType;
   
   const basePrice = getPrice(compeTypeSlug, teamPhase);
   const nominalDiscount = (basePrice * discountPercentage) / 100;
@@ -47,6 +53,10 @@ export default async function PaymentPage() {
   
   const startedAt = userTeam[0].paymentStartedAt;
   const isExpired = startedAt ? (new Date().getTime() > new Date(startedAt).getTime() + (3 * 60 * 60 * 1000)) : false;
+
+  // GATE PAYMENT CLOSING - 5 OKTOBER 12:00 WIB
+  const PAYMENT_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
+  const now = new Date();
 
   return (
     <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 md:p-12 box-border overflow-x-hidden">
@@ -107,6 +117,15 @@ export default async function PaymentPage() {
                 <p>Please save or print this page as a valid proof of payment.</p>
               </div>
             </div>
+          </div>
+        ) : (now > PAYMENT_DEADLINE && !isVerified && !isPending) ? (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-3xl p-8 sm:p-12 backdrop-blur-sm text-center max-w-2xl mx-auto mt-10 shadow-[0_0_30px_rgba(239,68,68,0.15)] flex flex-col items-center">
+             <AlertCircle size={64} className="text-red-400 mx-auto mb-6" />
+             <h2 className="font-display text-2xl font-bold text-red-400 mb-2">Gate Pembayaran Ditutup</h2>
+             <p className="text-silver-shine text-sm leading-relaxed mb-8">
+               Batas waktu pembayaran (5 Oktober 2026, 12:00 WIB) telah berakhir. Mohon maaf, registrasi tim Anda dianggap gagal karena melewati batas waktu yang telah ditentukan.
+             </p>
+             <Link href="/dashboard" className="bg-white/10 text-white font-bold px-6 py-3 rounded-xl hover:bg-white/20 transition-colors">Kembali ke Dashboard</Link>
           </div>
         ) : (
           <>

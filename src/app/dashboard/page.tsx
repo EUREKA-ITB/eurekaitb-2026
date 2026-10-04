@@ -184,6 +184,7 @@ export default async function DashboardPage() {
                     currentUrl={abstractUrl} 
                     compeType={compeTypeSlug} 
                     currentCase={caseChoice} 
+                    abstractStatus={abstractStatus}
                   />
                 </div>
               </div>
@@ -219,7 +220,6 @@ export default async function DashboardPage() {
                   <div>
                     <p className="text-silver-shine text-xs uppercase tracking-wider mb-2 flex items-center gap-2"><Users size={16}/> Registration Data</p>
                     
-                    {/* BUG NAMA TERBALIK DIPERBAIKI DI SINI */}
                     <h3 className="font-display text-2xl font-bold text-white mb-6">
                       {isPO && membersData.length > 0 ? membersData[0].fullName : userTeam[0].teamName}
                     </h3>
@@ -318,7 +318,6 @@ export default async function DashboardPage() {
                           <span className="bg-green-500 text-white px-2 py-0.5 rounded-md text-[8px] tracking-normal">VERIFIED</span>
                         </p>
                         
-                        {/* BUG NAMA TERBALIK DIPERBAIKI DI SINI JUGA */}
                         <h3 className="font-display text-2xl font-bold text-white mb-6 break-words mt-2">
                           {isPO && membersData.length > 0 ? membersData[0].fullName : userTeam[0].teamName}
                         </h3>
@@ -372,7 +371,8 @@ export default async function DashboardPage() {
                     <p className="text-sm text-silver-shine mb-6 max-w-lg mx-auto">
                       Congratulations! You are officially registered as a Finalist. Please upload your Full Paper and presentation according to the Guidebook schedule.
                     </p>
-                    <Link href={`/competition/${compeTypeSlug}`} className="inline-block bg-white/10 text-white font-bold px-8 py-3 rounded-xl text-sm transition-colors hover:bg-white/20 border border-white/20">
+                    {/* PERBAIKAN RUTING SUBMISSION ROOM */}
+                    <Link href="/dashboard/submission" className="inline-block bg-white/10 text-white font-bold px-8 py-3 rounded-xl text-sm transition-colors hover:bg-white/20 border border-white/20">
                       Open Submission Room
                     </Link>
                   </div>

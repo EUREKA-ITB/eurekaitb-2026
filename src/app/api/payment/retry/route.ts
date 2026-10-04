@@ -12,13 +12,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const PAYMENT_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
+    if (new Date() > PAYMENT_DEADLINE) {
+      return NextResponse.json({ error: "Batas waktu pembayaran telah berakhir." }, { status: 403 });
+    }
+
     const { teamId } = await req.json();
 
     if (!teamId) {
       return NextResponse.json({ error: "Team ID is required" }, { status: 400 });
     }
 
-    // Set kolom paymentStartedAt menjadi waktu saat ini (sekarang)
     await db.update(teams).set({
       paymentStartedAt: new Date()
     }).where(eq(teams.id, teamId));

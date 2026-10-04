@@ -6,6 +6,11 @@ import { hash } from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
+    const REGIST_DEADLINE = new Date("2026-10-04T23:59:59+07:00");
+    if (new Date() > REGIST_DEADLINE) {
+      return NextResponse.json({ error: "Pendaftaran akun baru EUREKA! ITB 2026 telah ditutup." }, { status: 403 });
+    }
+
     const { name, email, password, institution, level, nisn } = await req.json();
 
     if (!name || !email || !password) {

@@ -81,7 +81,6 @@ export default function RegisterLombaPage() {
             const paymentStatus = data.team.statusPayment;
             const docStatus = data.team.documentStatus;
 
-            // LOGIKA SINKRON DENGAN BACKEND
             const canEdit = paymentStatus === "unpaid" || (docStatus === "revision" && paymentStatus !== "verified");
 
             if (!canEdit) {
@@ -245,6 +244,25 @@ export default function RegisterLombaPage() {
             Your account is currently registered for <span className="text-white font-bold capitalize">{lockedCompeName}</span>. Registration data cannot be edited as it has been locked by the system. 
           </p>
           <Link href="/dashboard" className="inline-block bg-sunlight-orange text-blue-marine font-bold px-8 py-3 rounded-xl hover:bg-yellow-400 transition-colors">Return to Dashboard</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // LOGIKA GATE PENDAFTARAN - 4 OKTOBER 23:59 WIB
+  const REGIST_DEADLINE = new Date("2026-10-04T23:59:59+07:00");
+  const now = new Date();
+  
+  if (!isEditMode && now > REGIST_DEADLINE) {
+    return (
+      <div className="min-h-screen bg-blue-marine text-white font-sans p-4 sm:p-8 flex items-center justify-center box-border pt-20">
+        <div className="bg-white/5 border border-red-500/30 p-8 sm:p-12 rounded-3xl text-center max-w-lg shadow-[0_0_30px_rgba(239,68,68,0.15)] backdrop-blur-sm flex flex-col items-center">
+          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-6 text-red-400 font-bold text-2xl">X</div>
+          <h2 className="font-display text-2xl font-bold mb-4 text-red-400">Pendaftaran Ditutup</h2>
+          <p className="text-silver-shine text-sm leading-relaxed mb-8">
+            Mohon maaf, gate pendaftaran EUREKA! ITB 2026 telah ditutup secara resmi pada tanggal 4 Oktober 2026 pukul 23:59 WIB.
+          </p>
+          <Link href="/dashboard" className="inline-block bg-white/10 text-white font-bold px-8 py-3 rounded-xl hover:bg-white/20 transition-colors">Kembali ke Dashboard</Link>
         </div>
       </div>
     );

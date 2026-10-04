@@ -88,6 +88,11 @@ export async function POST(req: Request) {
 
     const existingTeam = await db.select().from(teams).where(eq(teams.userId, userId)).limit(1);
     
+    const REGIST_DEADLINE = new Date("2026-10-04T23:59:59+07:00");
+    if (existingTeam.length === 0 && new Date() > REGIST_DEADLINE) {
+      return NextResponse.json({ error: "Batas waktu pendaftaran tim baru telah ditutup." }, { status: 403 });
+    }
+    
     let targetTeamId = "";
     const activePhase = getCurrentPhase();
     const finalInstitutionName = compeType === "industrial-case" ? null : institutionName;
@@ -96,10 +101,6 @@ export async function POST(req: Request) {
       const paymentStatus = existingTeam[0].statusPayment;
       const docStatus = existingTeam[0].documentStatus;
 
-      // LOGIKA LOCK SESUAI KEBUTUHAN BARU:
-      // Peserta BISA edit JIKA:
-      // 1. Belum bayar (unpaid)
-      // 2. ATAU disuruh revisi berkas (revision) asalkan pembayarannya belum di-acc (verified)
       const canEdit = paymentStatus === "unpaid" || (docStatus === "revision" && paymentStatus !== "verified");
 
       if (!canEdit) {
