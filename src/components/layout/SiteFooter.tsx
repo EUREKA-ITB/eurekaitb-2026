@@ -123,6 +123,12 @@ export default function SiteFooter() {
             <img src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/jago-s.png" alt="Jago" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/komatsu-s.png" alt="Komatsu" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-cms/uiss-m.png" alt="UISS" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
           </div>
         </div>
 

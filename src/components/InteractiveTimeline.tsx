@@ -50,7 +50,7 @@ const timelineEvents: EventItem[] = [
     endDate: "2026-10-04",
     dateLabel: "01 - 04 Oktober 2026",
     title: "[REGISTRATION EXTENDED]",
-    description: "Pendaftaran kompetisi utama EUREKA! ITB 2026 DIPERPANJANG hingga 5 Oktober 2026!",
+    description: "Pendaftaran kompetisi utama EUREKA! ITB 2026 DIPERPANJANG hingga 04 Oktober 2026!",
   },
   {
     id: 6,

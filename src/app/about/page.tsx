@@ -14,7 +14,7 @@ const sponsorTiers: { tier: string; sponsors: Sponsor[] }[] = [
     tier: "Collaborators",
     sponsors: [
       { name: "BRIN", logoUrl: "/logo-cms/brin-c.png" },
-      { name: "IASSSF", logoUrl: "/logo-cms/iasssf-white-c.png" },
+      { name: "IASSSF", logoUrl: "/logo-cms/iasssf-c.png" },
       { name: "PLN Nusantara Power", logoUrl: "/logo-cms/pln-c.png" },
       { name: "Puspresnas", logoUrl: "/logo-cms/puspresnas-c.png" },
     ],
@@ -23,12 +23,15 @@ const sponsorTiers: { tier: string; sponsors: Sponsor[] }[] = [
     tier: "Sponsor",
     sponsors: [
       { name: "Indolat", logoUrl: "/logo-cms/indolat-s.png" },
+      { name: "Jago", logoUrl: "/logo-cms/jago-s.png" },
+      { name: "Komatsu", logoUrl: "/logo-cms/komatsu-s.png" },
     ],
   },
   {
     tier: "Media Partner",
     sponsors: [
       { name: "@hlphysics", isTextOnly: true, link: "https://instagram.com/hlphysics" },
+      { name: "UISS", logoUrl: "/logo-cms/uiss-m.png" },
     ],
   },
 ];
