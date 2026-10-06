@@ -3,42 +3,64 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
-import { UploadCloud, CheckCircle, ShieldCheck } from "lucide-react";
+import { UploadCloud, CheckCircle2, CheckSquare } from "lucide-react";
 
 interface CloudinaryResult {
-  info?: string | { secure_url?: string; };
+  info?: string | { secure_url?: string };
 }
 
-export default function PaymentUploader({ teamId, initialUrl }: { teamId: string, initialUrl: string | null }) {
+export default function PaymentUploader({ 
+  teamId, 
+  initialUrl,
+  compeType
+}: { 
+  teamId: string; 
+  initialUrl: string | null;
+  compeType: string;
+}) {
   const router = useRouter();
-  const [paymentUrl, setPaymentUrl] = useState<string>(initialUrl || "");
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(initialUrl);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSave = async () => {
-    if (!paymentUrl) return alert("Harap unggah bukti transfer terlebih dahulu!");
+  const isPO = compeType === "physics-olympiad";
+  const PO_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
+  const SPC_ICC_DEADLINE = new Date("2026-10-25T23:59:59+07:00");
+  const PAYMENT_DEADLINE = isPO ? PO_DEADLINE : SPC_ICC_DEADLINE;
+
+  const handleUploadSuccess = (res: CloudinaryResult) => {
+    if (typeof res.info === "object" && res.info?.secure_url) {
+      setUploadedUrl(res.info.secure_url);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const now = new Date();
     
-    const PAYMENT_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
-    if (new Date() > PAYMENT_DEADLINE) {
-      return alert("Batas waktu pengiriman bukti pembayaran telah habis (5 Oktober 2026, 12:00 WIB)!");
+    if (now > PAYMENT_DEADLINE) {
+      const deadlineText = isPO ? "5 Oktober 2026, 12:00 WIB" : "25 Oktober 2026, 23:59 WIB";
+      alert(`Batas waktu pengiriman bukti pembayaran telah habis (${deadlineText})!`);
+      return;
+    }
+
+    if (!uploadedUrl) {
+      alert("Silakan unggah bukti pembayaran terlebih dahulu!");
+      return;
     }
 
     setIsSubmitting(true);
-    
     try {
-      const res = await fetch("/api/payment", {
+      const response = await fetch("/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamId, paymentUrl }),
+        body: JSON.stringify({ teamId, paymentUrl: uploadedUrl }),
       });
-      
-      if (res.ok) {
-        alert("Bukti transfer berhasil dikirim! Silakan tunggu verifikasi admin.");
-        router.push("/dashboard");
+
+      if (response.ok) {
         router.refresh();
       } else {
-        alert("Gagal menyimpan bukti transfer.");
+        alert("Gagal mengirim bukti pembayaran. Silakan coba lagi.");
       }
-    } catch (e) {
+    } catch (error) {
       alert("Terjadi kesalahan jaringan.");
     } finally {
       setIsSubmitting(false);
@@ -46,55 +68,50 @@ export default function PaymentUploader({ teamId, initialUrl }: { teamId: string
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-between">
-      
-      <div className="mb-6">
-        <CldUploadWidget 
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
-          onSuccess={(res: CloudinaryResult) => { 
-            if(typeof res.info === "object" && res.info?.secure_url) {
-              setPaymentUrl(res.info.secure_url);
-            }
-          }}
-        >
-          {({ open }) => (
-            <div 
-              onClick={() => open()}
-              className={`relative border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer group ${
-                paymentUrl 
-                ? "border-green-400/50 bg-green-400/10 hover:bg-green-400/20" 
-                : "border-white/20 bg-black/20 hover:bg-white/5 hover:border-sunlight-orange/50"
-              }`}
-            >
-              <div className="flex flex-col items-center justify-center text-center pointer-events-none">
-                {paymentUrl ? (
-                  <>
-                    <CheckCircle className="text-green-400 mb-3" size={40} />
-                    <span className="text-sm text-green-400 font-bold mb-1">Bukti Transfer Berhasil Diunggah!</span>
-                    <span className="text-xs text-silver-shine">Klik lagi jika ingin mengganti gambar</span>
-                  </>
-                ) : (
-                  <>
-                    <UploadCloud className="text-silver-shine group-hover:text-sunlight-orange mb-3 transition-colors" size={40} />
-                    <span className="text-sm text-white font-bold mb-1">Upload Struk Mutasi / Screenshot M-Banking</span>
-                    <span className="text-xs text-silver-shine">Format: JPG, PNG, (Maks 2MB)</span>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </CldUploadWidget>
-      </div>
+    <div className="flex flex-col gap-4">
+      <CldUploadWidget 
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
+        options={{ maxFiles: 1, clientAllowedFormats: ["jpg", "jpeg", "png", "webp", "pdf"], resourceType: "auto" }}
+        onSuccess={handleUploadSuccess}
+      >
+        {({ open }) => (
+          <div 
+            onClick={() => open()} 
+            className={`cursor-pointer border-2 border-dashed rounded-2xl p-6 text-center transition-colors ${
+              uploadedUrl 
+                ? "border-green-500/50 bg-green-500/5 hover:bg-green-500/10" 
+                : "border-white/20 bg-black/20 hover:bg-white/5"
+            }`}
+          >
+            {uploadedUrl ? (
+              <>
+                <CheckCircle2 size={40} className="mx-auto mb-3 text-green-400" />
+                <p className="font-bold text-green-400 mb-1 text-sm">Bukti Transfer Berhasil Diunggah!</p>
+                <p className="text-xs text-silver-shine">Klik lagi jika ingin mengganti gambar</p>
+              </>
+            ) : (
+              <>
+                <UploadCloud size={40} className="mx-auto mb-3 text-sunlight-orange" />
+                <p className="font-bold text-white mb-1 text-sm">Unggah Bukti Transfer</p>
+                <p className="text-xs text-silver-shine">Format: JPG, PNG, atau PDF (Maks 5MB)</p>
+              </>
+            )}
+          </div>
+        )}
+      </CldUploadWidget>
 
       <button 
-        onClick={handleSave}
-        disabled={!paymentUrl || isSubmitting}
-        className="w-full flex items-center justify-center gap-2 bg-sunlight-orange text-blue-marine font-bold py-4 rounded-xl hover:bg-yellow-400 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        onClick={handleSubmit}
+        disabled={isSubmitting || !uploadedUrl}
+        className={`flex items-center justify-center gap-2 w-full font-bold py-3.5 rounded-xl text-sm transition-all shadow-lg ${
+          !uploadedUrl || isSubmitting
+            ? "bg-white/10 text-white/40 cursor-not-allowed"
+            : "bg-sunlight-orange text-blue-marine hover:bg-yellow-400"
+        }`}
       >
-        <ShieldCheck size={20} />
-        {isSubmitting ? "Mengamankan Data..." : "Kirim Bukti Pembayaran"}
+        <CheckSquare size={18} />
+        {isSubmitting ? "Memproses..." : "Kirim Bukti Pembayaran"}
       </button>
-
     </div>
   );
 }

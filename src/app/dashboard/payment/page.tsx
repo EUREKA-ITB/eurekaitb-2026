@@ -53,10 +53,9 @@ export default async function PaymentPage() {
   const startedAt = userTeam[0].paymentStartedAt;
   const isExpired = startedAt ? (new Date().getTime() > new Date(startedAt).getTime() + (3 * 60 * 60 * 1000)) : false;
 
-  // PEMISAHAN DEADLINE PEMBAYARAN BERDASARKAN CABANG LOMBA
   const isPO = compeTypeSlug === "physics-olympiad";
   const PO_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
-  const SPC_ICC_DEADLINE = new Date("2026-10-25T23:59:59+07:00"); // Deadline khusus SPC & ICC pasca lolos abstrak
+  const SPC_ICC_DEADLINE = new Date("2026-10-25T23:59:59+07:00");
   const PAYMENT_DEADLINE = isPO ? PO_DEADLINE : SPC_ICC_DEADLINE;
   const now = new Date();
 
@@ -263,7 +262,7 @@ export default async function PaymentPage() {
                      </div>
                      <p className="text-silver-shine text-sm mb-6">Upload a clear transfer receipt or m-banking screenshot so the system can validate it.</p>
                      
-                     <PaymentUploader teamId={userTeam[0].id} initialUrl={existingPaymentUrl} />
+                     <PaymentUploader teamId={userTeam[0].id} initialUrl={existingPaymentUrl} compeType={compeTypeSlug} />
                   </div>
                 </div>
               </>
