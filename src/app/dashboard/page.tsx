@@ -2,14 +2,35 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { users, teams, teamMembers } from "@/db/schema";
-import { eq, sql, inArray } from "drizzle-orm";
+import { users, teams, teamMembers, announcements } from "@/db/schema";
+import { eq, sql, inArray, desc } from "drizzle-orm";
 import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
-import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users, MessageCircle, AlertCircle } from "lucide-react";
+import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users, MessageCircle, AlertCircle, Bell } from "lucide-react";
 import Image from "next/image";
 import AbstractPortalClient from "./AbstractPortalClient"; 
 import SuccessConfetti from "./SuccessConfetti";
+
+type AnnouncementItem = {
+  id: string;
+  title: string;
+  content: string;
+  category: "urgent" | "info" | "competition";
+  isPinned: boolean;
+  createdAt: Date;
+};
+
+type TeamMemberItem = {
+  id: string;
+  teamId: string | null;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  grade: string;
+  photoUrl: string | null;
+  ktmUrl: string | null;
+  isLeader: boolean | null;
+};
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -17,7 +38,6 @@ export default async function DashboardPage() {
 
   const sessionEmail = session.user.email.toLowerCase();
 
-  // FIX CASE SENSITIVITY: Cari user berdasarkan lowercase email untuk menghindari mismatch ID lama & baru
   const matchedUsers = await db
     .select()
     .from(users)
@@ -27,7 +47,6 @@ export default async function DashboardPage() {
 
   const userIds = matchedUsers.map(u => u.id);
 
-  // Cari tim yang terikat ke salah satu ID user tersebut (baik ID lama maupun baru)
   const userTeam = await db
     .select()
     .from(teams)
@@ -36,17 +55,7 @@ export default async function DashboardPage() {
 
   const hasRegistered = userTeam.length > 0;
 
-  let membersData: {
-    id: string;
-    teamId: string | null;
-    fullName: string;
-    email: string;
-    phoneNumber: string;
-    grade: string;
-    photoUrl: string | null;
-    ktmUrl: string | null;
-    isLeader: boolean | null;
-  }[] = [];
+  let membersData: TeamMemberItem[] = [];
 
   let isVerified = false;
   let isPending = false;
@@ -54,13 +63,13 @@ export default async function DashboardPage() {
   let isSPC = false;
   let isICC = false;
   let abstractStatus = "waiting";
-  let abstractUrl = null;
-  let caseChoice = null;
+  let abstractUrl: string | null = null;
+  let caseChoice: string | null = null;
   let participantNumber = "";
   let cbtPassword = "";
   let compeTypeSlug = "";
   let documentStatus = "waiting";
-  let adminNotes = null;
+  let adminNotes: string | null = null;
 
   if (hasRegistered) {
     isVerified = userTeam[0].statusPayment === "verified";
@@ -89,6 +98,18 @@ export default async function DashboardPage() {
     }
   }
 
+  let latestAnnouncement: AnnouncementItem[] = [];
+  try {
+    const result = await db
+      .select()
+      .from(announcements)
+      .orderBy(desc(announcements.isPinned), desc(announcements.createdAt))
+      .limit(1);
+    latestAnnouncement = result as AnnouncementItem[];
+  } catch (error) {
+    latestAnnouncement = [];
+  }
+
   const waGroupLinks = {
     "physics-olympiad": "https://chat.whatsapp.com/D5abGwkP7qyBzYRMA8s0aU",
     "science-project": "https://chat.whatsapp.com/B60UKcQMg2bGUBI3vzTOqH",
@@ -108,6 +129,34 @@ export default async function DashboardPage() {
             <LogoutButton/>
           </div>
         </header>
+
+        {latestAnnouncement.length > 0 && (
+          <div className="bg-gradient-to-r from-blue-900/40 to-black/40 border border-sunlight-orange/30 rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+            <div className="flex items-start gap-4">
+              <div className="bg-sunlight-orange/20 p-3 rounded-xl text-sunlight-orange shrink-0 mt-0.5">
+                <Bell size={20} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-sunlight-orange/20 text-sunlight-orange px-2 py-0.5 rounded">
+                    Latest Info
+                  </span>
+                  <span className="text-xs text-silver-shine">
+                    {new Date(latestAnnouncement[0].createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                  </span>
+                </div>
+                <h3 className="font-bold text-white text-base">{latestAnnouncement[0].title}</h3>
+                <p className="text-xs text-silver-shine mt-1 line-clamp-1">{latestAnnouncement[0].content}</p>
+              </div>
+            </div>
+            <Link 
+              href="/announcements" 
+              className="bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors whitespace-nowrap shrink-0 border border-white/20"
+            >
+              View All →
+            </Link>
+          </div>
+        )}
 
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8 mb-8 backdrop-blur-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 overflow-hidden relative">
           <div className="relative z-10 w-full md:w-2/3 flex items-center justify-between">
@@ -381,7 +430,7 @@ export default async function DashboardPage() {
 
                 {(isSPC || isICC) && (
                   <div className="lg:col-span-2 bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl text-center flex flex-col justify-center">
-                    <FileText size5={40} className="text-sunlight-orange mx-auto mb-4" />
+                    <FileText size={40} className="text-sunlight-orange mx-auto mb-4" />
                     <h2 className="font-display text-2xl font-bold text-white mb-2">Full Paper Submission Portal</h2>
                     <p className="text-sm text-silver-shine mb-6 max-w-lg mx-auto">
                       Congratulations! You are officially registered as a Finalist. Please upload your Full Paper and presentation according to the Guidebook schedule.
