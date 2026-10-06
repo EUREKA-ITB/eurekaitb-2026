@@ -26,7 +26,6 @@ export default async function PaymentPage() {
 
   const compeTypeSlug = userTeam[0].compeType as CompeType;
   
-  // VALIDASI ALUR: SPC & ICC tidak boleh masuk portal bayar kalau abstrak belum "passed"
   if ((compeTypeSlug === "science-project" || compeTypeSlug === "industrial-case") && userTeam[0].abstractStatus !== "passed") {
     redirect("/dashboard");
   }
@@ -54,8 +53,11 @@ export default async function PaymentPage() {
   const startedAt = userTeam[0].paymentStartedAt;
   const isExpired = startedAt ? (new Date().getTime() > new Date(startedAt).getTime() + (3 * 60 * 60 * 1000)) : false;
 
-  // GATE PAYMENT CLOSING - 5 OKTOBER 12:00 WIB
-  const PAYMENT_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
+  // PEMISAHAN DEADLINE PEMBAYARAN BERDASARKAN CABANG LOMBA
+  const isPO = compeTypeSlug === "physics-olympiad";
+  const PO_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
+  const SPC_ICC_DEADLINE = new Date("2026-10-25T23:59:59+07:00"); // Deadline khusus SPC & ICC pasca lolos abstrak
+  const PAYMENT_DEADLINE = isPO ? PO_DEADLINE : SPC_ICC_DEADLINE;
   const now = new Date();
 
   return (
@@ -123,7 +125,7 @@ export default async function PaymentPage() {
              <AlertCircle size={64} className="text-red-400 mx-auto mb-6" />
              <h2 className="font-display text-2xl font-bold text-red-400 mb-2">Gate Pembayaran Ditutup</h2>
              <p className="text-silver-shine text-sm leading-relaxed mb-8">
-               Batas waktu pembayaran (5 Oktober 2026, 12:00 WIB) telah berakhir. Mohon maaf, registrasi tim Anda dianggap gagal karena melewati batas waktu yang telah ditentukan.
+               Batas waktu pembayaran untuk kategori {compeTypeSlug.replace(/-/g, " ")} telah berakhir. Mohon maaf, registrasi tim Anda dianggap melewati batas waktu yang ditentukan.
              </p>
              <Link href="/dashboard" className="bg-white/10 text-white font-bold px-6 py-3 rounded-xl hover:bg-white/20 transition-colors">Kembali ke Dashboard</Link>
           </div>

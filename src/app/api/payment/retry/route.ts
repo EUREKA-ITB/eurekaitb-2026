@@ -12,15 +12,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const PAYMENT_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
-    if (new Date() > PAYMENT_DEADLINE) {
-      return NextResponse.json({ error: "Batas waktu pembayaran telah berakhir." }, { status: 403 });
-    }
-
     const { teamId } = await req.json();
 
     if (!teamId) {
       return NextResponse.json({ error: "Team ID is required" }, { status: 400 });
+    }
+
+    const teamRecord = await db.select().from(teams).where(eq(teams.id, teamId)).limit(1);
+    if (teamRecord.length === 0) {
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+    }
+
+    const isPO = teamRecord[0].compeType === "physics-olympiad";
+    const PAYMENT_DEADLINE = isPO 
+      ? new Date("2026-10-05T12:00:00+07:00") 
+      : new Date("2026-10-25T23:59:59+07:00");
+
+    if (new Date() > PAYMENT_DEADLINE) {
+      return NextResponse.json({ error: "Batas waktu pembayaran telah berakhir." }, { status: 403 });
     }
 
     await db.update(teams).set({

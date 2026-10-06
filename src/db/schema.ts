@@ -8,6 +8,7 @@ export const registrationPhaseEnum = pgEnum("registration_phase", ["early_bird",
 export const abstractStatusEnum = pgEnum("abstract_status", ["waiting", "passed", "failed"]); 
 export const documentStatusEnum = pgEnum("document_status", ["waiting", "passed", "revision"]);
 export const referralTierEnum = pgEnum("referral_tier", ["Quantum", "Photon", "Electron"]);
+export const announcementCategoryEnum = pgEnum("announcement_category", ["urgent", "info", "competition"]);
 
 export const users = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -124,5 +125,14 @@ export const referralCodes = pgTable("referral_codes", {
   usedByTeam: uuid("used_by_team").references(() => teams.id),
   usedAt: timestamp("used_at"),
   createdBy: varchar("created_by", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const announcements = pgTable("announcements", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  category: announcementCategoryEnum("category").default("info").notNull(),
+  isPinned: boolean("is_pinned").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

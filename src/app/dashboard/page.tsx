@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { users, teams, teamMembers } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql, inArray } from "drizzle-orm";
 import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
 import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users, MessageCircle, AlertCircle } from "lucide-react";
@@ -15,10 +15,25 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.email) redirect("/login");
 
-  const dbUser = await db.select().from(users).where(eq(users.email, session.user.email)).limit(1);
-  if (dbUser.length === 0) redirect("/login");
+  const sessionEmail = session.user.email.toLowerCase();
 
-  const userTeam = await db.select().from(teams).where(eq(teams.userId, dbUser[0].id)).limit(1);
+  // FIX CASE SENSITIVITY: Cari user berdasarkan lowercase email untuk menghindari mismatch ID lama & baru
+  const matchedUsers = await db
+    .select()
+    .from(users)
+    .where(sql`LOWER(${users.email}) = ${sessionEmail}`);
+
+  if (matchedUsers.length === 0) redirect("/login");
+
+  const userIds = matchedUsers.map(u => u.id);
+
+  // Cari tim yang terikat ke salah satu ID user tersebut (baik ID lama maupun baru)
+  const userTeam = await db
+    .select()
+    .from(teams)
+    .where(inArray(teams.userId, userIds))
+    .limit(1);
+
   const hasRegistered = userTeam.length > 0;
 
   let membersData: {
@@ -366,12 +381,11 @@ export default async function DashboardPage() {
 
                 {(isSPC || isICC) && (
                   <div className="lg:col-span-2 bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl text-center flex flex-col justify-center">
-                    <FileText size={40} className="text-sunlight-orange mx-auto mb-4" />
+                    <FileText size5={40} className="text-sunlight-orange mx-auto mb-4" />
                     <h2 className="font-display text-2xl font-bold text-white mb-2">Full Paper Submission Portal</h2>
                     <p className="text-sm text-silver-shine mb-6 max-w-lg mx-auto">
                       Congratulations! You are officially registered as a Finalist. Please upload your Full Paper and presentation according to the Guidebook schedule.
                     </p>
-                    {/* PERBAIKAN RUTING SUBMISSION ROOM */}
                     <Link href="/dashboard/submission" className="inline-block bg-white/10 text-white font-bold px-8 py-3 rounded-xl text-sm transition-colors hover:bg-white/20 border border-white/20">
                       Open Submission Room
                     </Link>

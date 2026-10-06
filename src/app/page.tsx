@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, CalendarDays, ChevronRight, Sparkles, Trophy, Bell, Megaphone } from "lucide-react";
 import InteractiveTimeline from "@/components/InteractiveTimeline";
 import Image from "next/image";
+import { db } from "@/db";
+import { announcements } from "@/db/schema";
+import { desc } from "drizzle-orm";
 
 const competitionCards = [
   { title: "Physics Olympiad", tagline: "Individu - SMA/Sederajat", description: "Kompetisi ini cocok bagi kamu yang ingin mengukur penguasaan dan problem solving konsep fisika secara mendalam.", href: "/competition/physics-olympiad" },
@@ -15,11 +18,31 @@ const faqPreview = [
   { q: "Di mana guidebook dan update diumumkan?", a: "Guidebook dan pengumuman utama bisa diakses dari halaman kompetisi, halaman side event, dan FAQ umum." },
 ];
 
-export default function LandingPage() {
+type AnnouncementItem = {
+  id: string;
+  title: string;
+  content: string;
+  category: "urgent" | "info" | "competition";
+  isPinned: boolean;
+  createdAt: Date;
+};
+
+export default async function LandingPage() {
+  let latestAnnouncement: AnnouncementItem[] = [];
+  try {
+    const result = await db
+      .select()
+      .from(announcements)
+      .orderBy(desc(announcements.isPinned), desc(announcements.createdAt))
+      .limit(1);
+    latestAnnouncement = result as AnnouncementItem[];
+  } catch (error) {
+    latestAnnouncement = [];
+  }
+
   return (
     <div className="min-h-screen overflow-x-hidden text-white selection:bg-sunlight-orange selection:text-blue-marine">
       
-      {/* 1. HERO SECTION */}
       <section className="relative isolate pt-32 pb-24 px-4 sm:px-6 flex flex-col items-center text-center">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(255,184,0,0.15),_transparent_40%),linear-gradient(180deg,_rgba(5,10,31,0.1),_rgba(5,10,31,0.8))]"></div>
         <div className="max-w-4xl mx-auto">
@@ -39,9 +62,12 @@ export default function LandingPage() {
           <p className="mt-6 mx-auto max-w-2xl text-base sm:text-lg leading-8 text-silver-shine">
             EUREKA ITB merupakan Badan Semi Otonom (BSO) di bawah naungan HIMAFI ITB yang menyelenggarakan kompetisi tentang sains terutama fisika berskala nasional tingkat SMA dan perguruan tinggi.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link href="/#lomba" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-sunlight-orange px-8 py-3.5 text-sm font-bold text-blue-marine transition-all hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(255,184,0,0.3)]">
               Lihat Kompetisi <ArrowRight size={16} />
+            </Link>
+            <Link href="/announcements" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-sunlight-orange/40 bg-sunlight-orange/10 px-8 py-3.5 text-sm font-bold text-sunlight-orange transition-colors hover:bg-sunlight-orange/20">
+              <Megaphone size={16} /> Pengumuman Resmi
             </Link>
             <Link href="/faq" className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-sm font-bold text-white transition-colors hover:bg-white/10">
               FAQ Umum
@@ -50,7 +76,38 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 2. TIMELINE SECTION */}
+      {latestAnnouncement.length > 0 && (
+        <section className="px-4 sm:px-6 -mt-10 mb-12 relative z-20">
+          <div className="max-w-5xl mx-auto w-full">
+            <div className="bg-gradient-to-r from-blue-900/60 to-black/60 border border-sunlight-orange/40 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-[0_0_25px_rgba(255,183,3,0.15)] backdrop-blur-md">
+              <div className="flex items-start gap-4">
+                <div className="bg-sunlight-orange/20 p-3.5 rounded-2xl text-sunlight-orange shrink-0 mt-0.5">
+                  <Bell size={24} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-sunlight-orange/20 text-sunlight-orange px-2.5 py-1 rounded-full border border-sunlight-orange/30">
+                      Pengumuman Terbaru
+                    </span>
+                    <span className="text-xs text-silver-shine">
+                      {new Date(latestAnnouncement[0].createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                    </span>
+                  </div>
+                  <h3 className="font-display font-bold text-white text-lg sm:text-xl">{latestAnnouncement[0].title}</h3>
+                  <p className="text-xs sm:text-sm text-silver-shine mt-1.5 line-clamp-2 leading-relaxed">{latestAnnouncement[0].content}</p>
+                </div>
+              </div>
+              <Link 
+                href="/announcements" 
+                className="bg-sunlight-orange hover:bg-yellow-400 text-blue-marine font-bold px-6 py-3 rounded-2xl text-sm transition-colors whitespace-nowrap shrink-0 shadow-lg w-full sm:w-auto text-center"
+              >
+                Lihat Semua Pengumuman →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section id="timeline" className="px-4 sm:px-6 py-20 border-t border-white/5 bg-black/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -67,7 +124,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. COMPETITIONS SECTION */}
       <section id="lomba" className="px-4 sm:px-6 py-20 relative isolate">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.03),_transparent_40%)]"></div>
         <div className="max-w-7xl mx-auto">
@@ -100,7 +156,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. MINI COMPE SECTION */}
       <section id="side-event" className="px-4 sm:px-6 py-12">
         <div className="max-w-7xl mx-auto rounded-3xl border border-sunlight-orange/20 bg-gradient-to-r from-sunlight-orange/10 to-transparent p-8 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="absolute -right-20 -top-20 w-64 h-64 bg-sunlight-orange/10 rounded-full blur-3xl"></div>
@@ -118,7 +173,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. PREVIEW FAQ SECTION */}
       <section className="px-4 sm:px-6 py-16 mb-10 w-full overflow-hidden">
         <div className="max-w-7xl mx-auto w-full">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6 mb-8 w-full">
