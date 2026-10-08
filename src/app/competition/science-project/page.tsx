@@ -36,8 +36,8 @@ export default function ScienceProjectPage() {
   };
 
   const documents = [
-    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/gb-spc-rev1.pdf" },
-    { id: "format_laporan", title: "Report Format", url: "https://drive.google.com/drive/folders/1qCLomko2HcE_j5gImmNITH4_BP3MRKae?usp=drive_link" },
+    { id: "guidebook", title: "Official Guidebook", url: "/guidebooks/gb-spc-rev2.pdf" },
+    { id: "format_laporan", title: "Report Format", url: "https://drive.google.com/drive/u/2/folders/1U7gQLgxt9XbYOEVuXP34ZTpF-qNS0BjM" },
   ];
   
   const [activePdfIndex, setActivePdfIndex] = useState(0);

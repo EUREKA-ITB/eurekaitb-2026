@@ -10,6 +10,7 @@ import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users,
 import Image from "next/image";
 import AbstractPortalClient from "./AbstractPortalClient"; 
 import SuccessConfetti from "./SuccessConfetti";
+import ExamLoginGuide from "@/components/ExamLoginGuide";
 
 type AnnouncementItem = {
   id: string;
@@ -422,7 +423,11 @@ export default async function DashboardPage() {
                           <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">User:</p><p className="font-mono font-bold">{participantNumber}</p></div>
                           <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">Pass:</p><p className="font-mono font-bold">{cbtPassword}</p></div>
                         </div>
-                        <a href="https://cbt.indolat.com" target="_blank" rel="noreferrer" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">Enter Exam Platform</a>
+                        <ExamLoginGuide
+                          username={participantNumber}
+                          password={cbtPassword}
+                        />
+                        <a href="https://exam.eurekaitb.com" target="_blank" rel="noreferrer" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">Enter Exam Platform</a>
                       </div>
                     </div>
                   </div>
