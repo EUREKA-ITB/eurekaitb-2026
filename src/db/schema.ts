@@ -37,7 +37,7 @@ export const teams = pgTable("teams", {
   abstractUrl: text("abstract_url"), 
   abstractStatus: abstractStatusEnum("abstract_status").default("waiting").notNull(),
   caseChoice: varchar("case_choice", { length: 100 }), 
-  fullPaperUrl: text("full_paper_url"), 
+  fullPaperUrl: varchar("full_paper_url"), 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   paymentStartedAt: timestamp("payment_started_at"),
   participantNumber: varchar("participant_number", { length: 50 }),

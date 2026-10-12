@@ -23,9 +23,15 @@ export default function PaymentUploader({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isPO = compeType === "physics-olympiad";
+  const isSPC = compeType === "science-project";
+  
   const PO_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
-  const SPC_ICC_DEADLINE = new Date("2026-10-25T23:59:59+07:00");
-  const PAYMENT_DEADLINE = isPO ? PO_DEADLINE : SPC_ICC_DEADLINE;
+  const SPC_DEADLINE = new Date("2026-10-08T23:59:59+07:00");
+  const ICC_DEADLINE = new Date("2026-10-23T23:59:59+07:00");
+  
+  let PAYMENT_DEADLINE = ICC_DEADLINE;
+  if (isPO) PAYMENT_DEADLINE = PO_DEADLINE;
+  else if (isSPC) PAYMENT_DEADLINE = SPC_DEADLINE;
 
   const handleUploadSuccess = (res: CloudinaryResult) => {
     if (typeof res.info === "object" && res.info?.secure_url) {
@@ -37,7 +43,7 @@ export default function PaymentUploader({
     const now = new Date();
     
     if (now > PAYMENT_DEADLINE) {
-      const deadlineText = isPO ? "5 Oktober 2026, 12:00 WIB" : "25 Oktober 2026, 23:59 WIB";
+      const deadlineText = isPO ? "5 Oktober 2026, 12:00 WIB" : (isSPC ? "8 Oktober 2026, 23:59 WIB" : "23 Oktober 2026, 23:59 WIB");
       alert(`Batas waktu pengiriman bukti pembayaran telah habis (${deadlineText})!`);
       return;
     }

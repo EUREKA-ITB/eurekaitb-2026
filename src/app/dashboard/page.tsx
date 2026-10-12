@@ -6,11 +6,10 @@ import { users, teams, teamMembers, announcements } from "@/db/schema";
 import { eq, sql, inArray, desc } from "drizzle-orm";
 import Link from "next/link";
 import LogoutButton from "@/components/LogoutButton";
-import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users, MessageCircle, AlertCircle, Bell } from "lucide-react";
+import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users, MessageCircle, AlertCircle, Bell, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import AbstractPortalClient from "./AbstractPortalClient"; 
 import SuccessConfetti from "./SuccessConfetti";
-import ExamLoginGuide from "@/components/ExamLoginGuide";
 
 type AnnouncementItem = {
   id: string;
@@ -185,7 +184,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="flex flex-col w-full box-border">
-            
+
             {documentStatus === "revision" && (
                 <div className="bg-yellow-500/10 border border-yellow-500/30 p-5 sm:p-6 rounded-3xl w-full mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 shadow-[0_0_20px_rgba(234,179,8,0.1)]">
                    <AlertCircle className="text-yellow-500 shrink-0 mt-1 sm:mt-0" size={36} />
@@ -232,11 +231,11 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="w-full text-center border border-white/20 bg-black/40 text-silver-shine font-bold py-3.5 rounded-xl text-sm shadow-md flex items-center justify-center gap-2 cursor-not-allowed">
                     <Lock size={16}/> Data Registrasi Terkunci
                   </div>
-                  
+
                   {isICC && (
                     <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                       <MessageCircle size={18}/> Join WhatsApp Group
@@ -262,7 +261,7 @@ export default async function DashboardPage() {
                 : "bg-black/30 border border-white/10 shadow-none grayscale-[20%]"
               }`}>
                 {abstractStatus === "passed" && <SuccessConfetti />}
-                
+
                 <div className={`p-4 rounded-full shrink-0 relative z-10 ${abstractStatus === "passed" ? "bg-sunlight-orange/20 text-sunlight-orange" : "bg-white/5 text-silver-shine"}`}>
                   {abstractStatus === "passed" ? <Trophy size={32} /> : <AlertCircle size={32} />}
                 </div>
@@ -284,11 +283,11 @@ export default async function DashboardPage() {
                 <div className="bg-white/5 border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm flex flex-col justify-between">
                   <div>
                     <p className="text-silver-shine text-xs uppercase tracking-wider mb-2 flex items-center gap-2"><Users size={16}/> Registration Data</p>
-                    
+
                     <h3 className="font-display text-2xl font-bold text-white mb-6">
                       {isPO && membersData.length > 0 ? membersData[0].fullName : userTeam[0].teamName}
                     </h3>
-                    
+
                     <div className="space-y-4 text-sm bg-black/20 p-5 rounded-xl border border-white/5">
                       <div className="flex justify-between items-center border-b border-white/10 pb-3 gap-2">
                         <span className="text-silver-shine">Category</span><span className="font-semibold capitalize text-sunlight-orange text-right">{compeTypeSlug.replace(/-/g, " ")}</span>
@@ -298,7 +297,7 @@ export default async function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {userTeam[0].statusPayment === "unpaid" ? (
                     <Link href="/dashboard/register-lomba" className="w-full text-center border-2 border-white/20 text-white font-bold py-3 rounded-xl hover:bg-white/10 transition-colors text-sm mt-6 block">
                       Edit Registration Data
@@ -321,7 +320,7 @@ export default async function DashboardPage() {
                     <h3 className="font-display text-xl font-bold mb-4 text-white flex items-center gap-2">
                       <CreditCard className={isPending ? "text-yellow-500" : "text-silver-shine"} size={24}/> Administration
                     </h3>
-                    
+
                     {abstractStatus === "failed" ? (
                       <>
                         <p className="text-sm text-silver-shine mb-6">
@@ -348,7 +347,7 @@ export default async function DashboardPage() {
                       </>
                     )}
                   </div>
-                  
+
                   {abstractStatus !== "failed" && (
                     <div className="mt-6 text-center">
                       {!isPending && (
@@ -370,7 +369,7 @@ export default async function DashboardPage() {
 
             {isVerified && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                
+
                 <div className="lg:col-span-1 flex flex-col gap-4">
                   <div className="bg-gradient-to-br from-sunlight-orange to-yellow-600 p-1 rounded-3xl shadow-2xl relative overflow-hidden group">
                     <div className="bg-blue-marine/90 w-full h-full rounded-[22px] p-6 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden">
@@ -382,11 +381,11 @@ export default async function DashboardPage() {
                           Official Participant
                           <span className="bg-green-500 text-white px-2 py-0.5 rounded-md text-[8px] tracking-normal">VERIFIED</span>
                         </p>
-                        
+
                         <h3 className="font-display text-2xl font-bold text-white mb-6 break-words mt-2">
                           {isPO && membersData.length > 0 ? membersData[0].fullName : userTeam[0].teamName}
                         </h3>
-                        
+
                         <div className="space-y-3 text-xs mb-8">
                           <div>
                             <p className="text-silver-shine">Category</p>
@@ -406,7 +405,7 @@ export default async function DashboardPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   <a href={waGroupLinks[compeTypeSlug as keyof typeof waGroupLinks]} target="_blank" rel="noreferrer" className="w-full bg-green-500/20 border border-green-500/40 text-green-400 font-bold py-3.5 rounded-xl hover:bg-green-500/30 transition-colors text-sm shadow-md flex items-center justify-center gap-2">
                     <MessageCircle size={18}/> Join WhatsApp Group
                   </a>
@@ -419,15 +418,36 @@ export default async function DashboardPage() {
                       <div className="bg-gradient-to-r from-blue-900/40 to-black/40 border border-white/10 rounded-2xl p-6">
                         <h3 className="text-white font-bold mb-2">Preliminary & Semifinal: CBT Platform</h3>
                         <p className="text-sm text-silver-shine mb-4">Use the credentials below to access the external EUREKA exam platform.</p>
+                        
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">User:</p><p className="font-mono font-bold">{participantNumber}</p></div>
                           <div className="bg-white/5 p-3 rounded-lg border border-white/10"><p className="text-[10px] uppercase text-silver-shine">Pass:</p><p className="font-mono font-bold">{cbtPassword}</p></div>
                         </div>
-                        <ExamLoginGuide
-                          username={participantNumber}
-                          password={cbtPassword}
-                        />
-                        <a href="https://exam.eurekaitb.com" target="_blank" rel="noreferrer" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">Enter Exam Platform</a>
+
+                        <details className="group rounded-xl border border-white/10 bg-black/20 mb-6 transition-colors hover:bg-white/5 cursor-pointer">
+                          <summary className="list-none font-bold text-sm text-sunlight-orange p-4 flex justify-between items-center outline-none">
+                            <span className="flex items-center gap-2"><FileText size={16}/> Tutorial Login Portal CBT</span>
+                            <ChevronDown size={16} className="transition-transform group-open:rotate-180" />
+                          </summary>
+                          <div className="p-4 pt-0 text-xs text-silver-shine space-y-3 border-t border-white/10 mt-2 leading-relaxed">
+                            <p>1. Peserta mengakses halaman dashboard peserta pada laman web eurekaitb.com dan mencatat credentials <strong>Username</strong> dan <strong>Password</strong> yang didapatkan peserta.</p>
+                            <p>2. Peserta membuka laman web exam.eurekaitb.com dengan klik tombol <strong>Enter Exam Platform</strong> dan login menggunakan credentials masing-masing dengan format seperti berikut:</p>
+                            <ul className="list-disc pl-5 space-y-1">
+                              <li><strong>Email Address:</strong> [username dalam huruf nonkapital]@eurekaitb.com</li>
+                              <li><strong>Password:</strong> [password dalam huruf kapital]</li>
+                            </ul>
+                            <div className="bg-white/5 p-3 rounded-lg border border-white/10 mt-2 text-white">
+                              <p className="font-bold mb-1">Contoh:</p>
+                              <ul className="list-disc pl-5 space-y-1">
+                                <li><strong>Email Address:</strong> e26-po-0001@eurekaitb.com</li>
+                                <li><strong>Password:</strong> 2HV0VR</li>
+                              </ul>
+                            </div>
+                            <p>3. Setelah peserta login, Try Out akan muncul di dashboard peserta dan siap untuk dikerjakan.</p>
+                          </div>
+                        </details>
+
+                        <a href="https://exam.eurekaitb.com/" target="_blank" rel="noreferrer" className="block text-center bg-sunlight-orange text-blue-marine font-bold py-3 rounded-xl text-sm transition-colors hover:bg-yellow-400">Enter Exam Platform</a>
                       </div>
                     </div>
                   </div>

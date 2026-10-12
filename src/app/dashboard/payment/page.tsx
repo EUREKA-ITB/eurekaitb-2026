@@ -54,9 +54,15 @@ export default async function PaymentPage() {
   const isExpired = startedAt ? (new Date().getTime() > new Date(startedAt).getTime() + (3 * 60 * 60 * 1000)) : false;
 
   const isPO = compeTypeSlug === "physics-olympiad";
+  const isSPC = compeTypeSlug === "science-project";
   const PO_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
-  const SPC_ICC_DEADLINE = new Date("2026-10-25T23:59:59+07:00");
-  const PAYMENT_DEADLINE = isPO ? PO_DEADLINE : SPC_ICC_DEADLINE;
+  const SPC_DEADLINE = new Date("2026-10-08T23:59:59+07:00");
+  const ICC_DEADLINE = new Date("2026-10-23T23:59:59+07:00");
+  
+  let PAYMENT_DEADLINE = ICC_DEADLINE;
+  if (isPO) PAYMENT_DEADLINE = PO_DEADLINE;
+  else if (isSPC) PAYMENT_DEADLINE = SPC_DEADLINE;
+  
   const now = new Date();
 
   return (
@@ -105,7 +111,7 @@ export default async function PaymentPage() {
                 {discountPercentage > 0 && (
                   <div className="flex justify-between items-center pb-2 mb-2">
                     <span className="font-semibold text-green-600">Referral Discount ({discountPercentage}%)</span>
-                    <span className="font-bold text-green-600">- {formatIDR(nominalDiscount)}</span>
+                    <span className="font-bold text-green-600">{formatIDR(nominalDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
@@ -186,7 +192,7 @@ export default async function PaymentPage() {
                         {discountPercentage > 0 && (
                            <div className="flex justify-between items-center bg-green-500/10 p-3 rounded-lg border border-green-500/20">
                               <span className="text-green-400 font-bold">Referral Applied ({discountPercentage}%)</span>
-                              <span className="font-bold text-green-400">- {formatIDR(nominalDiscount)}</span>
+                              <span className="font-bold text-green-400">{formatIDR(nominalDiscount)}</span>
                            </div>
                         )}
                         

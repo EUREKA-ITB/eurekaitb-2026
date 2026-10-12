@@ -79,6 +79,13 @@ export async function POST(req: Request) {
     if (!compeType || !teamName || members.length === 0) {
       return NextResponse.json({ error: "All essential fields are required!" }, { status: 400 });
     }
+
+    if (compeType === "science-project" || compeType === "industrial-case") {
+       if (members.length < 2 || members.length > 3) {
+          return NextResponse.json({ error: "Tim SPC dan ICC wajib beranggotakan 2 hingga 3 orang." }, { status: 400 });
+       }
+    }
+
     if (compeType !== "industrial-case" && !institutionName) {
       return NextResponse.json({ error: "Institution is required for PO and SPC!" }, { status: 400 });
     }
@@ -88,9 +95,9 @@ export async function POST(req: Request) {
 
     const existingTeam = await db.select().from(teams).where(eq(teams.userId, userId)).limit(1);
     
-    const REGIST_DEADLINE = new Date("2026-10-04T23:59:59+07:00");
+    const REGIST_DEADLINE = new Date("2026-09-30T23:59:59+07:00");
     if (existingTeam.length === 0 && new Date() > REGIST_DEADLINE) {
-      return NextResponse.json({ error: "Batas waktu pendaftaran tim baru telah ditutup." }, { status: 403 });
+      return NextResponse.json({ error: "Batas waktu pendaftaran tim baru telah ditutup (30 September 2026)." }, { status: 403 });
     }
     
     let targetTeamId = "";

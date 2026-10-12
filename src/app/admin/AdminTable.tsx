@@ -107,7 +107,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
       t.abstractUrl || "Empty", t.document.urlPayment || "Empty"
     ]);
     
-    // FIX: Menggunakan Blob untuk menghindari limitasi ukuran string dari encodeURI
     const csvContent = [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -118,7 +117,7 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url); // Cleanup memory
+    URL.revokeObjectURL(url);
     
     toast.success("CSV file successfully downloaded!");
   };
@@ -345,7 +344,6 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
                     )}
                   </td>
                   <td className="p-5 text-right whitespace-nowrap">
-                    {/* FIX: suppressHydrationWarning agar ekstensi browser tidak bikin error merah */}
                     <button 
                       suppressHydrationWarning 
                       onClick={() => { setSelectedTeam(team); setTempNotes(team.adminNotes || ""); }} 
@@ -385,21 +383,20 @@ export default function AdminTable({ initialData }: { initialData: AdminTeamData
               
               {selectedTeam.statusPayment === "verified" && selectedTeam.participantNumber && (
                 <div className="bg-gradient-to-r from-sunlight-orange/20 to-transparent p-5 rounded-2xl border border-sunlight-orange/40 shadow-[0_0_15px_rgba(255,184,0,0.1)]">
-                  {/* FIX: Conditional Label & Icon berdasarkan Kategori */}
                   <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-sunlight-orange">
                     <Key size={18}/> 
-                    {selectedTeam.compeType === 'physics_olympiad' ? 'CBT Credentials (Indolat)' : 'Team Credentials'}
+                    {selectedTeam.compeType === 'physics-olympiad' ? 'CBT Credentials (Indolat)' : 'Team Credentials'}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 bg-black/40 rounded-xl border border-white/10">
                       <p className="text-[10px] uppercase tracking-wider text-silver-shine mb-1">
-                        {selectedTeam.compeType === 'physics_olympiad' ? 'CBT Username' : 'Team ID'}
+                        {selectedTeam.compeType === 'physics-olympiad' ? 'CBT Username' : 'Team ID'}
                       </p>
                       <p className="font-mono font-bold text-white text-lg tracking-wider">{selectedTeam.participantNumber}</p>
                     </div>
                     <div className="p-4 bg-black/40 rounded-xl border border-white/10">
                       <p className="text-[10px] uppercase tracking-wider text-silver-shine mb-1">
-                        {selectedTeam.compeType === 'physics_olympiad' ? 'CBT Password' : 'Access Key'}
+                        {selectedTeam.compeType === 'physics-olympiad' ? 'CBT Password' : 'Access Key'}
                       </p>
                       <p className="font-mono font-bold text-white text-lg tracking-wider">{selectedTeam.cbtPassword || "N/A"}</p>
                     </div>
