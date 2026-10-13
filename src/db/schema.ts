@@ -134,5 +134,6 @@ export const announcements = pgTable("announcements", {
   content: text("content").notNull(),
   category: announcementCategoryEnum("category").default("info").notNull(),
   isPinned: boolean("is_pinned").default(false).notNull(),
+  pdfUrl: text("pdf_url"), // <-- Tambahan kolom PDF Viewer / Lampiran
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
