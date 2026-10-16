@@ -159,7 +159,7 @@ export default function AbstractPortalClient({
       {!isSPC && <div className="mb-6"></div>}
 
       <CldUploadWidget 
-        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PDF_PRESET} 
         options={{ maxFiles: 1, clientAllowedFormats: ["pdf"], resourceType: "auto" }}
         onSuccess={handleUploadSuccess}
       >

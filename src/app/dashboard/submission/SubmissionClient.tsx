@@ -101,7 +101,7 @@ export default function SubmissionClient({
         <p className="text-xs text-silver-shine mb-6">Unggah dokumen lengkap sesuai panduan Guidebook.</p>
         
         <CldUploadWidget 
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PDF_PRESET} 
           options={{ maxFiles: 1, clientAllowedFormats: ["pdf"], resourceType: "auto" }}
           onSuccess={(res: CloudinaryResult) => {
             if (typeof res.info === "object" && res.info?.secure_url) {
