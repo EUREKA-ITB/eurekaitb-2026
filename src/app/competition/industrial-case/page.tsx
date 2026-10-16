@@ -6,6 +6,7 @@ import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCirc
 import { COMPETITION_PRICING, PHASE_NAMES, formatIDR, getCurrentPhase } from "@/lib/competition-config";
 import type { CompeType, Phase } from "@/lib/competition-config";
 import Image from "next/image";
+import { CldImage } from "next-cloudinary";
 
 type DocItem = { id: string; title: string; url: string; };
 type TimelineItem = { date: string; title: string; desc: string; };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Sparkles, Target, Users, Atom, Handshake, Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CldImage } from "next-cloudinary";
 
 type Sponsor = {
   name: string;
@@ -151,7 +152,7 @@ export default function AboutPage() {
                     >
                       {sponsor.logoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img 
+                        <CldImage 
                           src={sponsor.logoUrl} 
                           alt={sponsor.name} 
                           className="max-h-full max-w-full object-contain drop-shadow-2xl rounded-md" 

@@ -3,6 +3,7 @@ import { ExternalLink, Mail } from "lucide-react";
 import { db } from "@/db"; 
 import { sideEventBlocks } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
+import { CldImage } from "next-cloudinary";
 
 export const revalidate = 0; 
 
@@ -29,7 +30,7 @@ export default async function SideEventPage() {
       <div className="w-full max-w-xl z-10 flex flex-col items-center">
         
         <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-xl overflow-hidden">
-           <img 
+           <CldImage  
              src="/side-event/PP-SE-2.png" 
              alt="Profile Side Event" 
              loading="lazy"
@@ -60,7 +61,7 @@ export default async function SideEventPage() {
               if (block.type === "image") {
                 const imageContent = (
                   <div className="w-full rounded-2xl overflow-hidden border border-white/10 bg-black/40 flex flex-col">
-                    <img 
+                    <CldImage
                       src={getDirectImageUrl(block.url)} 
                       alt={block.title || "EUREKA Image"} 
                       loading="lazy"
@@ -123,7 +124,7 @@ export default async function SideEventPage() {
                   
                   <div className="flex items-center gap-4 relative z-10 min-w-0 flex-1 pr-4">
                     {block.iconUrl ? (
-                      <img 
+                      <CldImage
                         src={getDirectImageUrl(block.iconUrl)} 
                         alt="Icon" 
                         loading="lazy"
