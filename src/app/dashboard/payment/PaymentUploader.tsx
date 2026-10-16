@@ -76,7 +76,7 @@ export default function PaymentUploader({
   return (
     <div className="flex flex-col gap-4">
       <CldUploadWidget 
-        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET} 
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PDF_PRESET} 
         options={{ maxFiles: 1, clientAllowedFormats: ["jpg", "jpeg", "png", "webp", "pdf"], resourceType: "auto" }}
         onSuccess={handleUploadSuccess}
       >
