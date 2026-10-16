@@ -26,7 +26,7 @@ export default function PaymentUploader({
   const isSPC = compeType === "science-project";
   
   const PO_DEADLINE = new Date("2026-10-05T12:00:00+07:00");
-  const SPC_DEADLINE = new Date("2026-10-08T23:59:59+07:00");
+  const SPC_DEADLINE = new Date("2026-10-23T23:59:59+07:00");
   const ICC_DEADLINE = new Date("2026-10-23T23:59:59+07:00");
   
   let PAYMENT_DEADLINE = ICC_DEADLINE;
