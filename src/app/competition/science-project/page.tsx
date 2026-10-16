@@ -6,7 +6,6 @@ import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCirc
 import { COMPETITION_PRICING, PHASE_NAMES, formatIDR, getCurrentPhase } from "@/lib/competition-config";
 import type { CompeType, Phase } from "@/lib/competition-config";
 import Image from "next/image";
-import { CldImage } from "next-cloudinary";
 
 type DocItem = { id: string; title: string; url: string; };
 type TimelineItem = { date: string; title: string; desc: string; };
@@ -106,9 +105,9 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
               </p>
               <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <CldImage src="/logo-cms/brin-c.png" alt="BRIN" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                <img src="/logo-cms/brin-c.png" alt="BRIN" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <CldImage src="/logo-cms/iasssf-c.png" alt="IASSSF" className="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                <img src="/logo-cms/iasssf-c.png" alt="IASSSF" className="h-20 sm:h-24 md:h-28 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
               </div>
             </div>
             

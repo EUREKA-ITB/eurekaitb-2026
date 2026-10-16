@@ -6,7 +6,6 @@ import { ArrowLeft, BookOpen, Trophy, Users, FileText, Calendar, Medal, HelpCirc
 import { COMPETITION_PRICING, PHASE_NAMES, formatIDR, getCurrentPhase } from "@/lib/competition-config";
 import type { CompeType } from "@/lib/competition-config";
 import Image from "next/image";
-import { CldImage } from "next-cloudinary";
 
 type DocItem = { id: string; title: string; url: string; };
 type TimelineItem = { date: string; title: string; desc: string; };
@@ -106,14 +105,14 @@ function CompetitionTemplate({ formatName, lombaId, info, documents, activeDoc, 
                 <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-silver-shine text-center">Curated By</p>
                 <div className="flex items-center h-16">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <CldImage src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-14 sm:h-16 md:h-18 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                  <img src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-14 sm:h-16 md:h-18 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
                 </div>
               </div>
               <div className="flex flex-col items-center justify-between h-24">
                 <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-silver-shine text-center">Official Platform Partner</p>
                 <div className="flex items-center h-16">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <CldImage src="/logo-cms/indolat-s.png" alt="Indolat" className="h-9 sm:h-11 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+                  <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-9 sm:h-11 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
                 </div>
               </div>
             </div>

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowUpRight, Mail, MapPin } from "lucide-react";
-import { CldImage } from "next-cloudinary";
 
 const quickLinks = [
   { label: "Home", href: "/" },
@@ -115,21 +114,21 @@ export default function SiteFooter() {
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/puspresnas-c.png" alt="Puspresnas" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/brin-c.png" alt="BRIN" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/brin-c.png" alt="BRIN" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/iasssf-c.png" alt="IASSSF" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/iasssf-c.png" alt="IASSSF" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/pln-c.png" alt="PLN Nusantara Power" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/indolat-s.png" alt="Indolat" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/indolat-s.png" alt="Indolat" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/jago-s.png" alt="Jago" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/jago-s.png" alt="Jago" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/komatsu-s.png" alt="Komatsu" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/komatsu-s.png" alt="Komatsu" className="h-8 sm:h-10 md:h-12 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <CldImage src="/logo-cms/uiss-m.png" alt="UISS" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
+            <img src="/logo-cms/uiss-m.png" alt="UISS" className="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xl transition-transform hover:scale-105" />
           </div>
         </div>
 
