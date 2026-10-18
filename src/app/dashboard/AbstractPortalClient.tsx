@@ -128,7 +128,7 @@ export default function AbstractPortalClient({
 
             <div className="mt-2 pt-6 border-t border-white/10">
               <p className="text-xs text-silver-shine mb-3">
-                Dokumen dapat direvisi sebelum batas waktu (25 Oktober 2026).
+                Dokumen dapat direvisi sebelum batas waktu (16 Oktober 2026 pukul 23.59).
               </p>
               <button 
                 onClick={() => { setIsSuccess(false); setUploadedUrl(null); }}
