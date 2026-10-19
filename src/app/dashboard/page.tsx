@@ -10,6 +10,7 @@ import { CheckCircle2, Clock, CreditCard, FileText, Lock, QrCode, Trophy, Users,
 import Image from "next/image";
 import AbstractPortalClient from "./AbstractPortalClient"; 
 import SuccessConfetti from "./SuccessConfetti";
+import CompetitionResult from "./CompetitionResult";
 
 type AnnouncementItem = {
   id: string;
@@ -97,6 +98,9 @@ export default async function DashboardPage() {
        else currentStep = 1; 
     }
   }
+
+  const resultStatus = userTeam[0]?.resultStatus ?? "pending";
+  const resultNotes = userTeam[0]?.resultNotes ?? null;
 
   let latestAnnouncement: AnnouncementItem[] = [];
   try {
@@ -276,6 +280,13 @@ export default async function DashboardPage() {
                   </p>
                 </div>
               </div>
+            )}
+
+            {(isSPC || isICC) && resultStatus !== "pending" && (
+              <CompetitionResult
+                resultStatus={resultStatus}
+                resultNotes={resultNotes}
+              />
             )}
 
             {(!isVerified && (isPO || ((isSPC || isICC) && abstractStatus !== "waiting"))) && (

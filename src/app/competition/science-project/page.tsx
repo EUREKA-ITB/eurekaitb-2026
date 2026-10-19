@@ -47,7 +47,7 @@ export default function ScienceProjectPage() {
     { date: "Aug 16 - 29, 2026", title: "Wave 1 Registration", desc: "Pendaftaran peserta dan pengumpulan abstrak secara online." },
     { date: "Aug 30 - Sep 19, 2026", title: "Wave 2 Registration", desc: "Pendaftaran peserta dan pengumpulan abstrak secara online." },
     { date: "Sep 20 - 30, 2026", title: "Wave 3 Registration", desc: "Pendaftaran peserta dan pengumpulan abstrak secara online." },
-    { date: "Oct 31, 2026", title: "Semifinal Round", desc: "Peserta mengumpulkan full paper secara online." },
+    { date: "Oct 23, 2026", title: "Semifinal Round", desc: "Peserta mengumpulkan full paper secara online." },
     { date: "Nov 28 - 29, 2026", title: "Final Round", desc: "Dilaksanakan secara luring di Kampus ITB Ganesha." },
   ];
 
