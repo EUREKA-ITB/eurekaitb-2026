@@ -3,17 +3,23 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
-import { UploadCloud, CheckCircle2, FileText, CheckSquare, AlertCircle } from "lucide-react";
+import {
+  UploadCloud,
+  CheckCircle2,
+  FileText,
+  CheckSquare,
+  AlertCircle,
+} from "lucide-react";
 
 interface CloudinaryResult {
   info?: string | { secure_url?: string };
 }
 
-export default function SubmissionClient({ 
-  teamId, 
-  compeType, 
-  initialUrl 
-}: { 
+export default function SubmissionClient({
+  teamId,
+  compeType,
+  initialUrl,
+}: {
   teamId: string;
   compeType: string;
   initialUrl: string | null;
@@ -26,34 +32,54 @@ export default function SubmissionClient({
 
   const SPC_DEADLINE = new Date("2026-10-23T23:59:59+07:00");
   const ICC_DEADLINE = new Date("2026-11-07T23:59:59+07:00");
-  const SUBMISSION_DEADLINE = compeType === "science-project" ? SPC_DEADLINE : ICC_DEADLINE;
-  const isLocked = new Date() > SUBMISSION_DEADLINE;
+  const submissionDeadline =
+    compeType === "science-project" ? SPC_DEADLINE : ICC_DEADLINE;
+  const isLocked = new Date() > submissionDeadline;
 
   const handleSubmit = async () => {
     setErrorMessage(null);
 
     if (!paperUrl) {
-      setErrorMessage("Harap unggah dokumen PDF terlebih dahulu sebelum submit!");
+      setErrorMessage(
+        "Harap unggah dokumen PDF terlebih dahulu sebelum submit!"
+      );
       return;
     }
 
     setIsSubmitting(true);
+
     try {
       const response = await fetch("/api/submission", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamId, paperUrl }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          teamId,
+          type: "fullPaper",
+          paperUrl,
+        }),
       });
 
-      if (response.ok) {
-        setIsSuccess(true);
-        router.refresh();
-      } else {
-        const errorData = await response.json();
-        setErrorMessage(`GAGAL SUBMIT: ${errorData.error}`);
+      const responseData = (await response.json()) as {
+        error?: string;
+      };
+
+      if (!response.ok) {
+        setErrorMessage(
+          `GAGAL SUBMIT: ${
+            responseData.error ?? "Terjadi kesalahan saat mengirim dokumen."
+          }`
+        );
+        return;
       }
-    } catch (error) {
-      setErrorMessage("GAGAL JARINGAN: Terjadi kesalahan koneksi atau server down.");
+
+      setIsSuccess(true);
+      router.refresh();
+    } catch {
+      setErrorMessage(
+        "GAGAL JARINGAN: Terjadi kesalahan koneksi atau server down."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -61,28 +87,49 @@ export default function SubmissionClient({
 
   if (isLocked) {
     return (
-      <div className="bg-red-500/10 border border-red-500/30 p-4 sm:p-6 rounded-2xl text-red-400 font-bold max-w-2xl mx-auto text-sm sm:text-base w-full">
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold text-red-400 sm:p-6 sm:text-base">
         Batas waktu pengumpulan dokumen telah berakhir!
       </div>
     );
   }
 
-  if (isSuccess && paperUrl === initialUrl) {
+  if (isSuccess && paperUrl === initialUrl && initialUrl) {
     return (
-      <div className="bg-green-500/10 border border-green-500/30 p-6 sm:p-8 rounded-2xl text-center max-w-2xl mx-auto w-full">
-        <CheckCircle2 size={48} className="text-green-400 mx-auto mb-4 sm:w-16 sm:h-16" />
-        <h3 className="text-lg sm:text-xl font-bold text-green-400 mb-2">Submission Tersimpan!</h3>
-        <p className="text-xs sm:text-sm text-silver-shine mb-6">Dokumen tim Anda telah terarsip di sistem kami.</p>
-        
-        <a href={initialUrl!} target="_blank" rel="noreferrer" className="inline-block bg-white/10 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold mb-4 hover:bg-white/20 transition">
+      <div className="mx-auto w-full max-w-2xl rounded-2xl border border-green-500/30 bg-green-500/10 p-6 text-center sm:p-8">
+        <CheckCircle2
+          size={48}
+          className="mx-auto mb-4 text-green-400 sm:h-16 sm:w-16"
+        />
+
+        <h3 className="mb-2 text-lg font-bold text-green-400 sm:text-xl">
+          Submission Tersimpan!
+        </h3>
+
+        <p className="mb-6 text-xs text-silver-shine sm:text-sm">
+          Dokumen tim Anda telah tersimpan di sistem kami.
+        </p>
+
+        <a
+          href={initialUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mb-4 inline-block rounded-xl bg-white/10 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-white/20 sm:text-sm"
+        >
           Lihat Dokumen Terkirim ↗
         </a>
 
-        <div className="mt-4 pt-4 border-t border-green-500/20">
-          <p className="text-xs text-silver-shine mb-3">Ingin merevisi dokumen sebelum deadline ditutup?</p>
-          <button 
-            onClick={() => { setIsSuccess(false); setPaperUrl(null); }}
-            className="text-xs bg-yellow-500/20 text-yellow-500 px-4 py-2.5 rounded-lg hover:bg-yellow-500/30 transition font-bold w-full sm:w-auto"
+        <div className="mt-4 border-t border-green-500/20 pt-4">
+          <p className="mb-3 text-xs text-silver-shine">
+            Ingin mengganti dokumen sebelum batas waktu pengumpulan?
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsSuccess(false);
+              setPaperUrl(null);
+            }}
+            className="w-full rounded-lg bg-yellow-500/20 px-4 py-2.5 text-xs font-bold text-yellow-500 transition hover:bg-yellow-500/30 sm:w-auto"
           >
             Upload Ulang Dokumen Baru
           </button>
@@ -92,57 +139,94 @@ export default function SubmissionClient({
   }
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 text-left max-w-2xl mx-auto w-full">
-      <div className="bg-black/30 border border-white/10 p-5 sm:p-8 rounded-2xl w-full">
-        <h3 className="font-bold text-white mb-2 flex items-center gap-2 text-sm sm:text-base">
-          <FileText size={18} className="text-sunlight-orange shrink-0"/> 
-          {compeType === "industrial-case" ? "Full Report (PDF)" : "Full Paper (PDF)"}
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 text-left sm:gap-6">
+      <div className="w-full rounded-2xl border border-white/10 bg-black/30 p-5 sm:p-8">
+        <h3 className="mb-2 flex items-center gap-2 text-sm font-bold text-white sm:text-base">
+          <FileText size={18} className="shrink-0 text-sunlight-orange" />
+          {compeType === "industrial-case"
+            ? "Full Report (PDF)"
+            : "Full Paper (PDF)"}
         </h3>
-        <p className="text-xs text-silver-shine mb-6">Unggah dokumen lengkap sesuai panduan Guidebook.</p>
-        
-        <CldUploadWidget 
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PDF_PRESET} 
-          options={{ maxFiles: 1, clientAllowedFormats: ["pdf"], resourceType: "auto" }}
-          onSuccess={(res: CloudinaryResult) => {
-            if (typeof res.info === "object" && res.info?.secure_url) {
-              setPaperUrl(res.info.secure_url);
-              setErrorMessage(null); // Menghilangkan error jika upload berhasil
+
+        <p className="mb-6 text-xs text-silver-shine">
+          Unggah dokumen lengkap sesuai panduan Guidebook.
+        </p>
+
+        <CldUploadWidget
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PDF_PRESET}
+          options={{
+            maxFiles: 1,
+            clientAllowedFormats: ["pdf"],
+            resourceType: "auto",
+          }}
+          onSuccess={(result: CloudinaryResult) => {
+            if (
+              typeof result.info === "object" &&
+              result.info?.secure_url
+            ) {
+              setPaperUrl(result.info.secure_url);
+              setErrorMessage(null);
             }
           }}
         >
           {({ open }) => (
-            <div onClick={() => open()} className={`cursor-pointer border-2 border-dashed rounded-xl p-6 sm:p-8 text-center transition-colors ${paperUrl ? "border-green-500/50 bg-green-500/5" : "border-white/20 bg-white/5 hover:bg-white/10"}`}>
+            <button
+              type="button"
+              onClick={() => open()}
+              className={`w-full cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors sm:p-8 ${
+                paperUrl
+                  ? "border-green-500/50 bg-green-500/5"
+                  : "border-white/20 bg-white/5 hover:bg-white/10"
+              }`}
+            >
               {paperUrl ? (
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <CheckCircle2 size={32} className="text-green-400"/>
-                  <span className="text-green-400 text-sm font-bold">Dokumen Siap Dikirim</span>
-                  <span className="text-xs text-silver-shine font-normal">Klik area ini jika ingin mengganti file PDF</span>
-                </div>
+                <span className="flex flex-col items-center justify-center gap-2">
+                  <CheckCircle2 size={32} className="text-green-400" />
+                  <span className="text-sm font-bold text-green-400">
+                    Dokumen Siap Dikirim
+                  </span>
+                  <span className="text-xs font-normal text-silver-shine">
+                    Klik area ini jika ingin mengganti file PDF
+                  </span>
+                </span>
               ) : (
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <UploadCloud size={32} className="text-white"/>
-                  <span className="text-white text-sm font-bold">Pilih File PDF</span>
-                  <span className="text-xs text-silver-shine font-normal">Maksimal 5MB</span>
-                </div>
+                <span className="flex flex-col items-center justify-center gap-2">
+                  <UploadCloud size={32} className="text-white" />
+                  <span className="text-sm font-bold text-white">
+                    Pilih File PDF
+                  </span>
+                  <span className="text-xs font-normal text-silver-shine">
+                    Maksimal 5MB
+                  </span>
+                </span>
               )}
-            </div>
+            </button>
           )}
         </CldUploadWidget>
       </div>
 
       {errorMessage && (
-        <div className="bg-red-500/20 border border-red-500/30 p-4 rounded-xl flex items-start gap-3">
-          <AlertCircle size={20} className="text-red-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-100 font-semibold">{errorMessage}</p>
+        <div
+          role="alert"
+          className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/20 p-4"
+        >
+          <AlertCircle
+            size={20}
+            className="mt-0.5 shrink-0 text-red-400"
+          />
+          <p className="text-sm font-semibold text-red-100">
+            {errorMessage}
+          </p>
         </div>
       )}
 
-      <button 
+      <button
+        type="button"
         onClick={handleSubmit}
         disabled={isSubmitting || !paperUrl}
-        className={`flex items-center justify-center gap-2 w-full font-bold py-3.5 sm:py-4 rounded-xl text-sm transition-all shadow-lg ${
+        className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold shadow-lg transition-all sm:py-4 ${
           !paperUrl || isSubmitting
-            ? "bg-white/10 text-white/40 cursor-not-allowed"
+            ? "cursor-not-allowed bg-white/10 text-white/40"
             : "bg-sunlight-orange text-blue-marine hover:bg-yellow-400"
         }`}
       >
