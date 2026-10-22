@@ -39,9 +39,9 @@ export default async function SubmissionPage() {
         </Link>
 
         <div className="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-3xl p-6 sm:p-12 shadow-2xl relative overflow-hidden w-full">
-          <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none hidden sm:block">
+          {/* <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none hidden sm:block">
             <FileText size={200} />
-          </div>
+          </div> */}
           
           <div className="relative z-10 text-center w-full">
             <UploadCloud size={64} className="text-sunlight-orange mx-auto mb-6" />
