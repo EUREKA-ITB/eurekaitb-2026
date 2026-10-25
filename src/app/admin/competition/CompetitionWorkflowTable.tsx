@@ -2,13 +2,26 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
+import { DownloadCloud, FileSpreadsheet } from "lucide-react";
 
 type SubmissionType = "fullPaper" | "poster" | "presentation";
 type UpdateTarget = "abstract" | "submission" | "result";
 
+type WorkflowMember = {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  isLeader: boolean;
+  photoUrl: string | null;
+};
+
 type WorkflowTeam = {
   id: string;
   teamName: string;
+  institutionName: string;
   compeType: string;
   abstractUrl: string | null;
   abstractStatus: string;
@@ -24,6 +37,7 @@ type WorkflowTeam = {
   presentationNotes: string | null;
   resultStatus: string;
   resultNotes: string | null;
+  members: WorkflowMember[];
 };
 
 const submissionLabels: Record<SubmissionType, string> = {
@@ -78,6 +92,34 @@ function competitionLabel(compeType: string) {
   return normalized.replace(/-/g, " ");
 }
 
+function safeName(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[^a-zA-Z0-9_-]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 80) || "file";
+}
+
+function extensionFromUrl(url: string) {
+  try {
+    const pathname = new URL(url).pathname;
+    const extension = pathname.split(".").pop()?.toLowerCase() ?? "";
+    return /^[a-z0-9]{1,8}$/.test(extension) ? extension : "bin";
+  } catch {
+    return "bin";
+  }
+}
+
+function csvValue(value: unknown) {
+  let text = value == null ? "" : String(value);
+
+  if (/^[\t\r ]*[=+\-@]/.test(text)) {
+    text = `'${text}`;
+  }
+
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
 function getSubmissionUrl(team: WorkflowTeam, type: SubmissionType) {
   if (type === "poster") return team.posterUrl;
   if (type === "presentation") return team.presentationUrl;
@@ -105,6 +147,7 @@ export default function CompetitionWorkflowTable({
   const [teams, setTeams] = useState(initialTeams);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [isZipping, setIsZipping] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [competitionFilter, setCompetitionFilter] = useState("all");
@@ -121,7 +164,13 @@ export default function CompetitionWorkflowTable({
 
       const matchesSearch =
         !normalizedSearch ||
-        team.teamName.toLowerCase().includes(normalizedSearch);
+        team.teamName.toLowerCase().includes(normalizedSearch) ||
+        team.institutionName.toLowerCase().includes(normalizedSearch) ||
+        team.members.some(
+          (member) =>
+            member.fullName.toLowerCase().includes(normalizedSearch) ||
+            member.email.toLowerCase().includes(normalizedSearch)
+        );
 
       const matchesStatus =
         statusFilter === "all" ||
@@ -240,13 +289,181 @@ export default function CompetitionWorkflowTable({
     }
   }
 
+  function exportCSV() {
+    if (visibleTeams.length === 0) {
+      toast.error("Tidak ada tim pada filter yang dipilih.");
+      return;
+    }
+
+    const headers = [
+      "Team ID",
+      "Nama Tim",
+      "Institusi",
+      "Kompetisi",
+      "Nama Anggota",
+      "Email Anggota",
+      "Nomor Telepon Anggota",
+      "Status Abstrak",
+      "Link Abstrak",
+      "Status Pembayaran",
+      "Status Full Paper / Report",
+      "Link Full Paper / Report",
+      "Catatan Full Paper / Report",
+      "Status Poster",
+      "Link Poster",
+      "Catatan Poster",
+      "Status Presentasi",
+      "Link Presentasi",
+      "Catatan Presentasi",
+      "Hasil Akhir",
+      "Catatan Hasil Akhir",
+    ];
+
+    const rows = visibleTeams.map((team) => [
+      team.id,
+      team.teamName,
+      team.institutionName,
+      competitionLabel(team.compeType),
+      team.members.map((member) => member.fullName).join("; "),
+      team.members.map((member) => member.email).join("; "),
+      team.members.map((member) => member.phoneNumber).join("; "),
+      labelForStatus(team.abstractStatus),
+      team.abstractUrl ?? "",
+      labelForStatus(team.statusPayment),
+      labelForStatus(team.submissionStatus),
+      team.fullPaperUrl ?? "",
+      team.submissionNotes ?? "",
+      labelForStatus(team.posterStatus),
+      team.posterUrl ?? "",
+      team.posterNotes ?? "",
+      labelForStatus(team.presentationStatus),
+      team.presentationUrl ?? "",
+      team.presentationNotes ?? "",
+      labelForStatus(team.resultStatus),
+      team.resultNotes ?? "",
+    ]);
+
+    const csv = [
+      headers.map(csvValue).join(","),
+      ...rows.map((row) => row.map(csvValue).join(",")),
+    ].join("\r\n");
+
+    const blob = new Blob(["\uFEFF", csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const filterName = safeName(
+      `${competitionFilter}_${statusFilter}_${search || "semua"}`
+    );
+
+    link.href = url;
+    link.download = `EUREKA2026_Competition_${filterName}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    toast.success(`CSV ${visibleTeams.length} tim berhasil diunduh.`);
+  }
+
+  async function exportZIP() {
+    if (visibleTeams.length === 0) {
+      toast.error("Tidak ada tim pada filter yang dipilih.");
+      return;
+    }
+
+    setIsZipping(true);
+    const toastId = toast.loading(
+      `Menyiapkan berkas dari ${visibleTeams.length} tim...`
+    );
+
+    try {
+      const zip = new JSZip();
+      const errors: string[] = [];
+      const downloads: Promise<void>[] = [];
+
+      for (const team of visibleTeams) {
+        const teamFolderName = `${safeName(team.teamName)}_${team.id.slice(0, 8)}`;
+        const teamFolder = zip.folder(teamFolderName);
+
+        const files: Array<{ label: string; url: string | null }> = [
+          { label: "Abstrak", url: team.abstractUrl },
+          { label: "Full_Paper_Report", url: team.fullPaperUrl },
+          { label: "Poster", url: team.posterUrl },
+          { label: "Presentasi", url: team.presentationUrl },
+          ...team.members.map((member, index) => ({
+            label: `Foto_Anggota_${index + 1}_${safeName(member.fullName)}`,
+            url: member.photoUrl,
+          })),
+        ];
+
+        for (const file of files) {
+          if (!file.url) continue;
+
+          downloads.push(
+            fetch(file.url)
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error(`HTTP ${response.status}`);
+                }
+                return response.blob();
+              })
+              .then((blob) => {
+                const extension = extensionFromUrl(file.url as string);
+                teamFolder?.file(`${safeName(file.label)}.${extension}`, blob);
+              })
+              .catch(() => {
+                errors.push(`${team.teamName}: ${file.label} (${file.url})`);
+              })
+          );
+        }
+      }
+
+      await Promise.all(downloads);
+
+      if (downloads.length === 0) {
+        toast.error("Tidak ada file yang bisa dimasukkan ke ZIP.", {
+          id: toastId,
+        });
+        return;
+      }
+
+      if (errors.length > 0) {
+        zip.file("GAGAL_DIUNDUH.txt", errors.join("\r\n"));
+      }
+
+      const content = await zip.generateAsync({ type: "blob" });
+      const filterName = safeName(
+        `${competitionFilter}_${statusFilter}_${search || "semua"}`
+      );
+
+      saveAs(content, `EUREKA2026_Competition_${filterName}.zip`);
+
+      if (errors.length > 0) {
+        toast.success(
+          `ZIP selesai. ${errors.length} file gagal diambil; cek GAGAL_DIUNDUH.txt.`,
+          { id: toastId, duration: 6000 }
+        );
+      } else {
+        toast.success(`ZIP ${visibleTeams.length} tim berhasil diunduh.`, {
+          id: toastId,
+        });
+      }
+    } catch {
+      toast.error("Gagal membuat file ZIP.", { id: toastId });
+    } finally {
+      setIsZipping(false);
+    }
+  }
+
   function renderSubmission(team: WorkflowTeam, type: SubmissionType) {
     const url = getSubmissionUrl(team, type);
     const status = getSubmissionStatus(team, type);
     const noteKey = `${team.id}:${type}`;
     const savedNotes = getSubmissionNotes(team, type);
     const currentNotes = notes[noteKey] ?? savedNotes ?? "";
-    const requiresNote = currentNotes.trim().length > 0;
+    const hasNote = currentNotes.trim().length > 0;
     const isBusy = busyId === team.id;
 
     return (
@@ -303,7 +520,7 @@ export default function CompetitionWorkflowTable({
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
-            disabled={isBusy || !url || !requiresNote}
+            disabled={isBusy || !url || !hasNote}
             onClick={() => update(team, "submission", "revision", type)}
             className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-300 transition-colors hover:bg-amber-500/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -319,7 +536,7 @@ export default function CompetitionWorkflowTable({
           </button>
           <button
             type="button"
-            disabled={isBusy || !url || !requiresNote}
+            disabled={isBusy || !url || !hasNote}
             onClick={() => update(team, "submission", "rejected", type)}
             className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-300 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -551,7 +768,7 @@ export default function CompetitionWorkflowTable({
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:p-5">
           <p className="text-xs font-bold uppercase tracking-wider text-silver-shine">
             Total tim
@@ -586,13 +803,13 @@ export default function CompetitionWorkflowTable({
         <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-3">
           <label className="min-w-0">
             <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-silver-shine">
-              Cari tim
+              Cari tim atau anggota
             </span>
             <input
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Ketik nama tim..."
+              placeholder="Ketik nama tim, institusi, atau anggota..."
               className="w-full min-w-0 rounded-xl border border-white/10 bg-[#0b1022] px-4 py-3 text-sm text-white outline-none transition-colors placeholder:text-silver-shine/60 focus:border-sunlight-orange"
             />
           </label>
@@ -640,9 +857,34 @@ export default function CompetitionWorkflowTable({
           </label>
         </div>
 
-        <p className="mt-4 text-xs text-silver-shine">
-          Menampilkan {visibleTeams.length} dari {teams.length} tim.
-        </p>
+        <div className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-silver-shine">
+            Menampilkan {visibleTeams.length} dari {teams.length} tim. CSV dan
+            ZIP mengikuti hasil filter ini.
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={exportZIP}
+              disabled={isZipping || visibleTeams.length === 0}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <DownloadCloud size={16} />
+              {isZipping ? "Menyiapkan ZIP..." : "ZIP berkas"}
+            </button>
+
+            <button
+              type="button"
+              onClick={exportCSV}
+              disabled={visibleTeams.length === 0}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <FileSpreadsheet size={16} />
+              CSV data
+            </button>
+          </div>
+        </div>
       </div>
 
       {visibleTeams.length === 0 ? (
@@ -659,7 +901,7 @@ export default function CompetitionWorkflowTable({
               key={team.id}
               className="min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-lg shadow-black/10"
             >
-              <div className="flex flex-col gap-4 border-b border-white/10 p-4 sm:p-5 md:flex-row md:items-start md:justify-between">
+              <div className="flex flex-col gap-4 border-b border-white/10 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wider text-sunlight-orange">
                     {competitionLabel(team.compeType)}
@@ -667,8 +909,8 @@ export default function CompetitionWorkflowTable({
                   <h2 className="mt-1 break-words text-lg font-bold text-white sm:text-xl">
                     {team.teamName}
                   </h2>
-                  <p className="mt-1 break-all text-[11px] text-silver-shine">
-                    ID: {team.id}
+                  <p className="mt-1 break-words text-sm text-silver-shine">
+                    {team.institutionName}
                   </p>
                 </div>
 
@@ -678,7 +920,7 @@ export default function CompetitionWorkflowTable({
                     setSelectedTeamId(team.id);
                     setError("");
                   }}
-                  className="inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-blue-400/30 bg-blue-500/10 px-4 py-2.5 text-sm font-bold text-blue-300 transition-colors hover:bg-blue-500/20 md:w-auto"
+                  className="inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-blue-400/30 bg-blue-500/10 px-4 py-2.5 text-sm font-bold text-blue-300 transition-colors hover:bg-blue-500/20 sm:w-auto"
                 >
                   Lihat detail
                 </button>
@@ -721,6 +963,7 @@ export default function CompetitionWorkflowTable({
                 <span className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-silver-shine">
                   Full paper: {labelForStatus(team.submissionStatus)}
                 </span>
+
                 {team.compeType.replace(/_/g, "-") === "science-project" && (
                   <>
                     <span className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-silver-shine">
@@ -763,8 +1006,8 @@ export default function CompetitionWorkflowTable({
                 >
                   {selectedTeam.teamName}
                 </h2>
-                <p className="mt-1 break-all text-xs text-silver-shine">
-                  ID: {selectedTeam.id}
+                <p className="mt-1 break-words text-sm text-silver-shine">
+                  {selectedTeam.institutionName}
                 </p>
               </div>
 
@@ -777,9 +1020,7 @@ export default function CompetitionWorkflowTable({
               </button>
             </header>
 
-            <div className="space-y-5 p-4 sm:p-6">
-              {renderTeamDetails(selectedTeam)}
-            </div>
+            <div className="space-y-5 p-4 sm:p-6">{renderTeamDetails(selectedTeam)}</div>
           </section>
         </div>
       )}
