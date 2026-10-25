@@ -1,5 +1,5 @@
+import { and, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { teams } from "@/db/schema";
 import { getOwnedTeam } from "@/lib/owned-team";
@@ -24,12 +24,56 @@ const submissionFields = {
   },
 };
 
-export async function POST(req: Request) {
-  try {
-    const body: unknown = await req.json();
+const validStatuses = [
+  "not_submitted",
+  "submitted",
+  "revision",
+  "accepted",
+  "rejected",
+] as const;
 
-    if (!body || typeof body !== "object") {
-      return NextResponse.json({ error: "Data submission tidak valid." }, { status: 400 });
+type SubmissionStatus = (typeof validStatuses)[number];
+
+function isSubmissionType(value: unknown): value is SubmissionType {
+  return (
+    value === "fullPaper" ||
+    value === "poster" ||
+    value === "presentation"
+  );
+}
+
+function isSubmissionStatus(value: unknown): value is SubmissionStatus {
+  return (
+    typeof value === "string" &&
+    validStatuses.includes(value as SubmissionStatus)
+  );
+}
+
+function getLockedMessage(status: SubmissionStatus) {
+  if (status === "submitted") {
+    return "Dokumen sudah dikirim dan sedang diperiksa. Tunggu hasil pemeriksaan admin.";
+  }
+
+  if (status === "accepted") {
+    return "Dokumen sudah diterima dan tidak bisa diubah.";
+  }
+
+  if (status === "rejected") {
+    return "Dokumen berstatus ditolak dan pengiriman dikunci. Hubungi admin jika perlu peninjauan.";
+  }
+
+  return "Status submission berubah. Muat ulang halaman sebelum mencoba lagi.";
+}
+
+export async function POST(request: Request) {
+  try {
+    const body: unknown = await request.json();
+
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json(
+        { error: "Data submission tidak valid." },
+        { status: 400 }
+      );
     }
 
     const payload = body as {
@@ -38,32 +82,44 @@ export async function POST(req: Request) {
       paperUrl?: unknown;
     };
 
-    const teamId = typeof payload.teamId === "string" ? payload.teamId.trim() : "";
+    const teamId =
+      typeof payload.teamId === "string" ? payload.teamId.trim() : "";
+    const paperUrl =
+      typeof payload.paperUrl === "string" ? payload.paperUrl.trim() : "";
     const type = payload.type;
-    const paperUrl = typeof payload.paperUrl === "string" ? payload.paperUrl.trim() : "";
 
-    if (
-      !teamId ||
-      !paperUrl ||
-      (type !== "fullPaper" && type !== "poster" && type !== "presentation")
-    ) {
-      return NextResponse.json({ error: "Data submission belum lengkap." }, { status: 400 });
+    if (!teamId || !paperUrl || !isSubmissionType(type)) {
+      return NextResponse.json(
+        { error: "Data submission belum lengkap." },
+        { status: 400 }
+      );
     }
 
     let parsedUrl: URL;
+
     try {
       parsedUrl = new URL(paperUrl);
     } catch {
-      return NextResponse.json({ error: "URL dokumen tidak valid." }, { status: 400 });
+      return NextResponse.json(
+        { error: "URL dokumen tidak valid." },
+        { status: 400 }
+      );
     }
 
     if (parsedUrl.protocol !== "https:") {
-      return NextResponse.json({ error: "URL dokumen harus menggunakan HTTPS." }, { status: 400 });
+      return NextResponse.json(
+        { error: "URL dokumen harus menggunakan HTTPS." },
+        { status: 400 }
+      );
     }
 
     const owned = await getOwnedTeam(teamId);
+
     if ("error" in owned) {
-      return NextResponse.json({ error: owned.error }, { status: owned.status });
+      return NextResponse.json(
+        { error: owned.error },
+        { status: owned.status }
+      );
     }
 
     const { team } = owned;
@@ -71,16 +127,25 @@ export async function POST(req: Request) {
     const isICC = team.compeType === "industrial-case";
 
     if (!isSPC && !isICC) {
-      return NextResponse.json({ error: "Kategori ini tidak memiliki tahap submission." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Kategori ini tidak memiliki tahap submission." },
+        { status: 403 }
+      );
     }
 
     if (isICC && type !== "fullPaper") {
-      return NextResponse.json({ error: "ICC hanya memiliki submission full report." }, { status: 400 });
+      return NextResponse.json(
+        { error: "ICC hanya memiliki submission full report." },
+        { status: 400 }
+      );
     }
 
     if (team.abstractStatus !== "passed" || team.statusPayment !== "verified") {
       return NextResponse.json(
-        { error: "Tim harus lolos abstrak dan pembayaran harus terverifikasi." },
+        {
+          error:
+            "Tim harus lolos abstrak dan pembayaran harus terverifikasi.",
+        },
         { status: 403 }
       );
     }
@@ -91,11 +156,15 @@ export async function POST(req: Request) {
         : new Date("2026-11-07T23:59:59+07:00");
 
     if (Date.now() > deadline.getTime()) {
-      return NextResponse.json({ error: "Batas waktu submission telah berakhir." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Batas waktu submission telah berakhir." },
+        { status: 403 }
+      );
     }
 
     const fields = submissionFields[type];
-    const [currentTeam] = await db
+
+    const [currentSubmission] = await db
       .select({
         url: fields.url,
         status: fields.status,
@@ -104,40 +173,105 @@ export async function POST(req: Request) {
       .where(eq(teams.id, team.id))
       .limit(1);
 
+    if (!currentSubmission) {
+      return NextResponse.json(
+        { error: "Data tim tidak ditemukan." },
+        { status: 404 }
+      );
+    }
+
     if (
-      currentTeam.status !== "not_submitted" &&
-      currentTeam.status !== "revision"
+      currentSubmission.status !== "not_submitted" &&
+      currentSubmission.status !== "revision"
     ) {
       return NextResponse.json(
-        { error: "Submission sedang diperiksa atau sudah dikunci." },
+        {
+          error: getLockedMessage(currentSubmission.status),
+          status: currentSubmission.status,
+          savedUrl: currentSubmission.url,
+        },
         { status: 409 }
       );
     }
 
-    await db
+    const urlField =
+      type === "fullPaper"
+        ? "fullPaperUrl"
+        : type === "poster"
+          ? "posterUrl"
+          : "presentationUrl";
+
+    const statusField =
+      type === "fullPaper"
+        ? "submissionStatus"
+        : type === "poster"
+          ? "posterStatus"
+          : "presentationStatus";
+
+    const notesField =
+      type === "fullPaper"
+        ? "submissionNotes"
+        : type === "poster"
+          ? "posterNotes"
+          : "presentationNotes";
+
+    const updated = await db
       .update(teams)
       .set({
-        [type === "fullPaper"
-          ? "fullPaperUrl"
-          : type === "poster"
-            ? "posterUrl"
-            : "presentationUrl"]: paperUrl,
-        [type === "fullPaper"
-          ? "submissionStatus"
-          : type === "poster"
-            ? "posterStatus"
-            : "presentationStatus"]: "submitted",
-        [type === "fullPaper"
-          ? "submissionNotes"
-          : type === "poster"
-            ? "posterNotes"
-            : "presentationNotes"]: null,
+        [urlField]: paperUrl,
+        [statusField]: "submitted",
+        [notesField]: null,
       })
-      .where(eq(teams.id, team.id));
+      .where(
+        and(
+          eq(teams.id, team.id),
+          inArray(fields.status, ["not_submitted", "revision"])
+        )
+      )
+      .returning({ id: teams.id });
 
-    return NextResponse.json({ success: true, status: "submitted" });
+    if (updated.length === 0) {
+      const [latestSubmission] = await db
+        .select({
+          url: fields.url,
+          status: fields.status,
+        })
+        .from(teams)
+        .where(eq(teams.id, team.id))
+        .limit(1);
+
+      const latestStatus = latestSubmission?.status;
+
+      if (latestStatus && isSubmissionStatus(latestStatus)) {
+        return NextResponse.json(
+          {
+            error: getLockedMessage(latestStatus),
+            status: latestStatus,
+            savedUrl: latestSubmission.url,
+          },
+          { status: 409 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          error:
+            "Status submission berubah saat dokumen dikirim. Muat ulang halaman.",
+        },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      status: "submitted",
+    });
   } catch (error) {
     console.error("Submission API error:", error);
-    return NextResponse.json({ error: "Terjadi kesalahan server." }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Terjadi kesalahan server saat menyimpan submission." },
+      { status: 500 }
+    );
   }
 }
