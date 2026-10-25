@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/db";
-import { teams, users } from "@/db/schema";
+import { teamMembers, teams, users } from "@/db/schema";
 import CompetitionWorkflowTable from "./CompetitionWorkflowTable";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +25,10 @@ export default async function CompetitionWorkflowPage() {
     redirect("/dashboard");
   }
 
-  const rows = await db.select().from(teams);
+  const [rows, allMembers] = await Promise.all([
+    db.select().from(teams),
+    db.select().from(teamMembers),
+  ]);
 
   const initialTeams = rows
     .filter(
@@ -36,6 +39,7 @@ export default async function CompetitionWorkflowPage() {
     .map((team) => ({
       id: team.id,
       teamName: team.teamName,
+      institutionName: team.institutionName ?? "-",
       compeType: team.compeType,
       abstractUrl: team.abstractUrl,
       abstractStatus: team.abstractStatus,
@@ -51,6 +55,15 @@ export default async function CompetitionWorkflowPage() {
       presentationNotes: team.presentationNotes,
       resultStatus: team.resultStatus,
       resultNotes: team.resultNotes,
+      members: allMembers
+        .filter((member) => member.teamId === team.id)
+        .map((member) => ({
+          fullName: member.fullName,
+          email: member.email,
+          phoneNumber: member.phoneNumber,
+          isLeader: member.isLeader,
+          photoUrl: member.photoUrl,
+        })),
     }));
 
   return (
