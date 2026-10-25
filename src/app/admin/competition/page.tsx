@@ -54,24 +54,25 @@ export default async function CompetitionWorkflowPage() {
     }));
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-blue-marine px-4 pb-12 pt-24 text-white sm:px-8">
+    <main className="box-border min-h-screen overflow-x-hidden bg-blue-marine px-4 pb-12 pt-28 font-sans text-white sm:px-8">
       <div className="mx-auto w-full max-w-7xl">
-        <header className="mb-8 flex flex-col gap-3 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-sunlight-orange">
-              Admin · SPC & ICC
-            </p>
-            <h1 className="mt-2 text-2xl font-bold sm:text-3xl">
-              Seleksi dan Progres Kompetisi
+        <header className="mb-8 flex flex-col gap-5 border-b border-red-500/30 pb-6 md:flex-row md:items-end md:justify-between">
+          <div className="min-w-0">
+            <span className="mb-3 inline-flex rounded-full bg-red-500 px-3 py-1 text-xs font-bold uppercase tracking-widest text-white shadow-[0_0_15px_rgba(239,68,68,0.25)]">
+              Administrator Mode · SPC & ICC
+            </span>
+            <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
+              Progres Kompetisi
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-silver-shine">
-              Cari tim, tinjau abstrak dan submission, lalu tetapkan hasil akhir.
+              Tinjau abstrak dan berkas kompetisi, lalu tetapkan hasil akhir
+              setiap tim.
             </p>
           </div>
 
           <a
             href="/admin"
-            className="inline-flex w-fit rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10"
+            className="inline-flex w-fit shrink-0 items-center justify-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
           >
             Kembali ke Admin utama
           </a>
