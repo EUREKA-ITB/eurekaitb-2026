@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
 import {
@@ -18,8 +18,14 @@ type SubmissionStatus =
   | "accepted"
   | "rejected";
 
+interface CloudinaryUploadInfo {
+  secure_url?: string;
+  format?: string;
+  bytes?: number;
+}
+
 interface CloudinaryResult {
-  info?: string | { secure_url?: string };
+  info?: string | CloudinaryUploadInfo;
 }
 
 interface SubmissionResponse {
@@ -27,6 +33,8 @@ interface SubmissionResponse {
   status?: SubmissionStatus;
   savedUrl?: string | null;
 }
+
+const MAX_PDF_BYTES = 5 * 1024 * 1024;
 
 export default function SubmissionClient({
   teamId,
@@ -53,13 +61,30 @@ export default function SubmissionClient({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isDeadlinePassed, setIsDeadlinePassed] = useState(false);
 
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_PDF_PRESET;
   const spcDeadline = new Date("2026-10-23T23:59:59+07:00");
   const iccDeadline = new Date("2026-11-07T23:59:59+07:00");
   const deadline =
     compeType === "science-project" ? spcDeadline : iccDeadline;
-  const isDeadlinePassed = Date.now() > deadline.getTime();
+  const deadlineTimestamp = deadline.getTime();
   const isICC = compeType === "industrial-case";
+
+  useEffect(() => {
+    const checkDeadline = () => {
+      setIsDeadlinePassed(Date.now() > deadlineTimestamp);
+    };
+
+    const initialCheck = window.setTimeout(checkDeadline, 0);
+    const interval = window.setInterval(checkDeadline, 60_000);
+
+    return () => {
+      window.clearTimeout(initialCheck);
+      window.clearInterval(interval);
+    };
+  }, [deadlineTimestamp]);
+
 
   const handleSubmit = async () => {
     setErrorMessage(null);
@@ -107,9 +132,9 @@ export default function SubmissionClient({
       }
 
       setSubmissionStatus("submitted");
-      setSavedUrl(paperUrl);
+      setSavedUrl(responseData.savedUrl ?? paperUrl);
       setSubmissionNotes(null);
-      setPaperUrl(paperUrl);
+      setPaperUrl(responseData.savedUrl ?? paperUrl);
       setErrorMessage(null);
       router.refresh();
     } catch {
@@ -204,7 +229,7 @@ export default function SubmissionClient({
     );
   }
 
-  if (isDeadlinePassed) {
+  if (isDeadlinePassed && submissionStatus !== "revision") {
     return (
       <section className="mx-auto w-full max-w-2xl rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-left sm:p-6">
         <div className="flex items-start gap-3">
@@ -217,8 +242,8 @@ export default function SubmissionClient({
               Batas pengiriman sudah berakhir
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-silver-shine">
-              Submission baru atau revisi tidak dapat dikirim setelah batas
-              waktu pengumpulan.
+              Batas waktu reguler telah berakhir. Submission baru ditutup,
+              tetapi revisi yang diminta admin tetap dapat dikirim di bawah.
             </p>
           </div>
         </div>
@@ -264,7 +289,8 @@ export default function SubmissionClient({
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-silver-shine">
                 Perbaiki dokumen sesuai catatan di bawah, lalu unggah file PDF
-                revisi.
+                revisi. Revisi yang diminta admin tetap dapat dikirim meskipun deadline
+                reguler telah lewat.
               </p>
 
               {submissionNotes && (
@@ -301,60 +327,98 @@ export default function SubmissionClient({
         </h3>
 
         <p className="mb-6 text-xs leading-relaxed text-silver-shine">
-          Unggah dokumen PDF sesuai panduan kompetisi.
+          Unggah dokumen PDF sesuai panduan kompetisi. Ukuran maksimum 5 MB.
         </p>
 
-        <CldUploadWidget
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PDF_PRESET}
-          options={{
-            maxFiles: 1,
-            clientAllowedFormats: ["pdf"],
-            resourceType: "auto",
-          }}
-          onSuccess={(result: CloudinaryResult) => {
-            if (
-              typeof result.info === "object" &&
-              result.info?.secure_url
-            ) {
-              setPaperUrl(result.info.secure_url);
+        {uploadPreset ? (
+          <CldUploadWidget
+            uploadPreset={uploadPreset}
+            options={{
+              maxFiles: 1,
+              maxFileSize: MAX_PDF_BYTES,
+              clientAllowedFormats: ["pdf"],
+              resourceType: "auto",
+            }}
+            onSuccess={(result: CloudinaryResult) => {
+              const info =
+                typeof result.info === "object" ? result.info : undefined;
+              const url = info?.secure_url?.trim();
+              const format = info?.format?.toLowerCase();
+              const bytes = info?.bytes;
+
+              if (!url) {
+                setPaperUrl(null);
+                setErrorMessage(
+                  "Upload selesai tetapi URL file tidak diterima. Coba unggah ulang."
+                );
+                return;
+              }
+
+              if (format !== "pdf") {
+                setPaperUrl(null);
+                setErrorMessage("File yang diunggah harus berformat PDF.");
+                return;
+              }
+
+              if (
+                typeof bytes !== "number" ||
+                bytes <= 0 ||
+                bytes > MAX_PDF_BYTES
+              ) {
+                setPaperUrl(null);
+                setErrorMessage("Ukuran PDF harus lebih dari 0 dan maksimal 5 MB.");
+                return;
+              }
+
+              setPaperUrl(url);
               setErrorMessage(null);
-            }
-          }}
-        >
-          {({ open }) => (
-            <button
-              type="button"
-              onClick={() => open()}
-              className={`w-full cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors sm:p-8 ${
-                paperUrl
-                  ? "border-green-500/50 bg-green-500/5"
-                  : "border-white/20 bg-white/5 hover:bg-white/10"
-              }`}
-            >
-              {paperUrl ? (
-                <span className="flex flex-col items-center justify-center gap-2">
-                  <CheckCircle2 size={32} className="text-green-400" />
-                  <span className="text-sm font-bold text-green-400">
-                    PDF siap dikirim
+            }}
+          >
+            {({ open }) => (
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMessage(null);
+                  open();
+                }}
+                className={`w-full cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors sm:p-8 ${
+                  paperUrl
+                    ? "border-green-500/50 bg-green-500/5"
+                    : "border-white/20 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                {paperUrl ? (
+                  <span className="flex flex-col items-center justify-center gap-2">
+                    <CheckCircle2 size={32} className="text-green-400" />
+                    <span className="text-sm font-bold text-green-400">
+                      PDF siap dikirim
+                    </span>
+                    <span className="text-xs font-normal text-silver-shine">
+                      Klik area ini untuk memilih file PDF lain
+                    </span>
                   </span>
-                  <span className="text-xs font-normal text-silver-shine">
-                    Klik area ini untuk memilih file PDF lain
+                ) : (
+                  <span className="flex flex-col items-center justify-center gap-2">
+                    <UploadCloud size={32} className="text-white" />
+                    <span className="text-sm font-bold text-white">
+                      Pilih file PDF
+                    </span>
+                    <span className="text-xs font-normal text-silver-shine">
+                      Maksimal 5 MB
+                    </span>
                   </span>
-                </span>
-              ) : (
-                <span className="flex flex-col items-center justify-center gap-2">
-                  <UploadCloud size={32} className="text-white" />
-                  <span className="text-sm font-bold text-white">
-                    Pilih file PDF
-                  </span>
-                  <span className="text-xs font-normal text-silver-shine">
-                    Maksimal 5MB
-                  </span>
-                </span>
-              )}
-            </button>
-          )}
-        </CldUploadWidget>
+                )}
+              </button>
+            )}
+          </CldUploadWidget>
+        ) : (
+          <p
+            role="alert"
+            className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
+          >
+            Portal upload belum dikonfigurasi. Hubungi panitia.
+          </p>
+        )}
       </div>
 
       {errorMessage && (
@@ -366,16 +430,18 @@ export default function SubmissionClient({
             size={20}
             className="mt-0.5 shrink-0 text-red-400"
           />
-          <p className="text-sm font-semibold text-red-100">{errorMessage}</p>
+          <p className="break-words text-sm font-semibold text-red-100">
+            {errorMessage}
+          </p>
         </div>
       )}
 
       <button
         type="button"
         onClick={handleSubmit}
-        disabled={isSubmitting || !paperUrl}
+        disabled={isSubmitting || !paperUrl || !uploadPreset}
         className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold shadow-lg transition-all sm:py-4 ${
-          !paperUrl || isSubmitting
+          !paperUrl || isSubmitting || !uploadPreset
             ? "cursor-not-allowed bg-white/10 text-white/40"
             : "bg-sunlight-orange text-blue-marine hover:bg-yellow-400"
         }`}
