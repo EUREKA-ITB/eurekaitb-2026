@@ -242,34 +242,12 @@ export default function SubmissionClient({
               Batas pengiriman sudah berakhir
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-silver-shine">
-              Batas waktu reguler telah berakhir. Submission baru ditutup,
-              tetapi revisi yang diminta admin tetap dapat dikirim di bawah.
+              Batas waktu reguler telah berakhir. Submission baru tidak dapat dikirim.
             </p>
           </div>
         </div>
 
-        {submissionStatus === "revision" && submissionNotes && (
-          <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4">
-            <p className="mb-1 text-xs font-bold uppercase tracking-wider text-yellow-400">
-              Catatan revisi admin
-            </p>
-            <p className="whitespace-pre-wrap break-words text-sm text-white">
-              {submissionNotes}
-            </p>
-          </div>
-        )}
 
-        {savedUrl && (
-          <a
-            href={savedUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-4 inline-flex max-w-full items-center gap-2 break-all rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
-          >
-            <FileText size={18} className="shrink-0 text-sunlight-orange" />
-            Lihat dokumen yang tersimpan
-          </a>
-        )}
       </section>
     );
   }
