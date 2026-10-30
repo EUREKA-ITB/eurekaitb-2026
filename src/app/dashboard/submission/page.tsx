@@ -37,14 +37,17 @@ export default async function SubmissionPage() {
     redirect("/dashboard/register-lomba");
   }
 
-  const isVerified = team.statusPayment === "verified";
-  const isFinalist = team.abstractStatus === "passed" && isVerified;
+  const compeType = team.compeType.replace(/_/g, "-");
+  const isSupportedCompetition =
+    compeType === "science-project" || compeType === "industrial-case";
+  const isEligible =
+    team.abstractStatus === "passed" && team.statusPayment === "verified";
 
-  if (!isFinalist) {
+  if (!isSupportedCompetition || !isEligible) {
     redirect("/dashboard");
   }
 
-  const compeType = team.compeType.replace(/_/g, "-");
+  const isICC = compeType === "industrial-case";
 
   return (
     <div className="box-border min-h-screen w-full overflow-x-hidden bg-blue-marine p-4 font-sans text-white sm:p-8 md:p-12">
@@ -65,22 +68,17 @@ export default async function SubmissionPage() {
             />
 
             <h1 className="mb-4 font-display text-2xl font-bold text-white sm:text-4xl">
-              {compeType === "industrial-case"
-                ? "Full Report Submission"
-                : "Full Paper Submission"}
+              {isICC ? "Full Report Submission" : "Full Paper Submission"}
             </h1>
 
             <p className="mx-auto mb-10 max-w-2xl text-sm leading-relaxed text-silver-shine">
-              Tim{" "}
-              <span className="font-bold text-white">{team.teamName}</span>{" "}
+              Tim <span className="font-bold text-white">{team.teamName}</span>{" "}
               telah memenuhi syarat untuk mengirim{" "}
-              <strong>
-                {compeType === "industrial-case" ? "Full Report" : "Full Paper"}
-              </strong>
-              .
+              <strong>{isICC ? "Full Report" : "Full Paper"}</strong>.
             </p>
 
             <SubmissionClient
+              key={`${team.id}:${team.submissionStatus}:${team.fullPaperUrl ?? ""}:${team.submissionNotes ?? ""}`}
               teamId={team.id}
               compeType={compeType}
               initialUrl={team.fullPaperUrl || null}

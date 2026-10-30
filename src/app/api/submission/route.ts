@@ -10,17 +10,14 @@ const submissionFields = {
   fullPaper: {
     url: teams.fullPaperUrl,
     status: teams.submissionStatus,
-    notes: teams.submissionNotes,
   },
   poster: {
     url: teams.posterUrl,
     status: teams.posterStatus,
-    notes: teams.posterNotes,
   },
   presentation: {
     url: teams.presentationUrl,
     status: teams.presentationStatus,
-    notes: teams.presentationNotes,
   },
 };
 
@@ -65,9 +62,58 @@ function getLockedMessage(status: SubmissionStatus) {
   return "Status submission berubah. Muat ulang halaman sebelum mencoba lagi.";
 }
 
+function isCloudinaryPdfUrl(value: string, cloudName: string) {
+  let parsedUrl: URL;
+
+  try {
+    parsedUrl = new URL(value);
+  } catch {
+    return false;
+  }
+
+  if (
+    parsedUrl.protocol !== "https:" ||
+    parsedUrl.hostname !== "res.cloudinary.com" ||
+    parsedUrl.port !== "" ||
+    parsedUrl.username !== "" ||
+    parsedUrl.password !== "" ||
+    parsedUrl.search !== "" ||
+    parsedUrl.hash !== ""
+  ) {
+    return false;
+  }
+
+  const segments = parsedUrl.pathname.split("/").filter(Boolean);
+
+  if (segments.length < 5) {
+    return false;
+  }
+
+  const [urlCloudName, resourceType, uploadAction, ...assetPath] = segments;
+
+  if (
+    urlCloudName !== cloudName ||
+    (resourceType !== "image" && resourceType !== "raw") ||
+    uploadAction !== "upload"
+  ) {
+    return false;
+  }
+
+  return assetPath.join("/").toLowerCase().endsWith(".pdf");
+}
+
 export async function POST(request: Request) {
   try {
-    const body: unknown = await request.json();
+    let body: unknown;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Format data submission tidak valid." },
+        { status: 400 }
+      );
+    }
 
     if (!body || typeof body !== "object" || Array.isArray(body)) {
       return NextResponse.json(
@@ -95,24 +141,6 @@ export async function POST(request: Request) {
       );
     }
 
-    let parsedUrl: URL;
-
-    try {
-      parsedUrl = new URL(paperUrl);
-    } catch {
-      return NextResponse.json(
-        { error: "URL dokumen tidak valid." },
-        { status: 400 }
-      );
-    }
-
-    if (parsedUrl.protocol !== "https:") {
-      return NextResponse.json(
-        { error: "URL dokumen harus menggunakan HTTPS." },
-        { status: 400 }
-      );
-    }
-
     const owned = await getOwnedTeam(teamId);
 
     if ("error" in owned) {
@@ -123,8 +151,9 @@ export async function POST(request: Request) {
     }
 
     const { team } = owned;
-    const isSPC = team.compeType === "science-project";
-    const isICC = team.compeType === "industrial-case";
+    const compeType = team.compeType.replace(/_/g, "-");
+    const isSPC = compeType === "science-project";
+    const isICC = compeType === "industrial-case";
 
     if (!isSPC && !isICC) {
       return NextResponse.json(
@@ -135,7 +164,7 @@ export async function POST(request: Request) {
 
     if (isICC && type !== "fullPaper") {
       return NextResponse.json(
-        { error: "ICC hanya memiliki submission full report." },
+        { error: "ICC hanya menerima submission Full Report." },
         { status: 400 }
       );
     }
@@ -151,14 +180,26 @@ export async function POST(request: Request) {
     }
 
     const deadline =
-      team.compeType === "science-project"
+      compeType === "science-project"
         ? new Date("2026-10-23T23:59:59+07:00")
         : new Date("2026-11-07T23:59:59+07:00");
 
-    if (Date.now() > deadline.getTime()) {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME?.trim();
+
+    if (!cloudName) {
       return NextResponse.json(
-        { error: "Batas waktu submission telah berakhir." },
-        { status: 403 }
+        { error: "Konfigurasi upload belum tersedia. Hubungi panitia." },
+        { status: 503 }
+      );
+    }
+
+    if (!isCloudinaryPdfUrl(paperUrl, cloudName)) {
+      return NextResponse.json(
+        {
+          error:
+            "File harus berupa PDF yang diunggah melalui portal Cloudinary resmi.",
+        },
+        { status: 400 }
       );
     }
 
@@ -194,6 +235,19 @@ export async function POST(request: Request) {
       );
     }
 
+    const isPastDeadline = Date.now() > deadline.getTime();
+
+    if (isPastDeadline && currentSubmission.status !== "revision") {
+      return NextResponse.json(
+        { error: "Batas waktu submission baru telah berakhir." },
+        { status: 403 }
+      );
+    }
+
+    const allowedStatuses: SubmissionStatus[] = isPastDeadline
+      ? ["revision"]
+      : ["not_submitted", "revision"];
+
     const urlField =
       type === "fullPaper"
         ? "fullPaperUrl"
@@ -225,7 +279,9 @@ export async function POST(request: Request) {
       .where(
         and(
           eq(teams.id, team.id),
-          inArray(fields.status, ["not_submitted", "revision"])
+          eq(teams.abstractStatus, "passed"),
+          eq(teams.statusPayment, "verified"),
+          inArray(fields.status, allowedStatuses)
         )
       )
       .returning({ id: teams.id });
@@ -256,7 +312,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Status submission berubah saat dokumen dikirim. Muat ulang halaman.",
+            "Status submission atau kelayakan tim berubah. Muat ulang halaman.",
         },
         { status: 409 }
       );
@@ -265,6 +321,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       status: "submitted",
+      savedUrl: paperUrl,
     });
   } catch (error) {
     console.error("Submission API error:", error);

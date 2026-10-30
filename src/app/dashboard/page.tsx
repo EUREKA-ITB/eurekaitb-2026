@@ -739,27 +739,29 @@ export default async function DashboardPage() {
                   </div>
                 )}
 
-                {(isSPC || isICC) && (
-                  <div className="lg:col-span-2 bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-6 sm:p-8 rounded-3xl backdrop-blur-sm relative overflow-hidden shadow-2xl text-center flex flex-col justify-center">
-                    <FileText size={40} className="text-sunlight-orange mx-auto mb-4" />
-                    <h2 className="font-display text-2xl font-bold text-white mb-2">
-                      Full Paper Submission Portal
+                {(isSPC || isICC) && abstractStatus === "passed" && (
+                  <div className="lg:col-span-2 min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-5 text-center shadow-2xl backdrop-blur-sm sm:p-8">
+                    <FileText size={40} className="mx-auto mb-4 text-sunlight-orange" />
+                    <h2 className="mb-2 font-display text-2xl font-bold text-white">
+                      {isICC ? "Full Report Submission Portal" : "Full Paper Submission Portal"}
                     </h2>
-                    <p className="text-sm text-silver-shine mb-6 max-w-lg mx-auto">
-                      Congratulations! You are officially registered as a Finalist. Please upload your Full Paper and presentation according to the Guidebook schedule.
+                    <p className="mx-auto mb-6 max-w-lg break-words text-sm text-silver-shine">
+                      {isICC
+                        ? "Tim Anda lolos seleksi abstrak. Silakan lanjutkan registrasi ulang dan kirim Full Report melalui portal submission sesuai jadwal yang berlaku."
+                        : "Tim Anda lolos seleksi abstrak. Silakan unggah Full Paper melalui portal submission sesuai jadwal yang berlaku."}
                     </p>
                     <Link
                       href="/dashboard/submission"
-                      className="inline-block bg-white/10 text-white font-bold px-8 py-3 rounded-xl text-sm transition-colors hover:bg-white/20 border border-white/20"
+                      className="inline-flex min-h-11 w-full max-w-lg items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-white/20"
                     >
-                      Open Submission Room
+                      {isICC ? "Buka Portal Full Report" : "Buka Portal Full Paper"}
                     </Link>
                   </div>
                 )}
               </div>
             )}
 
-            {isICC && isVerified && (
+            {isICC && isVerified && abstractStatus === "passed" && (
               <section
                 aria-labelledby="icc-casebook-title"
                 className="mb-8 w-full min-w-0 overflow-hidden rounded-3xl border border-sunlight-orange/30 bg-white/5 p-4 shadow-xl sm:p-6 lg:p-8"
