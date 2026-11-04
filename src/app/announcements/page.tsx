@@ -26,6 +26,37 @@ export default async function PublicAnnouncementsPage() {
           </div>
         </header>
 
+        {/* Hasil Babak Semifinal */}
+        <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl w-full box-border">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-sunlight-orange/20 text-sunlight-orange rounded-2xl border border-sunlight-orange/30">
+                <FileText size={24} />
+              </div>
+              <div>
+                <h2 className="font-display text-lg sm:text-xl font-bold text-white">HASIL BABAK SEMIFINAL PHYSICS OLYMPIAD</h2>
+                <p className="text-xs text-silver-shine">Pratinjau langsung atau unduh dokumen PDF di bawah ini.</p>
+              </div>
+            </div>
+            <a 
+              href="/po/res-semfi-po.pdf" 
+              download="Pengumuman-Hasil-Babak-Semifinal-Eureka2026.pdf"
+              className="inline-flex items-center justify-center gap-2 bg-sunlight-orange text-blue-marine px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold hover:bg-yellow-400 transition-all shadow-md w-full sm:w-auto shrink-0"
+            >
+              <Download size={16} /> Download PDF
+            </a>
+          </div>
+
+          {/* Responsive PDF Embed Container */}
+          <div className="w-full h-[500px] sm:h-[650px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden relative shadow-inner">
+            <iframe 
+              src="/po/res-semfi-po.pdf" 
+              title="Pengumuman Hasil Babak Semifinal"
+              className="w-full h-full border-0"
+            />
+          </div>
+        </div>
+
         {/* Kotak Khusus PDF Viewer Pengumuman Semifinal */}
         <div className="bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 rounded-3xl p-6 sm:p-8 mb-8 shadow-2xl w-full box-border">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 border-b border-white/10 pb-4">
