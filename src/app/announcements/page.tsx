@@ -50,7 +50,7 @@ export default async function PublicAnnouncementsPage() {
           {/* Responsive PDF Embed Container */}
           <div className="w-full h-[500px] sm:h-[650px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden relative shadow-inner">
             <iframe 
-              src="/po/res-semfi-po.pdf" 
+              src="/po/res-semfi.pdf" 
               title="Pengumuman Hasil Babak Semifinal"
               className="w-full h-full border-0"
             />
