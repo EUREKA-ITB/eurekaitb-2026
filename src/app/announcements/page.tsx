@@ -50,7 +50,7 @@ export default async function PublicAnnouncementsPage() {
           {/* Responsive PDF Embed Container */}
           <div className="w-full h-[500px] sm:h-[650px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden relative shadow-inner">
             <iframe 
-              src="/po/res-semfi-po.pdf" 
+              src="/po/res-semfi.pdf" 
               title="Pengumuman Hasil Babak Semifinal"
               className="w-full h-full border-0"
             />
@@ -65,7 +65,7 @@ export default async function PublicAnnouncementsPage() {
                 <FileText size={24} />
               </div>
               <div>
-                <h2 className="font-display text-lg sm:text-xl font-bold text-white">PENGUMUMAN SEMIFINAL PHYSICS OLYMPIAD</h2>
+                <h2 className="font-display text-lg sm:text-xl font-bold text-white">PENGUMUMAN BABAK PENYISIHAN PHYSICS OLYMPIAD</h2>
                 <p className="text-xs text-silver-shine">Pratinjau langsung atau unduh dokumen PDF di bawah ini.</p>
               </div>
             </div>
@@ -82,7 +82,7 @@ export default async function PublicAnnouncementsPage() {
           <div className="w-full h-[500px] sm:h-[650px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden relative shadow-inner">
             <iframe 
               src="/po/pengumuman-semifinal.pdf" 
-              title="Pengumuman Semifinal PDF"
+              title="Pengumuman Babak Penyisihan"
               className="w-full h-full border-0"
             />
           </div>
